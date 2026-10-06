@@ -1,0 +1,7 @@
+{# Small helpers. Use with: {% from "_macros.html" import mmss %} #}
+
+{# 192 -> "3:12", 3725 -> "62:05" #}
+{% macro mmss(seconds) -%}
+{%- set s = (seconds or 0) | int -%}
+{{ "%d:%02d" | format(s // 60, s % 60) }}
+{%- endmacro %}

@@ -1,0 +1,10 @@
+{# The translation popup. Included by passage.html and result.html; reader.js fills and positions it. #}
+<div id="tr-pop" hidden role="dialog" aria-live="polite"
+     class="absolute z-20 w-max min-w-44 max-w-[min(340px,calc(100vw-16px))] rounded-xl border border-line bg-white px-4 py-3 shadow-xl">
+  <div data-q class="text-right font-arabic text-2xl font-semibold" lang="ar" dir="rtl"></div>
+  <div data-a class="mt-1 mb-2 text-base" lang="ru"></div>
+  <div class="flex justify-between gap-4 text-xs text-muted">
+    <span data-src></span>
+    <a data-g target="_blank" rel="noopener" class="text-accent hover:underline">Google Translate ↗</a>
+  </div>
+</div>
