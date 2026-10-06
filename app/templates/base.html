@@ -1,0 +1,68 @@
+{#
+  base.html: the shared layout. Every other page starts with {% extends "base.html" %}
+  and fills in {% block content %}.
+
+  Context: user (optional). When present, the header shows the nav and "Log out".
+#}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Qiraa{% endblock %} · قراءة</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>ق</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+
+  {# Tailwind compiled in the browser. Fine for a personal app; it logs a "not for production" warning. #}
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Inter", system-ui, sans-serif;
+      --font-arabic: "Noto Naskh Arabic", "Geeza Pro", "Traditional Arabic", serif;
+      --color-paper: #f7f3ea;
+      --color-ink: #1f1b16;
+      --color-muted: #6f6759;
+      --color-line: #e5dccb;
+      --color-accent: #0f6b4f;
+      --color-accent-soft: #dcefe6;
+      --color-gold: #b97a1c;
+      --color-bad: #b23a2e;
+      --color-bad-soft: #f7e1dd;
+    }
+  </style>
+  <style>
+    /* Arabic words that reader.js made tappable */
+    .w { cursor: pointer; border-radius: 4px; transition: background .1s; }
+    .w:hover { background: #dcefe6; }
+    .w.on { background: #fbe7a6; }
+  </style>
+</head>
+<body class="min-h-screen bg-paper font-sans text-ink antialiased">
+  <header class="sticky top-0 z-40 border-b border-line bg-white/85 backdrop-blur">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+      <a href="/passages" class="flex items-center gap-2 font-semibold">
+        <span class="font-arabic text-2xl leading-none text-accent" lang="ar">قراءة</span>
+        <span>Qiraa</span>
+      </a>
+      {% if user %}
+      <nav class="flex items-center gap-5 text-sm">
+        <a href="/passages" class="hover:text-accent">Passages</a>
+        <a href="/profile" class="hover:text-accent">Profile</a>
+        <form method="post" action="/logout">
+          <button class="cursor-pointer text-muted hover:text-bad">Log out</button>
+        </form>
+      </nav>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 py-8">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>
