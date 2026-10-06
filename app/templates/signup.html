@@ -1,0 +1,37 @@
+{#
+  signup.html
+  Route: GET /signup (show the form), POST /signup (re-render it with an error)
+
+  Context (all optional):
+    error      e.g. "That username is taken."
+    username   refills the field after a failed attempt
+
+  Submits POST /signup with fields: username, password, password_confirm
+  The browser checks the basic rules below too, but the server must check them again:
+  anyone can send a POST without using this form.
+#}
+{% extends "base.html" %}
+{% block title %}Sign up{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-sm rounded-2xl border border-line bg-white p-6">
+  <h1 class="mb-4 text-2xl font-bold">Create account</h1>
+  {% if error %}<p class="mb-4 rounded-lg bg-bad-soft px-3 py-2 text-sm text-bad">{{ error }}</p>{% endif %}
+  <form method="post" action="/signup" class="space-y-4">
+    <label class="block text-sm text-muted">Username
+      <input name="username" value="{{ username or '' }}" autocomplete="username" required autofocus
+             pattern="[A-Za-z0-9_]{3,32}" title="3–32 Latin letters, digits or _"
+             class="mt-1 block w-full rounded-lg border border-line bg-paper px-3 py-2 text-ink focus:outline-2 focus:outline-accent">
+    </label>
+    <label class="block text-sm text-muted">Password
+      <input name="password" type="password" autocomplete="new-password" minlength="8" required
+             class="mt-1 block w-full rounded-lg border border-line bg-paper px-3 py-2 text-ink focus:outline-2 focus:outline-accent">
+    </label>
+    <label class="block text-sm text-muted">Repeat password
+      <input name="password_confirm" type="password" autocomplete="new-password" minlength="8" required
+             class="mt-1 block w-full rounded-lg border border-line bg-paper px-3 py-2 text-ink focus:outline-2 focus:outline-accent">
+    </label>
+    <button class="w-full cursor-pointer rounded-xl bg-accent px-5 py-2.5 font-semibold text-white hover:brightness-110">Sign up</button>
+  </form>
+  <p class="mt-4 text-sm text-muted">Have an account? <a href="/login" class="text-accent hover:underline">Log in</a></p>
+</div>
+{% endblock %}

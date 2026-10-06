@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     database_url: str = f"sqlite:///{BASE_DIR / 'dev.db'}"
     migration_database_url: str | None = None
 
+    secure_cookies: bool = False
+    session_days: int = 30
+    app_timezone: str = "Asia/Tashkent"
+    allow_signup: bool = True
+
     @property
     def sqlalchemy_url(self) -> str:
         return to_sqlalchemy_url(self.database_url)

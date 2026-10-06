@@ -1,9 +1,14 @@
+from datetime import UTC, date, datetime
 from typing import ClassVar
 
 from sqlalchemy import (
     JSON,
+    CheckConstraint,
+    Date,
+    DateTime,
     ForeignKey,
     Index,
+    Integer,
     MetaData,
     String,
     Text,
@@ -11,6 +16,10 @@ from sqlalchemy import (
     column,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+
+def utcnow() -> datetime:
+    return datetime.now(UTC)
 
 
 class Base(DeclarativeBase):
@@ -23,6 +32,40 @@ class Base(DeclarativeBase):
             "pk": "pk_%(table_name)s",
         }
     )
+
+
+class User(Base):
+    __tablename__: str = "users"
+    __table_args__: tuple[CheckConstraint, ...] = (
+        CheckConstraint("username = lower(username)", name="username_lowercase"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(String(32), unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(String(255))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow
+    )
+    current_streak: Mapped[int] = mapped_column(Integer, server_default="0")
+    longest_streak: Mapped[int] = mapped_column(Integer, server_default="0")
+    last_active_on: Mapped[date | None] = mapped_column(Date, default=None)
+
+    sessions: Mapped[list["UserSession"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", passive_deletes=True
+    )
+
+
+class UserSession(Base):
+    __tablename__: str = "sessions"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    user: Mapped[User] = relationship(back_populates="sessions")
 
 
 class Passage(Base):

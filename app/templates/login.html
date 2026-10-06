@@ -1,0 +1,32 @@
+{#
+  login.html
+  Route: GET /login (show the form), POST /login (re-render it with an error)
+
+  Context (all optional):
+    error      message to show, e.g. "Wrong username or password."
+    username   refills the field after a failed attempt
+    next       where to go after logging in, e.g. "/profile" (default "/passages")
+
+  Submits POST /login with fields: username, password, next
+#}
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-sm rounded-2xl border border-line bg-white p-6">
+  <h1 class="mb-4 text-2xl font-bold">Log in</h1>
+  {% if error %}<p class="mb-4 rounded-lg bg-bad-soft px-3 py-2 text-sm text-bad">{{ error }}</p>{% endif %}
+  <form method="post" action="/login" class="space-y-4">
+    <input type="hidden" name="next" value="{{ next or '/passages' }}">
+    <label class="block text-sm text-muted">Username
+      <input name="username" value="{{ username or '' }}" autocomplete="username" required autofocus
+             class="mt-1 block w-full rounded-lg border border-line bg-paper px-3 py-2 text-ink focus:outline-2 focus:outline-accent">
+    </label>
+    <label class="block text-sm text-muted">Password
+      <input name="password" type="password" autocomplete="current-password" required
+             class="mt-1 block w-full rounded-lg border border-line bg-paper px-3 py-2 text-ink focus:outline-2 focus:outline-accent">
+    </label>
+    <button class="w-full cursor-pointer rounded-xl bg-accent px-5 py-2.5 font-semibold text-white hover:brightness-110">Log in</button>
+  </form>
+  <p class="mt-4 text-sm text-muted">No account? <a href="/signup" class="text-accent hover:underline">Sign up</a></p>
+</div>
+{% endblock %}
