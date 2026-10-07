@@ -1,32 +1,31 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Form, Request
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Form, HTTPException, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
+from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.db import DB
-from app.deps import MaybeUser
+from app.deps import CurrentUser, MaybeUser
 from app.models import User
+from app.redirects import safe_next
 from app.services import auth
-from app.templating import templates
+from app.templating import render
+from app.views import LoginPage, ProfilePage, ProfileStats, SignupPage
 
-router = APIRouter()
-
-
-def _safe_next(next_url: str | None) -> str:
-    if next_url and next_url.startswith("/") and not next_url.startswith("//"):
-        return next_url
-    return "/"
+router = APIRouter(tags=["auth"])
 
 
-def _login_response(db: DB, user: User, next_url: str = "/") -> RedirectResponse:
+def _login_response(
+    db: Session, user: User, next_url: str | None = None
+) -> RedirectResponse:
     token = auth.create_session(db, user)
     settings = get_settings()
-    response = RedirectResponse(_safe_next(next_url), status_code=303)
+    response = RedirectResponse(safe_next(next_url), status_code=303)
     response.set_cookie(
         auth.SESSION_COOKIE,
         token,
-        max_age=settings.session_days * 86400,
+        max_age=settings.session_days * 24 * 60 * 60,
         httponly=True,
         secure=settings.secure_cookies,
         samesite="lax",
@@ -34,75 +33,108 @@ def _login_response(db: DB, user: User, next_url: str = "/") -> RedirectResponse
     return response
 
 
-@router.get("/signup")
-def signup_page(request: Request, user: MaybeUser):
-    if user:
-        return RedirectResponse("/", status_code=303)
-
-    return templates.TemplateResponse(
-        request,
-        "signup.html",
-        status_code=200,
-    )
+def _require_signup_open() -> None:
+    if not get_settings().allow_signup:
+        raise HTTPException(403, "Sign-ups are closed.")
 
 
-@router.post("/signup")
+@router.get("/signup", response_model=None)
+def signup_page(request: Request, user: MaybeUser) -> HTMLResponse | RedirectResponse:
+    if user is not None:
+        return RedirectResponse("/passages", status_code=303)
+
+    _require_signup_open()
+
+    ctx: SignupPage = {"user": None, "username": None, "error": None}
+    return render(request, "signup.html", ctx)
+
+
+@router.post("/signup", response_model=None)
 def signup(
     request: Request,
     db: DB,
     username: Annotated[str, Form()],
     password: Annotated[str, Form()],
     password_confirm: Annotated[str, Form()],
-):
+) -> HTMLResponse | RedirectResponse:
+    _require_signup_open()
+
     try:
         user = auth.register(db, username, password, password_confirm)
     except auth.AuthError as exc:
-        return templates.TemplateResponse(
-            request,
-            "signup.html",
-            {"error": str(exc), "username": username},
-            status_code=400,
-        )
+        ctx: SignupPage = {"user": None, "username": username, "error": str(exc)}
+        return render(request, "signup.html", ctx, status_code=400)
+
     return _login_response(db, user)
 
 
-@router.get("/login")
-def login_page(request: Request, user: MaybeUser, next: str = "/"):
-    if user:
-        return RedirectResponse(_safe_next(next), status_code=303)
+@router.get("/login", response_model=None)
+def login_page(
+    request: Request, user: MaybeUser, next: str = "/passages"
+) -> HTMLResponse | RedirectResponse:
+    if user is not None:
+        return RedirectResponse(safe_next(next), status_code=303)
 
-    return templates.TemplateResponse(
-        request,
-        "login.html",
-        {
-            "next": next,
-        },
-    )
+    ctx: LoginPage = {
+        "user": None,
+        "username": None,
+        "error": None,
+        "next": safe_next(next),
+    }
+    return render(request, "login.html", ctx)
 
 
-@router.post("/login")
+@router.post("/login", response_model=None)
 def login(
     request: Request,
     db: DB,
     username: Annotated[str, Form()],
     password: Annotated[str, Form()],
-    next: Annotated[str, Form()] = "/",
-):
+    next: Annotated[str, Form()] = "/passages",
+) -> HTMLResponse | RedirectResponse:
     try:
         user = auth.authenticate(db, username, password)
     except auth.AuthError as exc:
-        return templates.TemplateResponse(
-            request,
-            "login.html",
-            {"error": str(exc), "username": username, "next": next},
-            status_code=400,
-        )
+        ctx: LoginPage = {
+            "user": None,
+            "username": username,
+            "error": str(exc),
+            "next": safe_next(next),
+        }
+        return render(request, "login.html", ctx, status_code=400)
+
     return _login_response(db, user, next)
 
 
 @router.post("/logout")
-def logout(request: Request, db: DB):
+def logout(request: Request, db: DB) -> RedirectResponse:
     auth.destroy_session(db, request.cookies.get(auth.SESSION_COOKIE))
+    response = RedirectResponse("/login", status_code=303)
+    response.delete_cookie(auth.SESSION_COOKIE)
+    return response
+
+
+@router.post("/account/delete", response_model=None)
+def delete_account(
+    request: Request, db: DB, user: CurrentUser, password: Annotated[str, Form()]
+) -> HTMLResponse | RedirectResponse:
+    try:
+        auth.delete_account(db, user, password)
+    except auth.AuthError as exc:
+        # TODO: step 6: use the real profile data here (profile_context), not placeholders
+        ctx: ProfilePage = {
+            "user": user,
+            "streak": 0,
+            "longest_streak": 0,
+            "stats": ProfileStats(
+                attempts=0, answered=0, accuracy=None, passages_done=0, passages_total=0
+            ),
+            "recent": [],
+            "calendar": None,
+            "delete_error": str(exc),
+        }
+        return render(request, "profile.html", ctx, status_code=400)
+
     response = RedirectResponse("/login", status_code=303)
     response.delete_cookie(auth.SESSION_COOKIE)
     return response

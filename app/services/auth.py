@@ -97,3 +97,11 @@ def destroy_session(db: Session, token: str | None) -> None:
             delete(UserSession).where(UserSession.token_hash == hash_token(token))
         )
         db.commit()
+
+
+def delete_account(db: Session, user: User, password: str) -> None:
+    if not verify_password(user.password_hash, password):
+        raise AuthError("Wrong password.")
+
+    db.delete(user)
+    db.commit()

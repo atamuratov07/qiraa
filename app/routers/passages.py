@@ -1,47 +1,55 @@
+from datetime import UTC, datetime
+
 from fastapi import APIRouter, HTTPException, Request
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 from app.db import DB
 from app.deps import CurrentUser
-from app.models import Passage, Question
-from app.templating import templates
+from app.services import attempts
+from app.templating import render
+from app.views import PassagesPage, PassageStartPage
 
 router = APIRouter(tags=["passages"])
 
 
 @router.get("/passages")
-def passages(request: Request, db: DB, user: CurrentUser):
-    passages = db.scalars(select(Passage).order_by(Passage.level, Passage.title)).all()
-
-    return templates.TemplateResponse(
-        request,
-        "passages.html",
-        {
-            "user": user,
-            "streak": 0,
-            "passages": passages,
-        },
-    )
+def passages(request: Request, db: DB, user: CurrentUser) -> HTMLResponse:
+    ctx: PassagesPage = {
+        "user": user,
+        "streak": 0,  # TODO: step 6
+        "passages": attempts.passage_cards(db, user),
+    }
+    return render(request, "passages.html", ctx)
 
 
-@router.get("/passages/{pid}")
-def passage(request: Request, pid: int, db: DB, user: CurrentUser):
-    passage = db.scalar(
-        select(Passage)
-        .where(Passage.id == pid)
-        .options(selectinload(Passage.questions).selectinload(Question.options))
-    )
+@router.get("/passages/{pid}", response_model=None)
+def passage_start(
+    request: Request, pid: int, db: DB, user: CurrentUser
+) -> HTMLResponse | RedirectResponse:
+    passage = attempts.load_passage(db, pid)
     if passage is None:
         raise HTTPException(404, "Passage not found")
 
-    return templates.TemplateResponse(
-        request,
-        "passage_start.html",
-        {
-            "user": user,
-            "streak": 0,
-            "passage": passage,
-            "question_count": len(passage.questions),
-        },
-    )
+    existing = attempts.open_attempt_for(db, user, passage)
+    if existing is not None:
+        return RedirectResponse(f"/attempts/{existing.id}", status_code=303)
+
+    best, tries = attempts.passage_stats(db, user, passage)
+    ctx: PassageStartPage = {
+        "user": user,
+        "passage": passage,
+        "question_count": len(passage.questions),
+        "best": best,
+        "tries": tries,
+    }
+    return render(request, "passage_start.html", ctx)
+
+
+@router.post("/passages/{passage_id}/attempts")
+def start_attempt(passage_id: int, db: DB, user: CurrentUser) -> RedirectResponse:
+    passage = attempts.load_passage(db, passage_id)
+    if passage is None:
+        raise HTTPException(404, "Passage not found")
+
+    attempt = attempts.start(db, user, passage, now=datetime.now(UTC))
+    return RedirectResponse(f"/attempts/{attempt.id}", status_code=303)

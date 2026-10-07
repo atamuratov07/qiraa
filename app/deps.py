@@ -24,5 +24,11 @@ def require_user(request: Request, db: DB) -> User:
     return user
 
 
+async def form_fields(request: Request) -> dict[str, str]:
+    form = await request.form()
+    return {k: v for k, v in form.items() if isinstance(v, str)}
+
+
+FormFields = Annotated[dict[str, str], Depends(form_fields)]
 CurrentUser = Annotated[User, Depends(require_user)]
 MaybeUser = Annotated[User | None, Depends(optional_user)]
