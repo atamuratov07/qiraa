@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Form, HTTPException, Request
@@ -10,8 +11,9 @@ from app.deps import CurrentUser, MaybeUser
 from app.models import User
 from app.redirects import safe_next
 from app.services import auth
+from app.services.profile import profile_context
 from app.templating import render
-from app.views import LoginPage, ProfilePage, ProfileStats, SignupPage
+from app.views import LoginPage, SignupPage
 
 router = APIRouter(tags=["auth"])
 
@@ -121,18 +123,7 @@ def delete_account(
     try:
         auth.delete_account(db, user, password)
     except auth.AuthError as exc:
-        # TODO: step 6: use the real profile data here (profile_context), not placeholders
-        ctx: ProfilePage = {
-            "user": user,
-            "streak": 0,
-            "longest_streak": 0,
-            "stats": ProfileStats(
-                attempts=0, answered=0, accuracy=None, passages_done=0, passages_total=0
-            ),
-            "recent": [],
-            "calendar": None,
-            "delete_error": str(exc),
-        }
+        ctx = profile_context(db, user, datetime.now(UTC), delete_error=str(exc))
         return render(request, "profile.html", ctx, status_code=400)
 
     response = RedirectResponse("/login", status_code=303)

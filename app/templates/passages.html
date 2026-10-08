@@ -63,7 +63,7 @@
         </span>
         <a href="/attempts/{{ u.id }}" class="font-semibold text-accent hover:underline">Resume</a>
         <form method="post" action="/attempts/{{ u.id }}/discard"
-              onsubmit="return confirm('Discard this unfinished attempt? Its saved answers will be deleted.')">
+              onsubmit="return confirm('Discard this unfinished attempt? Its saved answers will be deleted.')" data-background>
           <input type="hidden" name="next" value="/passages">
           <button class="cursor-pointer text-muted hover:text-bad">Discard</button>
         </form>

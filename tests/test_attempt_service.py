@@ -6,6 +6,7 @@ import pytest
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
+from app import timeutils
 from app.models import Attempt, AttemptAnswer, Passage, User
 from app.services import attempts
 from tests.factories import T0
@@ -34,8 +35,7 @@ def test_start_creates_an_attempt_with_every_question_shuffled(
     attempt = attempts.start(db, user, passage, T0)
 
     assert attempt.id is not None
-    # SQLite returns datetimes without a timezone after a commit, so compare through as_utc()
-    assert attempts.as_utc(attempt.started_at) == T0
+    assert timeutils.as_utc(attempt.started_at) == T0
     assert (attempt.elapsed_seconds, attempt.submitted_at) == (0, None)
     assert sorted(attempt.option_order) == ["1", "2"]
     assert sorted(attempt.option_order["1"]) == [
@@ -223,7 +223,7 @@ def test_submit_grades_and_closes(db: Session, user: User, passage: Passage) -> 
     assert (attempt.score, attempt.total) == (2, 2)
     assert attempt.elapsed_seconds == 20
     assert attempt.submitted_at is not None
-    assert attempts.as_utc(attempt.submitted_at) == T0 + timedelta(seconds=20)
+    assert timeutils.as_utc(attempt.submitted_at) == T0 + timedelta(seconds=20)
     assert saved_rows(db) == [(1, 11), (2, 22)]
 
 

@@ -1,11 +1,13 @@
 import random
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 
 from sqlalchemy import Select, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.models import Attempt, AttemptAnswer, Option, Passage, Question, User
+from app.services.streaks import record_activity
+from app.timeutils import as_utc, local_day
 from app.views import PassageCard, QuestionView, UnfinishedInfo
 
 AWAY_LIMIT = timedelta(seconds=30)
@@ -17,10 +19,6 @@ class AttemptClosed(Exception):
 
 class BadAnswer(ValueError):
     """The option doesn't belong to that question, or the question isn't in this attempt."""
-
-
-def as_utc(moment: datetime) -> datetime:
-    return moment if moment.tzinfo is not None else moment.replace(tzinfo=UTC)
 
 
 def apply_heartbeat(attempt: Attempt, now: datetime) -> None:
@@ -160,8 +158,8 @@ def passage_cards(db: Session, user: User) -> list[PassageCard]:
     question_count = {p.id: len(p.questions) for p in passages}
 
     stats: dict[int, tuple[int, int]] = {
-        pid: (int(best), tries)
-        for pid, best, tries in db.execute(_best_and_tries_query(user)).all()
+        passage_id: (int(best), tries)
+        for passage_id, best, tries in db.execute(_best_and_tries_query(user)).all()
     }
 
     open_attempts = db.scalars(
@@ -169,7 +167,7 @@ def passage_cards(db: Session, user: User) -> list[PassageCard]:
         .where(Attempt.user_id == user.id, Attempt.submitted_at.is_(None))
         .options(selectinload(Attempt.answers))
     ).all()
-    unfinished: dict[int, UnfinishedInfo] = {
+    unfinished = {
         a.passage_id: UnfinishedInfo(
             id=a.id,
             answered=len(a.answers),
@@ -252,7 +250,7 @@ def save_answer(
     try:
         db.commit()
     except IntegrityError:
-        #  Two fast clicks both found no row and both inserted; the other one won. Update it.
+        # Two fast clicks both found no row and both inserted; the other one won. Update it.
         db.rollback()
         _set_answer(db, attempt_id, question_id, option_id)
         db.commit()
@@ -308,12 +306,20 @@ def submit(
     attempt.score = grade(questions, saved_answers(attempt))
     attempt.submitted_at = now
 
-    # TODO: step 6: update the user's streak here, inside the same commit.
+    user = db.get(User, attempt.user_id)
+    assert user is not None
+    record_activity(user, local_day(now))
+
     db.commit()
 
 
 def discard(db: Session, attempt: Attempt) -> None:
     _require_open(attempt)
 
+    db.delete(attempt)
+    db.commit()
+
+
+def delete(db: Session, attempt: Attempt) -> None:
     db.delete(attempt)
     db.commit()

@@ -8,14 +8,20 @@ from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.deps import LoginRequired
-from app.routers import api, attempts, auth, passages
+from app.routers import api, attempts, auth, passages, profile
 from app.templating import APP_DIR, render
 from app.views import ErrorPage
 
 app = FastAPI(title="Qiraa")
 app.mount("/static", StaticFiles(directory=APP_DIR / "static"), name="static")
 
-for router in (auth.router, passages.router, attempts.router, api.router):
+for router in (
+    auth.router,
+    passages.router,
+    attempts.router,
+    api.router,
+    profile.router,
+):
     app.include_router(router)
 
 

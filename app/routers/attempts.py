@@ -89,3 +89,19 @@ def discard_attempt(
         raise HTTPException(409, str(exc)) from exc
 
     return RedirectResponse(safe_next(next), status_code=303)
+
+
+@router.post("/attempts/{aid}/delete")
+def delete_attempt(
+    aid: int,
+    db: DB,
+    user: CurrentUser,
+    next: Annotated[str, Form()] = "/profile",
+) -> RedirectResponse:
+    attempt = attempts.load_attempt(db, user, aid, with_content=False)
+    if attempt is None:
+        raise HTTPException(404, "Attempt not found")
+
+    attempts.delete(db, attempt)
+
+    return RedirectResponse(safe_next(next, default="/profile"), status_code=303)
