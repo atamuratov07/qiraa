@@ -7,7 +7,7 @@
 {% block content %}
 <div class="mx-auto max-w-md rounded-2xl border border-line bg-white p-8 text-center">
   <p class="text-5xl font-extrabold text-muted">{{ status_code }}</p>
-  <h1 class="mt-2 text-xl font-semibold">{{ message or "Something went wrong" }}</h1>
-  <a href="/passages" class="mt-4 inline-block text-accent hover:underline">Back to passages</a>
+  <h1 class="mt-2 text-xl font-semibold">{{ message or "Что-то пошло не так" }}</h1>
+  <a href="/passages" class="mt-4 inline-block text-accent hover:underline">Вернуться к текстам</a>
 </div>
 {% endblock %}

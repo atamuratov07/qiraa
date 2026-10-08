@@ -17,18 +17,18 @@
 #}
 {% extends "base.html" %}
 {% from "_macros.html" import mmss %}
-{% block title %}Passages{% endblock %}
+{% block title %}Тексты{% endblock %}
 {% block content %}
 {% set streak = streak | default(0) %}
 
 <section class="mb-10 flex flex-wrap items-center gap-6">
   <div class="flex min-w-36 flex-col items-center rounded-2xl border bg-white px-6 py-4 {{ 'border-gold' if streak else 'border-line' }}">
     <span class="text-4xl font-extrabold leading-none {{ 'text-gold' if streak else 'text-muted' }}">{{ streak }}</span>
-    <span class="mt-1 text-sm font-medium">day streak</span>
+    <span class="mt-1 text-sm font-medium">{{ streak | plural("день", "дня", "дней") }} подряд</span>
   </div>
   <div>
-    <h1 class="text-2xl font-bold">Marhaban, {{ user.username }}</h1>
-    <p class="text-muted">Pick a passage. Tap any Arabic word while reading to see it in Russian.</p>
+    <h1 class="text-2xl font-bold">Мархаба, {{ user.username }}</h1>
+    <p class="text-muted">Выбери текст. Нажми на любое арабское слово во время чтения, чтобы увидеть перевод Дера.</p>
   </div>
 </section>
 
@@ -36,22 +36,22 @@
 {% set groups = passages | groupby("level") %}
 {% for level, items in (groups | selectattr("grouper") | list) + (groups | rejectattr("grouper") | list) %}
 <section class="mb-8">
-  <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">{{ level or "Other" }}</h2>
+  <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">{{ level or "Другое" }}</h2>
   <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
     {% for p in items %}
     <div class="flex flex-col overflow-hidden rounded-2xl border bg-white transition hover:-translate-y-0.5 {{ 'border-gold' if p.unfinished else 'border-line hover:border-accent' }}">
       <a href="/passages/{{ p.id }}" class="flex flex-1 flex-col gap-2 p-4">
         <span class="font-arabic text-xl font-semibold" lang="ar" dir="rtl">{{ p.title }}</span>
         {% if p.question_count is defined %}
-        <span class="text-xs text-muted">{{ p.question_count }} questions</span>
+        <span class="text-xs text-muted">{{ p.question_count }} {{ p.question_count | plural("вопрос", "вопроса", "вопросов") }}</span>
         {% endif %}
         {% if p.best is defined and p.best is not none %}
           {% set color = 'text-accent' if p.best >= 80 else ('text-gold' if p.best >= 50 else 'text-bad') %}
           <span class="text-xs font-semibold {{ color }}">
-            Best {{ p.best }}%{% if p.tries is defined %} · {{ p.tries }} {{ 'try' if p.tries == 1 else 'tries' }}{% endif %}
+            Лучший результат {{ p.best }}%{% if p.tries is defined %} · {{ p.tries }} {{ p.tries | plural("попытка", "попытки", "попыток") }}{% endif %}
           </span>
         {% elif not p.unfinished %}
-          <span class="text-xs font-semibold text-accent">New</span>
+          <span class="text-xs font-semibold text-accent">Новый</span>
         {% endif %}
       </a>
 
@@ -59,13 +59,13 @@
       {% set u = p.unfinished %}
       <div class="flex items-center gap-3 border-t border-gold/30 bg-gold/10 px-4 py-2 text-xs">
         <span class="flex-1 font-semibold text-gold">
-          Unfinished · {{ u.answered }}/{{ u.total }} answered · {{ mmss(u.elapsed_seconds) }}
+          Не завершён · отвечено {{ u.answered }}/{{ u.total }} · {{ mmss(u.elapsed_seconds) }}
         </span>
-        <a href="/attempts/{{ u.id }}" class="font-semibold text-accent hover:underline">Resume</a>
+        <a href="/attempts/{{ u.id }}" class="font-semibold text-accent hover:underline">Продолжить</a>
         <form method="post" action="/attempts/{{ u.id }}/discard"
-              onsubmit="return confirm('Discard this unfinished attempt? Its saved answers will be deleted.')" data-background>
+              onsubmit="return confirm('Сбросить эту незавершённую попытку? Сохранённые ответы будут удалены.')" data-background>
           <input type="hidden" name="next" value="/passages">
-          <button class="cursor-pointer text-muted hover:text-bad">Discard</button>
+          <button class="cursor-pointer text-muted hover:text-bad">Сбросить</button>
         </form>
       </div>
       {% endif %}
@@ -74,6 +74,6 @@
   </div>
 </section>
 {% else %}
-<p class="rounded-2xl border border-line bg-white p-6 text-muted">No passages yet.</p>
+<p class="rounded-2xl border border-line bg-white p-6 text-muted">Текстов пока нет.</p>
 {% endfor %}
 {% endblock %}

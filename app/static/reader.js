@@ -91,15 +91,15 @@
       if (id !== requestId) return; // the user already tapped something else
       if (res.status === 401) return void (location.href = "/login");
       if (res.status === 404)
-        return void show("Translation endpoint isn't built yet.", "", true);
-      if (!res.ok) return void show(`Server error (${res.status}).`, "", true);
+        return void show("Перевод пока недоступен.", "", true);
+      if (!res.ok) return void show(`Ошибка сервера (${res.status}).`, "", true);
       const data = await res.json();
       if (id !== requestId) return;
       if (data.translation) show(data.translation, data.source, false);
-      else show("No translation found.", "", true);
+      else show("Перевод не найден.", "", true);
     } catch {
       if (id === requestId)
-        show("Network error. Try the link below.", "", true);
+        show("Ошибка сети. Попробуйте ссылку ниже.", "", true);
     }
     place(rect);
   }

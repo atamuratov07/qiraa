@@ -18,7 +18,7 @@ router = APIRouter(tags=["attempts"])
 def _own_attempt(db: DB, user: User, attempt_id: int) -> Attempt:
     attempt = attempts.load_attempt(db, user, attempt_id)
     if attempt is None:
-        raise HTTPException(404, "Attempt not found")
+        raise HTTPException(404, "Попытка не найдена")
 
     return attempt
 
@@ -100,7 +100,7 @@ def delete_attempt(
 ) -> RedirectResponse:
     attempt = attempts.load_attempt(db, user, aid, with_content=False)
     if attempt is None:
-        raise HTTPException(404, "Attempt not found")
+        raise HTTPException(404, "Попытка не найдена")
 
     attempts.delete(db, attempt)
 

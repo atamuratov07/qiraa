@@ -32,13 +32,15 @@ def normalize_username(raw: str) -> str:
 def register(db: Session, username: str, password: str, password_confirm: str) -> User:
     username = normalize_username(username)
     if not USERNAME_RE.fullmatch(username):
-        raise AuthError("Username: 3–32 characters, Latin letters, digits or _.")
+        raise AuthError("Имя пользователя: 3–32 символа, латинские буквы, цифры или _.")
     if not MIN_PASSWORD <= len(password) <= MAX_PASSWORD:
-        raise AuthError(f"Password must be {MIN_PASSWORD}–{MAX_PASSWORD} characters.")
+        raise AuthError(
+            f"Пароль должен содержать {MIN_PASSWORD}–{MAX_PASSWORD} символов."
+        )
     if password != password_confirm:
-        raise AuthError("Passwords don't match.")
+        raise AuthError("Пароли не совпадают.")
     if db.scalar(select(User.id).where(User.username == username)):
-        raise AuthError("That username is taken.")
+        raise AuthError("Это имя пользователя уже занято.")
 
     user = User(username=username, password_hash=hash_password(password))
     db.add(user)
@@ -50,9 +52,9 @@ def authenticate(db: Session, username: str, password: str) -> User:
     user = db.scalar(select(User).where(User.username == normalize_username(username)))
     if user is None:
         waste_equal_time(password)
-        raise AuthError("Wrong username or password.")
+        raise AuthError("Неверное имя пользователя или пароль.")
     if not verify_password(user.password_hash, password):
-        raise AuthError("Wrong username or password.")
+        raise AuthError("Неверное имя пользователя или пароль.")
     if needs_rehash(user.password_hash):
         user.password_hash = hash_password(password)
         db.commit()
@@ -101,7 +103,7 @@ def destroy_session(db: Session, token: str | None) -> None:
 
 def delete_account(db: Session, user: User, password: str) -> None:
     if not verify_password(user.password_hash, password):
-        raise AuthError("Wrong password.")
+        raise AuthError("Неверный пароль.")
 
     db.delete(user)
     db.commit()

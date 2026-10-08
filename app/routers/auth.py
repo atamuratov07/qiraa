@@ -37,7 +37,7 @@ def _login_response(
 
 def _require_signup_open() -> None:
     if not get_settings().allow_signup:
-        raise HTTPException(403, "Sign-ups are closed.")
+        raise HTTPException(403, "Регистрация закрыта.")
 
 
 @router.get("/signup", response_model=None)

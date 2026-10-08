@@ -35,7 +35,7 @@ def test_practice_from_start_to_result(logged_in: TestClient, db: Session) -> No
 
     page = client.get("/passages/1")
     assert page.status_code == 200
-    assert "2 questions" in page.text and "best" not in page.text
+    assert "2 вопроса" in page.text and "лучший результат" not in page.text
 
     attempt_id = start(client)
     page = client.get(f"/attempts/{attempt_id}")
@@ -74,9 +74,9 @@ def test_practice_from_start_to_result(logged_in: TestClient, db: Session) -> No
     ) == (2, 2)
 
     result = client.get(f"/attempts/{attempt_id}")
-    assert result.status_code == 200 and "100% correct" in result.text
-    assert "best 100% in 1 try" in client.get("/passages/1").text
-    assert "Best 100% · 1 try" in client.get("/passages").text
+    assert result.status_code == 200 and "100% верно" in result.text
+    assert "лучший результат 100% за 1 попытку" in client.get("/passages/1").text
+    assert "Лучший результат 100% · 1 попытка" in client.get("/passages").text
 
 
 # ---------------------------------------------------------------------------
@@ -96,7 +96,7 @@ def test_open_attempt_is_resumed_not_duplicated(logged_in: TestClient) -> None:
     )
 
     logged_in.put(f"/api/attempts/{attempt_id}/answers/2", json={"option_id": 21})
-    assert "Unfinished · 1/2 answered" in logged_in.get("/passages").text
+    assert "Не завершён · отвечено 1/2" in logged_in.get("/passages").text
 
 
 @pytest.mark.usefixtures("passage")
@@ -145,7 +145,10 @@ def test_autosave_rejects_bad_answers(logged_in: TestClient) -> None:
     response = logged_in.put(
         url, json={"option_id": 31}
     )  # option of passage 2's question
-    assert response.status_code == 400 and "not an answer" in response.json()["detail"]
+    assert (
+        response.status_code == 400
+        and "не относится к вопросу" in response.json()["detail"]
+    )
     assert logged_in.put(url, json={"option_id": "x"}).status_code == 422  # Pydantic
     assert logged_in.put(url, json={}).status_code == 422
 
@@ -183,7 +186,7 @@ def test_someone_elses_attempt_is_404(
     page = client.get(f"/attempts/{attempt_id}")
     assert page.status_code == 404 and "text/html" in page.headers["content-type"]
     api = client.post(f"/api/attempts/{attempt_id}/heartbeat")
-    assert (api.status_code, api.json()) == (404, {"detail": "Attempt not found"})
+    assert (api.status_code, api.json()) == (404, {"detail": "Попытка не найдена"})
     assert client.post(f"/attempts/{attempt_id}/discard").status_code == 404
 
 

@@ -37,6 +37,16 @@
   let runningSince = null; // performance.now() when the clock last started, null if stopped
   let beat = null;
 
+  // Russian plural: 1 вопрос, 2 вопроса, 5 вопросов, 21 вопрос, 11 вопросов
+  const plural = (n, one, few, many) => {
+    const n100 = n % 100;
+    const n10 = n % 10;
+    if (n100 >= 11 && n100 <= 14) return many;
+    if (n10 === 1) return one;
+    if (n10 >= 2 && n10 <= 4) return few;
+    return many;
+  };
+
   const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   const seconds = () =>
     Math.floor(
@@ -118,8 +128,8 @@
   const STORAGE_KEY = "qiraa.timerHidden";
   function setTimerHidden(hidden) {
     timeEl.hidden = hidden;
-    toggleBtn.textContent = hidden ? "show" : "hide";
-    toggleBtn.title = hidden ? "Show timer" : "Hide timer";
+    toggleBtn.textContent = hidden ? "показать" : "скрыть";
+    toggleBtn.title = hidden ? "Показать таймер" : "Скрыть таймер";
     try {
       localStorage.setItem(STORAGE_KEY, hidden ? "1" : "0");
     } catch {}
@@ -133,7 +143,7 @@
   const answered = () =>
     form.querySelectorAll("input[type=radio]:checked").length;
   function setStatus(text, bad = false) {
-    statusEl.textContent = `${answered()} of ${total} answered · ${text}`;
+    statusEl.textContent = `Отвечено ${answered()} из ${total} · ${text}`;
     statusEl.classList.toggle("text-bad", bad);
     statusEl.classList.toggle("text-muted", !bad);
     overlay.querySelector("[data-answered]").textContent = answered();
@@ -145,7 +155,7 @@
     if (input.type !== "radio") return;
     const questionId = input.closest("[data-question-id]").dataset.questionId;
     const mine = ++saveId;
-    setStatus("saving…");
+    setStatus("сохранение…");
     try {
       const res = await fetch(`/api/attempts/${id}/answers/${questionId}`, {
         method: "PUT",
@@ -153,15 +163,15 @@
         body: JSON.stringify({ option_id: Number(input.value) }),
       });
       if (handleGone(res) || mine !== saveId) return;
-      if (res.ok) setStatus("saved");
+      if (res.ok) setStatus("сохранено");
       else
         setStatus(
-          `not saved (${res.status}); it will be sent when you submit`,
+          `не сохранено (${res.status}); ответ отправится при проверке`,
           true,
         );
     } catch {
       if (mine === saveId)
-        setStatus("offline: not saved; it will be sent when you submit", true);
+        setStatus("нет сети: не сохранено; ответ отправится при проверке", true);
     }
   });
 
@@ -170,13 +180,13 @@
     const missing = total - answered();
     if (missing > 0) {
       const ok = confirm(
-        `${missing} question${missing === 1 ? " is" : "s are"} not answered. Submit anyway?`,
+        `${missing} ${plural(missing, "вопрос остался", "вопроса остались", "вопросов остались")} без ответа. Всё равно проверить?`,
       );
       if (!ok) return e.preventDefault();
     }
     clearInterval(beat); // the submit route does the final time calculation itself
     submitBtn.disabled = true; // no double submit
-    submitBtn.textContent = "Checking…";
+    submitBtn.textContent = "Проверяем…";
   });
 
   // ---- the attempt changed elsewhere (another tab, another device) --------------------

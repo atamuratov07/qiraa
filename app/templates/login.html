@@ -10,23 +10,23 @@
   Submits POST /login with fields: username, password, next
 #}
 {% extends "base.html" %}
-{% block title %}Log in{% endblock %}
+{% block title %}Вход{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-sm rounded-2xl border border-line bg-white p-6">
-  <h1 class="mb-4 text-2xl font-bold">Log in</h1>
+  <h1 class="mb-4 text-2xl font-bold">Вход</h1>
   {% if error %}<p class="mb-4 rounded-lg bg-bad-soft px-3 py-2 text-sm text-bad">{{ error }}</p>{% endif %}
   <form method="post" action="/login" class="space-y-4">
     <input type="hidden" name="next" value="{{ next or '/passages' }}">
-    <label class="block text-sm text-muted">Username
+    <label class="block text-sm text-muted">Имя пользователя
       <input name="username" value="{{ username or '' }}" autocomplete="username" required autofocus
              class="mt-1 block w-full rounded-lg border border-line bg-paper px-3 py-2 text-ink focus:outline-2 focus:outline-accent">
     </label>
-    <label class="block text-sm text-muted">Password
+    <label class="block text-sm text-muted">Пароль
       <input name="password" type="password" autocomplete="current-password" required
              class="mt-1 block w-full rounded-lg border border-line bg-paper px-3 py-2 text-ink focus:outline-2 focus:outline-accent">
     </label>
-    <button class="w-full cursor-pointer rounded-xl bg-accent px-5 py-2.5 font-semibold text-white hover:brightness-110">Log in</button>
+    <button class="w-full cursor-pointer rounded-xl bg-accent px-5 py-2.5 font-semibold text-white hover:brightness-110">Войти</button>
   </form>
-  <p class="mt-4 text-sm text-muted">No account? <a href="/signup" class="text-accent hover:underline">Sign up</a></p>
+  <p class="mt-4 text-sm text-muted">Нет аккаунта? <a href="/signup" class="text-accent hover:underline">Зарегистрироваться</a></p>
 </div>
 {% endblock %}

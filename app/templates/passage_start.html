@@ -43,16 +43,16 @@
     {% endif %}
     <h1 class="mt-3 font-arabic text-3xl font-bold leading-relaxed" lang="ar" dir="rtl">{{ passage.title }}</h1>
     <p class="mt-1 text-sm text-muted">
-      {{ question_count }} questions
-      {% if best is defined and best is not none %} · best {{ best }}%{% if tries is defined %} in {{ tries }} {{ 'try' if tries == 1 else 'tries' }}{% endif %}{% endif %}
+      {{ question_count }} {{ question_count | plural("вопрос", "вопроса", "вопросов") }}
+      {% if best is defined and best is not none %} · лучший результат {{ best }}%{% if tries is defined %} за {{ tries }} {{ tries | plural("попытку", "попытки", "попыток") }}{% endif %}{% endif %}
     </p>
     <form method="post" action="/passages/{{ passage.id }}/attempts" class="mt-5">
       <button autofocus class="w-full cursor-pointer rounded-xl bg-accent px-5 py-3 font-semibold text-white hover:brightness-110">
-        Start practice
+        Начать
       </button>
     </form>
-    <p class="mt-3 text-xs text-muted">The timer starts when you press Start and pauses if you leave.</p>
-    <a href="/passages" class="mt-4 inline-block text-sm text-accent hover:underline">← All passages</a>
+    <p class="mt-3 text-xs text-muted">Таймер запустится после нажатия «Начать» и встанет на паузу, если вы уйдёте со страницы.</p>
+    <a href="/passages" class="mt-4 inline-block text-sm text-accent hover:underline">← Все тексты</a>
   </div>
 </div>
 {% endblock %}

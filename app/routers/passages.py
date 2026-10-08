@@ -29,7 +29,7 @@ def passage_start(
 ) -> HTMLResponse | RedirectResponse:
     passage = attempts.load_passage(db, pid)
     if passage is None:
-        raise HTTPException(404, "Passage not found")
+        raise HTTPException(404, "Текст не найден")
 
     existing = attempts.open_attempt_for(db, user, passage)
     if existing is not None:
@@ -50,7 +50,7 @@ def passage_start(
 def start_attempt(pid: int, db: DB, user: CurrentUser) -> RedirectResponse:
     passage = attempts.load_passage(db, pid)
     if passage is None:
-        raise HTTPException(404, "Passage not found")
+        raise HTTPException(404, "Текст не найден")
 
     attempt = attempts.start(db, user, passage, now=datetime.now(UTC))
     return RedirectResponse(f"/attempts/{attempt.id}", status_code=303)

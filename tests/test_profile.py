@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.models import Attempt, AttemptAnswer, Passage, User
 from app.services import auth
 from app.services.profile import CALENDAR_DAYS, profile_context
-from app.templating import local_date
+from app.templating import local_date, plural, ru_date
 from app.views import ProfileStats
 from tests.factories import T0
 
@@ -117,7 +117,7 @@ def test_profile_page_before_and_after_a_quiz(
     logged_in: TestClient, db: Session, user: User, passage: Passage
 ) -> None:
     page = logged_in.get("/profile")
-    assert page.status_code == 200 and "Nothing yet" in page.text
+    assert page.status_code == 200 and "Пока ничего нет" in page.text
 
     start = logged_in.post("/passages/1/attempts")
     attempt_url = start.headers["location"]
@@ -127,7 +127,7 @@ def test_profile_page_before_and_after_a_quiz(
     assert page.status_code == 200
     assert "50%" in page.text  # accuracy: 1 of 2
     assert f'href="{attempt_url}"' in page.text  # listed under Recent quizzes
-    assert "Nothing yet" not in page.text
+    assert "Пока ничего нет" not in page.text
 
 
 @pytest.mark.usefixtures("passage")
@@ -151,14 +151,14 @@ def test_wrong_password_on_delete_shows_the_real_profile(
     page = logged_in.post("/account/delete", data={"password": "wrong-password"})
 
     assert page.status_code == 400
-    assert "Wrong password." in page.text
+    assert "Неверный пароль." in page.text
     assert "100%" in page.text  # real accuracy, not placeholder zeros
 
 
 def test_local_date_filter_shows_the_tashkent_date() -> None:
-    assert local_date(NIGHT, "%d %b") == "08 Oct"
+    assert local_date(NIGHT, "%d %b") == "08 окт"
     assert (
-        local_date(NIGHT.replace(tzinfo=None)) == "08 Oct 2026"
+        local_date(NIGHT.replace(tzinfo=None)) == "8 окт 2026"
     )  # naive, as from SQLite
 
 
@@ -177,7 +177,7 @@ def test_deleting_a_result(
     assert db.scalars(select(Attempt)).all() == []
     assert db.scalars(select(AttemptAnswer)).all() == []  # its answers went with it
     assert (
-        "Nothing yet" in logged_in.get("/profile").text
+        "Пока ничего нет" in logged_in.get("/profile").text
     )  # totals and the list are recomputed
     db.expire_all()
     assert (user.current_streak, user.last_active_on is not None) == (
@@ -205,3 +205,27 @@ def test_delete_only_redirects_within_the_site(logged_in: TestClient) -> None:
     logged_in.post(f"{attempt_url}/submit", data={"q1": "11"})
     response = logged_in.post(f"{attempt_url}/delete", data={"next": "//evil.example"})
     assert response.headers["location"] == "/profile"
+
+
+def test_ru_date_uses_russian_names() -> None:
+    assert ru_date(date(2026, 10, 8), "%a, %-d %b") == "чт, 8 окт"
+
+
+@pytest.mark.parametrize(
+    ("n", "word"),
+    [
+        (0, "дней"),
+        (1, "день"),
+        (2, "дня"),
+        (4, "дня"),
+        (5, "дней"),
+        (11, "дней"),
+        (14, "дней"),
+        (21, "день"),
+        (22, "дня"),
+        (111, "дней"),
+        (101, "день"),
+    ],
+)
+def test_plural(n: int, word: str) -> None:
+    assert plural(n, "день", "дня", "дней") == word
