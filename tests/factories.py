@@ -7,7 +7,9 @@ Id scheme, so tests can be read without looking anything up:
 
 from datetime import UTC, datetime
 
-from app.models import Option, Passage, Question, User
+from app.auth.models import User
+from app.passages.models import Passage
+from app.practice.models import Option, Question
 
 T0 = datetime(2026, 10, 7, 10, 0, 0, tzinfo=UTC)
 

@@ -8,20 +8,26 @@ from fastapi.responses import JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.deps import LoginRequired
-from app.routers import api, attempts, auth, passages, profile
-from app.templating import APP_DIR, render
-from app.views import ErrorPage
+from app import models  # noqa: F401  registers every model before the first query
+from app.auth.deps import LoginRequired
+from app.auth.routes import router as auth_router
+from app.core.config import APP_DIR
+from app.core.templating import render
+from app.core.views import ErrorPage
+from app.passages.routes import router as passages_router
+from app.practice.api import router as api_router
+from app.practice.routes import router as practice_router
+from app.profile.routes import router as profile_router
 
 app = FastAPI(title="Qiraa")
 app.mount("/static", StaticFiles(directory=APP_DIR / "static"), name="static")
 
 for router in (
-    auth.router,
-    passages.router,
-    attempts.router,
-    api.router,
-    profile.router,
+    auth_router,
+    passages_router,
+    practice_router,
+    api_router,
+    profile_router,
 ):
     app.include_router(router)
 

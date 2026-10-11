@@ -16,7 +16,7 @@ from typing import TypedDict
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db import SessionLocal
+from app.core.db import SessionLocal
 from app.models import Option, Passage, Question
 
 LETTERS = "ABCDEFGH"

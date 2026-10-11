@@ -12,11 +12,13 @@ from sqlalchemy import Engine, create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.config import get_settings
-from app.db import get_db
+from app.auth.models import User
+from app.auth.service import SESSION_COOKIE, create_session
+from app.core.config import get_settings
+from app.core.db import get_db
 from app.main import app
-from app.models import Base, Passage, User
-from app.services import auth
+from app.models import Base
+from app.passages.models import Passage
 from tests.factories import make_passage, make_question, make_user
 
 # ---------------------------------------------------------------------------
@@ -129,5 +131,5 @@ def client(engine: Engine) -> Iterator[TestClient]:
 
 @pytest.fixture
 def logged_in(client: TestClient, db: Session, user: User) -> TestClient:
-    client.cookies.set(auth.SESSION_COOKIE, auth.create_session(db, user))
+    client.cookies.set(SESSION_COOKIE, create_session(db, user))
     return client

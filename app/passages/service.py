@@ -1,0 +1,89 @@
+from sqlalchemy import Select, func, select
+from sqlalchemy.orm import Session, selectinload
+
+from app.auth.models import User
+from app.passages.models import Passage
+from app.passages.views import PassageCard, UnfinishedInfo
+from app.practice.models import Attempt, Question
+
+
+def load_passage(db: Session, passage_id: int) -> Passage | None:
+    return db.get(
+        Passage,
+        passage_id,
+        options=[selectinload(Passage.questions).selectinload(Question.options)],
+    )
+
+
+def _best_and_tries_query(user: User) -> Select[int, int, int]:
+    return (
+        select(
+            Attempt.passage_id,
+            func.max(Attempt.score * 100 / Attempt.total),
+            func.count(),
+        )
+        .where(
+            Attempt.user_id == user.id,
+            Attempt.submitted_at.is_not(None),
+            Attempt.total > 0,
+        )
+        .group_by(Attempt.passage_id)
+    )
+
+
+def passage_stats(db: Session, user: User, passage: Passage) -> tuple[int | None, int]:
+    row = db.execute(
+        _best_and_tries_query(user).where(Attempt.passage_id == passage.id)
+    ).first()
+
+    if row is None:
+        return None, 0
+
+    _, best, tries = row
+    return int(best), tries
+
+
+def passage_cards(db: Session, user: User) -> list[PassageCard]:
+    passages = db.scalars(
+        select(Passage)
+        .options(selectinload(Passage.questions))
+        .order_by(Passage.level, Passage.title)
+    ).all()
+    question_count = {p.id: len(p.questions) for p in passages}
+
+    stats: dict[int, tuple[int, int]] = {
+        passage_id: (int(best), tries)
+        for passage_id, best, tries in db.execute(_best_and_tries_query(user)).all()
+    }
+
+    open_attempts = db.scalars(
+        select(Attempt)
+        .where(Attempt.user_id == user.id, Attempt.submitted_at.is_(None))
+        .options(selectinload(Attempt.answers))
+    ).all()
+    unfinished = {
+        a.passage_id: UnfinishedInfo(
+            id=a.id,
+            answered=len(a.answers),
+            total=question_count.get(a.passage_id, 0),
+            elapsed_seconds=a.elapsed_seconds,
+        )
+        for a in open_attempts
+    }
+
+    cards: list[PassageCard] = []
+    for p in passages:
+        best, tries = stats.get(p.id, (None, 0))
+        cards.append(
+            PassageCard(
+                id=p.id,
+                title=p.title,
+                level=p.level,
+                question_count=question_count[p.id],
+                best=best,
+                tries=tries,
+                unfinished=unfinished.get(p.id),
+            )
+        )
+
+    return cards

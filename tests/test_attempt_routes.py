@@ -7,8 +7,10 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Attempt, Passage, User
-from app.services import auth
+from app.auth.models import User
+from app.auth.service import SESSION_COOKIE, create_session
+from app.passages.models import Passage
+from app.practice.models import Attempt
 
 
 def start(client: TestClient, passage_id: int = 1) -> int:
@@ -179,9 +181,9 @@ def test_submitted_attempt_is_read_only(logged_in: TestClient, db: Session) -> N
 def test_someone_elses_attempt_is_404(
     client: TestClient, db: Session, user: User, other_user: User, passage: Passage
 ) -> None:
-    client.cookies.set(auth.SESSION_COOKIE, auth.create_session(db, user))
+    client.cookies.set(SESSION_COOKIE, create_session(db, user))
     attempt_id = start(client)
-    client.cookies.set(auth.SESSION_COOKIE, auth.create_session(db, other_user))
+    client.cookies.set(SESSION_COOKIE, create_session(db, other_user))
 
     page = client.get(f"/attempts/{attempt_id}")
     assert page.status_code == 404 and "text/html" in page.headers["content-type"]

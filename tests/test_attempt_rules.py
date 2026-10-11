@@ -8,8 +8,14 @@ from datetime import timedelta
 
 import pytest
 
-from app.models import Attempt, AttemptAnswer
-from app.services import attempts
+from app.practice.models import Attempt, AttemptAnswer
+from app.practice.service import (
+    apply_heartbeat,
+    grade,
+    is_paused,
+    ordered_questions,
+    saved_answers,
+)
 from tests.factories import T0, make_passage, make_question
 
 # ---------------------------------------------------------------------------
@@ -33,7 +39,7 @@ def test_apply_heartbeat(seconds_later: float, expected_elapsed: int) -> None:
     attempt = Attempt(elapsed_seconds=100, last_seen_at=T0)
     now = T0 + timedelta(seconds=seconds_later)
     # Act
-    attempts.apply_heartbeat(attempt, now)
+    apply_heartbeat(attempt, now)
     # Assert
     assert attempt.elapsed_seconds == expected_elapsed
     assert attempt.last_seen_at == now
@@ -41,14 +47,14 @@ def test_apply_heartbeat(seconds_later: float, expected_elapsed: int) -> None:
 
 def test_apply_heartbeat_accepts_naive_datetimes() -> None:
     attempt = Attempt(elapsed_seconds=0, last_seen_at=T0.replace(tzinfo=None))
-    attempts.apply_heartbeat(attempt, T0 + timedelta(seconds=10))
+    apply_heartbeat(attempt, T0 + timedelta(seconds=10))
     assert attempt.elapsed_seconds == 10
 
 
 @pytest.mark.parametrize(("seconds_later", "paused"), [(30, False), (31, True)])
 def test_is_paused(seconds_later: int, paused: bool) -> None:
     attempt = Attempt(last_seen_at=T0)
-    assert attempts.is_paused(attempt, T0 + timedelta(seconds=seconds_later)) is paused
+    assert is_paused(attempt, T0 + timedelta(seconds=seconds_later)) is paused
 
 
 # ---------------------------------------------------------------------------
@@ -70,7 +76,7 @@ QUESTIONS = [make_question(1, correct=1), make_question(2, correct=2)]
     ],
 )
 def test_grade(answers: dict[int, int], expected_score: int) -> None:
-    assert attempts.grade(QUESTIONS, answers) == expected_score
+    assert grade(QUESTIONS, answers) == expected_score
 
 
 # ---------------------------------------------------------------------------
@@ -87,7 +93,7 @@ def test_saved_answers_skips_answers_whose_option_was_removed() -> None:
             ),  # option deleted from the bank
         ]
     )
-    assert attempts.saved_answers(attempt) == {1: 12}
+    assert saved_answers(attempt) == {1: 12}
 
 
 def test_ordered_questions_use_the_saved_order() -> None:
@@ -98,7 +104,7 @@ def test_ordered_questions_use_the_saved_order() -> None:
         passage=passage, option_order={"1": [13, 11, 12], "2": [22, 23, 21]}
     )
 
-    views = attempts.ordered_questions(attempt)
+    views = ordered_questions(attempt)
 
     assert [v.id for v in views] == [1, 2]  # questions keep their own order
     assert [o.id for o in views[0].options] == [13, 11, 12]
@@ -110,7 +116,7 @@ def test_ordered_questions_survive_changes_to_the_question_bank() -> None:
     # saved before option 12 was added, and while a since-deleted option 19 existed
     attempt = Attempt(passage=passage, option_order={"1": [13, 19, 11]})
 
-    [view] = attempts.ordered_questions(attempt)
+    [view] = ordered_questions(attempt)
 
     assert [o.id for o in view.options] == [13, 11, 12]  # 19 dropped, 12 appended
 
@@ -119,6 +125,6 @@ def test_ordered_questions_never_reorder_the_models_own_list() -> None:
     passage = make_passage(1, [make_question(1, correct=1)])
     attempt = Attempt(passage=passage, option_order={"1": [13, 12, 11]})
 
-    attempts.ordered_questions(attempt)
+    ordered_questions(attempt)
 
     assert [o.id for o in passage.questions[0].options] == [11, 12, 13]

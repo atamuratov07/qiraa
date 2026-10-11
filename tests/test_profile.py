@@ -7,11 +7,13 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Attempt, AttemptAnswer, Passage, User
-from app.services import auth
-from app.services.profile import CALENDAR_DAYS, profile_context
-from app.templating import local_date, plural, ru_date
-from app.views import ProfileStats
+from app.auth.models import User
+from app.auth.service import SESSION_COOKIE, create_session
+from app.core.templating import local_date, plural, ru_date
+from app.passages.models import Passage
+from app.practice.models import Attempt, AttemptAnswer
+from app.profile.service import CALENDAR_DAYS, profile_context
+from app.profile.views import ProfileStats
 from tests.factories import T0
 
 NIGHT = datetime(2026, 10, 7, 23, 16, tzinfo=UTC)  # 04:16 on 8 Oct in Tashkent
@@ -189,7 +191,7 @@ def test_cannot_delete_someone_elses_result(
 ) -> None:
     db.add(submitted(user, passage, 1, 2, T0))
     db.commit()
-    client.cookies.set(auth.SESSION_COOKIE, auth.create_session(db, other_user))
+    client.cookies.set(SESSION_COOKIE, create_session(db, other_user))
 
     response = client.post("/attempts/1/delete", data={"next": "/profile"})
 

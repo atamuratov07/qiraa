@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from app.config import Settings
+from app.core.config import BASE_DIR, Settings
 
 
 def write_env(tmp_path: Path, text: str) -> Path:
@@ -33,3 +33,7 @@ def test_environment_variable_beats_env_file(
     assert (
         Settings(_env_file=env).sqlalchemy_url == "postgresql+psycopg://a:b@host/other"
     )
+
+
+def test_base_dir_is_the_project_root() -> None:
+    assert (BASE_DIR / "pyproject.toml").is_file()

@@ -5,9 +5,11 @@ from datetime import UTC, date, datetime, timedelta
 import pytest
 from sqlalchemy.orm import Session
 
-from app.models import Passage, User
-from app.services import attempts, streaks
-from app.timeutils import local_day
+from app.auth.models import User
+from app.core.timeutils import local_day
+from app.passages.models import Passage
+from app.practice.service import discard, load_attempt, save_answer, start, submit
+from app.profile.streaks import record_activity, visible_streak
 from tests.factories import T0
 
 
@@ -105,7 +107,7 @@ def test_record_activity(
     expected: tuple[int, int, date],
 ) -> None:
     user = User(last_active_on=last, current_streak=current, longest_streak=longest)
-    streaks.record_activity(user, today)
+    record_activity(user, today)
     assert (user.current_streak, user.longest_streak, user.last_active_on) == expected
 
 
@@ -125,7 +127,7 @@ def test_record_activity(
 )
 def test_visible_streak(last: date | None, today: date, shown: int) -> None:
     user = User(last_active_on=last, current_streak=4, longest_streak=4)
-    assert streaks.visible_streak(user, today) == shown
+    assert visible_streak(user, today) == shown
 
 
 # ---------------------------------------------------------------------------
@@ -134,9 +136,9 @@ def test_visible_streak(last: date | None, today: date, shown: int) -> None:
 
 
 def submit_quiz(db: Session, user: User, passage: Passage, now: datetime) -> None:
-    attempt = attempts.load_attempt(db, user, attempts.start(db, user, passage, now).id)
+    attempt = load_attempt(db, user, start(db, user, passage, now).id)
     assert attempt is not None
-    attempts.submit(db, attempt, {1: 11}, now)
+    submit(db, attempt, {1: 11}, now)
 
 
 def stored_streak(db: Session, user: User) -> tuple[int, int, date | None]:
@@ -172,8 +174,8 @@ def test_a_quiz_after_local_midnight_counts_for_the_new_day(
 def test_unfinished_and_discarded_attempts_dont_count(
     db: Session, user: User, passage: Passage
 ) -> None:
-    attempt = attempts.start(db, user, passage, T0)
-    attempts.save_answer(db, attempt, 1, 11)
-    attempts.discard(db, attempt)
-    attempts.start(db, user, passage, T0)  # left open
+    attempt = start(db, user, passage, T0)
+    save_answer(db, attempt, 1, 11)
+    discard(db, attempt)
+    start(db, user, passage, T0)  # left open
     assert stored_streak(db, user) == (0, 0, None)
