@@ -4,13 +4,12 @@ Set TEST_DATABASE_URL to run the same tests against Postgres, e.g.
 """
 
 import os
-import sqlite3
 from collections.abc import Iterator
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import Engine, create_engine, event
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.config import get_settings
@@ -36,25 +35,25 @@ def default_settings(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     get_settings.cache_clear()
 
 
+DEFAULT_TEST_DATABASE_URL = "postgresql+psycopg://qiraa:qiraa@localhost:5432/qiraa_test"
+
+
 @pytest.fixture
-def engine(tmp_path: Path) -> Iterator[Engine]:
+def engine() -> Iterator[Engine]:
     """A fresh, empty database for one test.
 
-    `tmp_path` is a built-in pytest fixture: a new empty folder for each test.
-    Tables come from the models (create_all). Alembic is not involved here: these tests
-    check the app's behaviour, and migrations are checked when you run `alembic upgrade`.
+    Tables come from the models (create_all). Alembic is not involved here:
+    these tests check the app's behaviour, and CI checks the migrations.
     """
-    url = os.environ.get("TEST_DATABASE_URL") or f"sqlite:///{tmp_path / 'test.db'}"
-    engine = create_engine(url)
-    if engine.dialect.name == "sqlite":
-
-        @event.listens_for(engine, "connect")
-        def _foreign_keys_on(
-            dbapi_connection: sqlite3.Connection, _record: object
-        ) -> None:
-            dbapi_connection.execute("PRAGMA foreign_keys=ON")
-
-    Base.metadata.drop_all(engine)
+    engine = create_engine(
+        os.environ.get("TEST_DATABASE_URL", DEFAULT_TEST_DATABASE_URL)
+    )
+    try:
+        Base.metadata.drop_all(engine)
+    except OperationalError:
+        pytest.exit(
+            "Test database not reachable. Start it: docker compose up -d --wait db"
+        )
     Base.metadata.create_all(engine)
     yield engine
     engine.dispose()

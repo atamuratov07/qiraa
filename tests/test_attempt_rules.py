@@ -39,7 +39,7 @@ def test_apply_heartbeat(seconds_later: float, expected_elapsed: int) -> None:
     assert attempt.last_seen_at == now
 
 
-def test_apply_heartbeat_accepts_naive_datetimes_from_sqlite() -> None:
+def test_apply_heartbeat_accepts_naive_datetimes() -> None:
     attempt = Attempt(elapsed_seconds=0, last_seen_at=T0.replace(tzinfo=None))
     attempts.apply_heartbeat(attempt, T0 + timedelta(seconds=10))
     assert attempt.elapsed_seconds == 10

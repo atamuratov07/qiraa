@@ -38,9 +38,7 @@ def october(day: int) -> date:
             october(8),
             id="midnight in Tashkent",
         ),
-        pytest.param(
-            datetime(2026, 10, 7, 23, 16), october(8), id="naive, as SQLite returns it"
-        ),
+        pytest.param(datetime(2026, 10, 7, 23, 16), october(8), id="naive"),
     ],
 )
 def test_local_day(moment: datetime, expected: date) -> None:

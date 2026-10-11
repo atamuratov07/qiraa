@@ -27,7 +27,7 @@ def test_env_file_is_read_and_unknown_keys_are_ignored(
 def test_environment_variable_beats_env_file(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setenv("DATABASE_URL", "sqlite:///other.db")
+    monkeypatch.setenv("DATABASE_URL", "postgresql://a:b@host/other")
     env = write_env(tmp_path, "DATABASE_URL=postgresql://a:b@host/db\n")
 
-    assert Settings(_env_file=env).sqlalchemy_url == "sqlite:///other.db"
+    assert Settings(_env_file=env).sqlalchemy_url == "postgresql://a:b@host/other"

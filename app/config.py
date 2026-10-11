@@ -16,7 +16,7 @@ def to_sqlalchemy_url(url: str) -> str:
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", extra="ignore")
 
-    database_url: str = f"sqlite:///{BASE_DIR / 'dev.db'}"
+    database_url: str = "postgresql://qiraa:qiraa@localhost:5432/qiraa"
     migration_database_url: str | None = None
 
     secure_cookies: bool = False

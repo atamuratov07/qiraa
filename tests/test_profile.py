@@ -157,9 +157,7 @@ def test_wrong_password_on_delete_shows_the_real_profile(
 
 def test_local_date_filter_shows_the_tashkent_date() -> None:
     assert local_date(NIGHT, "%d %b") == "08 окт"
-    assert (
-        local_date(NIGHT.replace(tzinfo=None)) == "8 окт 2026"
-    )  # naive, as from SQLite
+    assert local_date(NIGHT.replace(tzinfo=None)) == "8 окт 2026"
 
 
 def test_deleting_a_result(

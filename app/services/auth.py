@@ -84,7 +84,7 @@ def user_from_token(db: Session, token: str | None) -> User | None:
     if session is None:
         return None
     expires = session.expires_at
-    if expires.tzinfo is None:  # SQLite drops tz info; values were written as UTC
+    if expires.tzinfo is None:
         expires = expires.replace(tzinfo=UTC)
     if expires < datetime.now(UTC):
         db.delete(session)

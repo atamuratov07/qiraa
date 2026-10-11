@@ -24,9 +24,7 @@ def utcnow() -> datetime:
 
 
 def unique_where(name: str, *columns: str, where: ColumnElement[bool]) -> Index:
-    return Index(
-        name, *columns, unique=True, postgresql_where=where, sqlite_where=where
-    )
+    return Index(name, *columns, unique=True, postgresql_where=where)
 
 
 class Base(DeclarativeBase):

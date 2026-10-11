@@ -39,8 +39,6 @@ def profile_stats(db: Session, user: User) -> ProfileStats:
 def activity_calendar(db: Session, user: User, now: datetime) -> list[CalendarDay]:
     """Submitted quizzes per local day for the last CALENDAR_DAYS days, oldest first.
 
-    Counted in Python: grouping by *Tashkent* date in SQL needs timezone functions that
-    differ between Postgres and SQLite, and there are only a few rows.
     One extra day is fetched so a quiz just after local midnight 35 days ago isn't missed.
     """
     today = local_day(now)
