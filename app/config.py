@@ -1,7 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -14,6 +14,8 @@ def to_sqlalchemy_url(url: str) -> str:
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", extra="ignore")
+
     database_url: str = f"sqlite:///{BASE_DIR / 'dev.db'}"
     migration_database_url: str | None = None
 

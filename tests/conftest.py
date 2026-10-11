@@ -13,6 +13,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine, event
 from sqlalchemy.orm import Session, sessionmaker
 
+from app.config import get_settings
 from app.db import get_db
 from app.main import app
 from app.models import Base, Passage, User
@@ -22,6 +23,17 @@ from tests.factories import make_passage, make_question, make_user
 # ---------------------------------------------------------------------------
 # Database
 # ---------------------------------------------------------------------------
+
+
+@pytest.fixture(autouse=True)
+def default_settings(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
+    monkeypatch.setenv("APP_TIMEZONE", "Asia/Tashkent")
+    monkeypatch.setenv("SECURE_COOKIES", "false")
+    monkeypatch.setenv("ALLOW_SIGNUP", "true")
+    monkeypatch.setenv("SESSION_DAYS", "30")
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
 
 
 @pytest.fixture
