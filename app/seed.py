@@ -1,6 +1,6 @@
 """Load the real practice passages into the database.
 
-    uv run python -m app.seed                                   # local dev.db
+    uv run python -m app.seed                                   # local Postgres (Compose)
     DATABASE_URL="postgresql://..." uv run python -m app.seed   # Neon (macOS/Linux)
 
 A passage whose slug already exists is skipped, so running it again only adds new ones.

@@ -11,6 +11,22 @@ Work towards 2.0, planned in [docs/ROADMAP-v2.md](docs/ROADMAP-v2.md): personal 
 content, in-app editors, grammar practice, speaking practice, a question navigator, sign-up
 with an invite code, and the interface in Uzbek, Russian and English.
 
+### Added
+
+- Postgres 18 in Docker Compose for development and tests, with a `qiraa` and a `qiraa_test`
+  database.
+- GitHub Actions on every push: migrations up, `alembic check`, migrations down, then the
+  tests, on Postgres 18.
+
+### Removed
+
+- SQLite support. Development, tests and production all use Postgres.
+
+### Fixed
+
+- Settings are now read from a `.env` file in the project root. Unknown keys in it are
+  ignored.
+
 ## [1.0.0] - 2026-10-10
 
 First release, built from 6 to 8 October 2026.

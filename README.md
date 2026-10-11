@@ -56,7 +56,7 @@ See [Roadmap](#roadmap).
 | Validation and settings | Pydantic v2, pydantic-settings |
 | Passwords | Argon2id (argon2-cffi) |
 | Time zones | `zoneinfo` with the `tzdata` package |
-| Database | Postgres on Neon in production, SQLite locally |
+| Database | Postgres 18: Neon in production, Docker Compose locally and for tests |
 | Frontend | Tailwind CSS v4 browser build from a CDN, three plain JavaScript files, no build step |
 | Packages | uv (`pyproject.toml` + `uv.lock`) |
 | Tests | pytest with FastAPI's `TestClient` |
@@ -80,24 +80,32 @@ that takes about a minute.
 
 ## Running it locally
 
-Requires [uv](https://docs.astral.sh/uv/).
+Requires [uv](https://docs.astral.sh/uv/) and Docker. Postgres runs in Docker; the app runs
+on your machine.
 
 ```bash
+docker compose up -d --wait db   # Postgres 18 on port 5432, returns once it accepts connections
 uv sync                          # creates .venv and installs everything from uv.lock
-uv run alembic upgrade head      # creates the tables in dev.db (SQLite) in the project root
+uv run alembic upgrade head      # creates the tables in the qiraa database
 uv run python -m app.seed        # loads the four passages
 uv run fastapi dev app/main.py   # http://127.0.0.1:8000, restarts on every save
 ```
 
 Open the address, sign up, and pick a passage. The interactive API page is at `/docs`.
 
+The Compose database keeps its data in a Docker volume between restarts. On the first start
+it creates two databases, `qiraa` for the app and `qiraa_test` for the tests
+(`docker/initdb/01-test-db.sql`). `docker compose down -v` deletes the volume, and the next
+`up` starts from empty databases.
+
 ### Settings
 
-Read from environment variables.
+Read from environment variables, or from a `.env` file in the project root (copy
+`.env.example`). Environment variables win over `.env`.
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `DATABASE_URL` | `sqlite:///<project>/dev.db` | the app's database; Neon's `postgresql://...` URL in production |
+| `DATABASE_URL` | `postgresql://qiraa:qiraa@localhost:5432/qiraa` | the app's database; the default is the Compose one; Neon's URL in production |
 | `MIGRATION_DATABASE_URL` | same as `DATABASE_URL` | the database Alembic migrates, if it should differ |
 | `SECURE_COOKIES` | `false` | `true` in production, so the session cookie is only sent over HTTPS |
 | `SESSION_DAYS` | `30` | how long a login lasts |
@@ -110,18 +118,21 @@ SQLAlchemy needs, so Neon's connection strings can be pasted as they are.
 ## Tests
 
 ```bash
-uv run pytest                    # a fresh SQLite database for every test
+docker compose up -d --wait db   # if it isn't running yet
+uv run pytest                    # all tests, on the qiraa_test database
 uv run pytest -k streak          # only tests with "streak" in the name
-TEST_DATABASE_URL=postgresql+psycopg://user:pass@localhost:5432/qiraa_test uv run pytest
 ```
 
-`TEST_DATABASE_URL` runs the same tests against Postgres. Use a database made only for tests:
-every test drops and recreates all tables.
+Every test drops and recreates all tables in `qiraa_test`. `TEST_DATABASE_URL` points the
+tests at another database (in the `postgresql+psycopg://...` form); use one made only for
+tests. When the database can't be reached, the run stops with
+`Test database not reachable. Start it: docker compose up -d --wait db`.
 
-The suite has 88 tests:
+The suite has 90 tests:
 
 | File | Tests | Covers |
 |---|---|---|
+| `test_config.py` | 2 | reading settings from `.env` (no database) |
 | `test_attempt_rules.py` | 19 | timer rule, grading, option order (plain objects, no database) |
 | `test_attempt_service.py` | 19 | attempt service functions, including two simulated double-click races |
 | `test_attempt_routes.py` | 9 | the full practice journey over HTTP, access checks, bad input |
@@ -129,6 +140,18 @@ The suite has 88 tests:
 | `test_profile.py` | 22 | profile numbers and calendar, profile pages, deleting results |
 
 A SQLAlchemy warning (for example a query that forgot a join) fails the test run.
+
+### CI
+
+`.github/workflows/tests.yml` runs on every push, against a Postgres 18 service container.
+It installs the locked dependencies, then:
+
+1. applies all migrations to an empty database (`alembic upgrade head`);
+2. fails if a model changed without a migration (`alembic check`);
+3. runs every migration's `downgrade()` back to empty (`alembic downgrade base`);
+4. runs the test suite.
+
+The result shows in the repository's Actions tab.
 
 ## Changing the app
 
@@ -227,8 +250,8 @@ doesn't change the streak.
 - Pages are rendered through `render()` with a typed context (a `TypedDict` from `views.py`).
   Jinja runs with `StrictUndefined`, so a misspelled variable raises an error instead of
   rendering as an empty string.
-- Times are stored in UTC. SQLite returns them without a time zone, so `as_utc()` adds it back
-  before any comparison, and `local_day()` turns a stored time into a Tashkent date.
+- Times are stored in UTC (`timestamptz` columns). `as_utc()` treats a time without a time zone
+  as UTC before any comparison, and `local_day()` turns a stored time into a Tashkent date.
 - Templates format dates with the `local_date` filter (Russian month names) and choose Russian
   plural forms with the `plural` filter.
 
@@ -334,16 +357,19 @@ attempt_answers
 ```
 
 Constraint and index names follow a naming convention set on `Base.metadata`, so Alembic
-generates the same names on SQLite and Postgres. The schema is created by a single migration,
+generates predictable names that later migrations can refer to. The schema is created by a
+single migration,
 `migrations/versions/6ad753184ecc_initial_schema.py`.
 
 ## Project structure
 
 ```
 qiraa/
+├── .github/workflows/
+│   └── tests.yml          CI: migrations and tests on Postgres for every push
 ├── app/
 │   ├── main.py            creates the app: static files, routers, error pages, /healthz
-│   ├── config.py          settings from environment variables
+│   ├── config.py          settings from environment variables and .env
 │   ├── db.py              database engine, sessions, the get_db dependency
 │   ├── models.py          SQLAlchemy models
 │   ├── schemas.py         Pydantic shapes of the JSON the API receives and sends
@@ -371,9 +397,12 @@ qiraa/
 │       ├── reader.js      tappable Arabic words and the translation popup
 │       ├── attempt.js     timer, pause and resume, autosave, the submit check
 │       └── forms.js       sends forms marked data-background without a page reload
+├── docker/initdb/         SQL run on the first start of the Compose database
 ├── migrations/            Alembic environment and the initial schema
-├── tests/                 conftest.py, factories.py and five test files
+├── tests/                 conftest.py, factories.py and six test files
+├── .env.example           settings for local development, to copy to .env
 ├── alembic.ini
+├── docker-compose.yml     Postgres for development and tests
 ├── Dockerfile
 ├── pyproject.toml
 └── uv.lock
@@ -388,8 +417,6 @@ qiraa/
 - The word popup only links to Google Translate.
 - Changing a loaded passage means deleting and re-seeding it, which also deletes its attempts.
 - Interface text and error messages are written directly in Russian in the templates and code.
-- Local development uses SQLite, which differs from Postgres (time zones, foreign keys, column
-  changes). Run the tests against Postgres before larger changes.
 - When you are logged out, submitting a form redirects to `/login` with that form's address
   in `next`. After logging in, the browser opens it with GET and gets `405`.
 

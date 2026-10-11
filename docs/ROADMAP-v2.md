@@ -46,7 +46,7 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 | Translations          | gettext with Babel and Jinja's i18n extension; English msgids; catalogs for `ru`, `uz`, `en`                                                                                                                                                    |
 | Language choice       | user setting, then cookie, then `Accept-Language`, then English                                                                                                                                                                                 |
 | Dates                 | Babel's date formatting replaces the hand-written Russian month names                                                                                                                                                                           |
-| Local database        | Postgres in Docker Compose for development and tests; the app itself runs on the machine, not in a container                                                                                                                                    |
+| Local database        | Postgres in Docker Compose for development and tests; the app itself runs on the machine, not in a container; SQLite support removed                                                                                                            |
 | Code layout           | organise by feature (see step 2)                                                                                                                                                                                                                |
 
 ## Open decisions (likely choice first)
@@ -108,9 +108,9 @@ the user delete fail instead of leaving private rows nobody can reach.
 
 ### 1. Postgres for development and CI
 
-- [ ] `docker-compose.yml` with Postgres (same major version as Neon), `qiraa` and
+- [x] `docker-compose.yml` with Postgres (same major version as Neon), `qiraa` and
       `qiraa_test` databases.
-- [ ] GitHub Actions workflow running `uv run pytest` against a Postgres service on every push.
+- [x] GitHub Actions workflow running `uv run pytest` against a Postgres service on every push.
       Done when: `docker compose up -d db`, migrations and all tests pass on Postgres locally and in CI.
 
 ### 2. Organise the code by feature

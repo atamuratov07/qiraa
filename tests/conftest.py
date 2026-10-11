@@ -1,6 +1,6 @@
 """
-Set TEST_DATABASE_URL to run the same tests against Postgres, e.g.
-    TEST_DATABASE_URL=postgresql+psycopg://postgres@localhost:5432/qiraa_test uv run pytest
+Tests use the qiraa_test database of the Postgres in docker-compose.yml.
+TEST_DATABASE_URL points them at another database. Every test drops all tables there.
 """
 
 import os

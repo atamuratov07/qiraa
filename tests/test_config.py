@@ -30,4 +30,6 @@ def test_environment_variable_beats_env_file(
     monkeypatch.setenv("DATABASE_URL", "postgresql://a:b@host/other")
     env = write_env(tmp_path, "DATABASE_URL=postgresql://a:b@host/db\n")
 
-    assert Settings(_env_file=env).sqlalchemy_url == "postgresql://a:b@host/other"
+    assert (
+        Settings(_env_file=env).sqlalchemy_url == "postgresql+psycopg://a:b@host/other"
+    )
