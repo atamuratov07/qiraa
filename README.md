@@ -243,13 +243,13 @@ doesn't change the streak.
 
 ### Conventions in the code
 
-- Routes stay thin: they read the request, call a function in `services/`, and choose the
-  response. Services contain no HTTP code, which makes them easy to test.
+- Routes stay thin: they read the request, call a function in the feature's `service.py`, and
+  choose the response. Services contain no HTTP code, which makes them easy to test.
 - Service functions take the current time as a `now` parameter instead of reading the clock,
   so tests can use fixed times.
-- Pages are rendered through `render()` with a typed context (a `TypedDict` from `views.py`).
-  Jinja runs with `StrictUndefined`, so a misspelled variable raises an error instead of
-  rendering as an empty string.
+- Pages are rendered through `render()` with a typed context (a `TypedDict` from the feature's
+  `views.py`). Jinja runs with `StrictUndefined`, so a misspelled variable raises an error
+  instead of rendering as an empty string.
 - Times are stored in UTC (`timestamptz` columns). `as_utc()` treats a time without a time zone
   as UTC before any comparison, and `local_day()` turns a stored time into a Tashkent date.
 - Templates format dates with the `local_date` filter (Russian month names) and choose Russian
@@ -260,15 +260,15 @@ doesn't change the streak.
 | Method | Path | What it does | Response |
 |---|---|---|---|
 | GET | `/` | Sends you to the passage list | 303 to `/passages` |
-| GET, POST | `/signup` | Show the form; create the account and log in | `signup.html`; 303 to `/passages`; 403 when sign-ups are closed |
-| GET, POST | `/login` | Show the form; check the password | `login.html`; 303 to `next` |
+| GET, POST | `/signup` | Show the form; create the account and log in | `auth/signup.html`; 303 to `/passages`; 403 when sign-ups are closed |
+| GET, POST | `/login` | Show the form; check the password | `auth/login.html`; 303 to `next` |
 | POST | `/logout` | Delete the session | 303 to `/login` |
-| GET | `/profile` | Streaks, statistics, calendar, latest results, account deletion | `profile.html` |
+| GET | `/profile` | Streaks, statistics, calendar, latest results, account deletion | `profile/profile.html` |
 | POST | `/account/delete` | Delete the account after checking the password | 303 to `/login`; 400 with the profile page on a wrong password |
-| GET | `/passages` | Streak and passage list with best score, tries and unfinished attempts | `passages.html` |
-| GET | `/passages/{pid}` | Start card for a passage | `passage_start.html`; 303 to the open attempt if there is one |
+| GET | `/passages` | Streak and passage list with best score, tries and unfinished attempts | `passages/list.html` |
+| GET | `/passages/{pid}` | Start card for a passage | `passages/start.html`; 303 to the open attempt if there is one |
 | POST | `/passages/{pid}/attempts` | Start an attempt (or return the open one) | 303 to `/attempts/{aid}` |
-| GET | `/attempts/{aid}` | Your own attempt: practice page while open, result once submitted | `attempt.html` or `result.html` |
+| GET | `/attempts/{aid}` | Your own attempt: practice page while open, result once submitted | `practice/attempt.html` or `practice/result.html` |
 | POST | `/attempts/{aid}/submit` | Form fields `q<question id>=<option id>`; grade and close | 303 to `/attempts/{aid}` |
 | POST | `/attempts/{aid}/discard` | Delete an open attempt and its answers | 303 to the form's `next`; 409 if already submitted |
 | POST | `/attempts/{aid}/delete` | Delete a result (any attempt of yours) | 303 to the form's `next`, default `/profile` |
@@ -368,31 +368,26 @@ qiraa/
 ├── .github/workflows/
 │   └── tests.yml          CI: migrations and tests on Postgres for every push
 ├── app/
-│   ├── main.py            creates the app: static files, routers, error pages, /healthz
-│   ├── config.py          settings from environment variables and .env
-│   ├── db.py              database engine, sessions, the get_db dependency
-│   ├── models.py          SQLAlchemy models
-│   ├── schemas.py         Pydantic shapes of the JSON the API receives and sends
-│   ├── views.py           dataclasses and TypedDicts: what each template receives
-│   ├── templating.py      Jinja setup, render(), Russian date and plural filters
-│   ├── deps.py            current-user dependencies, reading form fields
-│   ├── security.py        password hashing, session tokens
-│   ├── redirects.py       safe_next(): redirects only within the site
-│   ├── timeutils.py       as_utc(), local_day()
+│   ├── main.py            creates the app: static files, routes, error pages, /healthz
+│   ├── models.py          imports every model, for Alembic and the tests
 │   ├── seed.py            the passages and the script that loads them
-│   ├── routers/
-│   │   ├── auth.py        sign-up, login, logout, account deletion
-│   │   ├── passages.py    passage list, start card, starting an attempt
-│   │   ├── attempts.py    practice and result page, submit, discard, delete
-│   │   ├── api.py         JSON for attempt.js: autosave, heartbeat
-│   │   └── profile.py     the profile page
-│   ├── services/
-│   │   ├── auth.py        accounts and sessions
-│   │   ├── attempts.py    attempt lifecycle, grading, timer rule, list statistics
-│   │   ├── streaks.py     streak rules
-│   │   └── profile.py     profile statistics, calendar, latest results
-│   ├── templates/         base, passages, passage_start, attempt, result, profile,
-│   │                      login, signup, error, plus _macros and _popover
+│   ├── core/              shared by every feature
+│   │   ├── base.py        Base (naming convention), utcnow(), unique_where()
+│   │   ├── config.py      settings from environment variables and .env, project paths
+│   │   ├── db.py          database engine, sessions, the get_db dependency
+│   │   ├── deps.py        FormFields: reading form fields
+│   │   ├── redirects.py   safe_next(): redirects only within the site
+│   │   ├── templating.py  Jinja setup, render(), Russian date and plural filters
+│   │   ├── timeutils.py   as_utc(), local_day()
+│   │   └── views.py       ErrorPage
+│   ├── auth/              User, UserSession; sign-up, login, logout, account deletion;
+│   │                      CurrentUser and MaybeUser dependencies; password hashing
+│   │                      and session tokens (security.py)
+│   ├── passages/          Passage; passage list with statistics, start card
+│   ├── practice/          Question, Option, Attempt, AttemptAnswer; attempt lifecycle,
+│   │                      grading, timer rule; practice and result pages; JSON API
+│   ├── profile/           streak rules; profile statistics, calendar, latest results
+│   ├── templates/         base, error, _macros, _popover, plus one folder per feature
 │   └── static/
 │       ├── reader.js      tappable Arabic words and the translation popup
 │       ├── attempt.js     timer, pause and resume, autosave, the submit check
@@ -407,6 +402,11 @@ qiraa/
 ├── pyproject.toml
 └── uv.lock
 ```
+
+Each feature folder holds the same kinds of files: `models.py` (tables), `service.py`
+(database work and rules, no HTTP), `routes.py` (pages and form posts), `views.py` (what each
+template receives) and, in `practice/`, `api.py` with `schemas.py` for the JSON endpoints.
+Templates are in `app/templates/<feature>/`.
 
 ## Known limitations
 

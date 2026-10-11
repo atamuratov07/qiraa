@@ -116,8 +116,8 @@ the user delete fail instead of leaving private rows nobody can reach.
 ### 2. Organise the code by feature
 
 ```
-app/core/       config, db, templating, i18n, permissions, timeutils, redirects, security
-app/auth/       users, sessions, sign-up/login, deps
+app/core/       config, db, templating, i18n, permissions, timeutils, redirects
+app/auth/       users, sessions, sign-up/login, deps, security (password and token hashing)
 app/practice/   Question, Option, Attempt, AttemptAnswer, attempt service, routes, api,
                 attempt/result templates, the question navigator
 app/passages/   Passage, list and start pages, editor
@@ -129,7 +129,10 @@ app/models.py   imports every model so Alembic sees them
 ```
 
 Templates stay in `app/templates/<feature>/`.
-Done when: one commit that only moves code; all tests pass before and after.
+
+- [x] Move `core/`, `auth/`, `passages/`, `practice/`, `profile/`; the other folders and
+      modules (`grammar/`, `speaking/`, `content/`, `i18n`, `permissions`) arrive with their steps.
+      Done when: one commit that only moves code; all tests pass before and after.
 
 ### 3. Ownership, admin role, permissions, invite code
 

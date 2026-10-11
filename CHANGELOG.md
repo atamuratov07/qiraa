@@ -18,6 +18,11 @@ with an invite code, and the interface in Uzbek, Russian and English.
 - GitHub Actions on every push: migrations up, `alembic check`, migrations down, then the
   tests, on Postgres 18.
 
+### Changed
+
+- Code organised by feature: `app/core`, `auth`, `passages`, `practice` and `profile`, with
+  templates in a folder per feature. No change in behaviour.
+
 ### Removed
 
 - SQLite support. Development, tests and production all use Postgres.

@@ -36,23 +36,34 @@ docker compose down -v                    # delete the local databases
 `TEST_DATABASE_URL` (`postgresql+psycopg://...`) points the tests elsewhere. It must be a
 throwaway database: every test drops all tables.
 
-## Code layout (1.0)
+## Code layout
 
-`app/main.py` app and error handlers · `config.py` settings · `db.py` engine, `get_db`, `DB`
-alias · `models.py` · `schemas.py` JSON shapes · `views.py` dataclasses and one `TypedDict` per
-page · `templating.py` Jinja, `render()`, Russian `local_date`/`plural` filters · `deps.py`
-`CurrentUser`, `MaybeUser`, `FormFields`, `LoginRequired` · `security.py` · `redirects.py`
-`safe_next()` · `timeutils.py` `as_utc()`, `local_day()` · `seed.py` ·
-`routers/{auth,passages,attempts,api,profile}.py` ·
-`services/{auth,attempts,streaks,profile}.py` · `templates/` · `static/` ·
-`migrations/versions/6ad753184ecc_initial_schema.py` (single initial schema) · `tests/`.
+Organised by feature. `app/main.py` creates the app, includes every router and handles errors.
+`app/models.py` imports every model. `app/seed.py` loads the real passages (until step 5).
+
+- `core/`: `base.py` `Base`, `utcnow()`, `unique_where()` · `config.py` settings, `BASE_DIR`,
+  `APP_DIR` · `db.py` engine, `get_db`, `DB` alias · `deps.py` `FormFields` · `templating.py`
+  Jinja, `render()`, Russian `local_date`/`plural` filters · `timeutils.py` `as_utc()`,
+  `local_day()` · `redirects.py` `safe_next()` · `views.py` `ErrorPage`.
+- `auth/`: `User`, `UserSession` · `deps.py` `CurrentUser`, `MaybeUser`, `LoginRequired` ·
+  `security.py` password hashing, session tokens.
+- `passages/`: `Passage` · passage list statistics, start card.
+- `practice/`: `Question`, `Option`, `Attempt`, `AttemptAnswer` · attempt service · pages,
+  `api.py` and `schemas.py` for the JSON endpoints.
+- `profile/`: `streaks.py` · profile statistics and page.
+
+A feature has `models.py`, `service.py`, `routes.py` and `views.py` (dataclasses and one
+`TypedDict` per page) where it needs them. Templates are in `app/templates/<feature>/`; shared
+ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`) stay at the top.
+`migrations/versions/6ad753184ecc_initial_schema.py` is the single initial schema.
 
 ## Rules
 
 1. **Routes stay thin.** Read the request, call a service, choose the response. Services never
    import FastAPI.
 2. **Pass `now` in.** Service functions take `now: datetime` (UTC) instead of reading the clock.
-3. **Pages render through `render()` with a `TypedDict` context from `views.py`.** Jinja uses
+3. **Pages render through `render()` with a `TypedDict` context from the feature's
+   `views.py`.** Jinja uses
    `StrictUndefined`; every key is required, optional values are `X | None` passed as `None`.
 4. **Load owned rows through helpers that check ownership** (`load_attempt(db, user, id)`
    returns `None` for other users' rows). Someone else's object answers 404, never 403. An
@@ -80,6 +91,14 @@ page · `templating.py` Jinja, `render()`, Russian `local_date`/`plural` filters
     through `load_visible_*()` / `load_editable_*()` in `core/permissions.py`; routes never
     call `db.get()` on owned content. Account deletion removes the user's private content
     before the user row.
+13. **Imports between features.** `core/` imports no feature at runtime. Model files start
+    with `from __future__ import annotations` and import other features' models only under
+    `if TYPE_CHECKING:`; SQLAlchemy finds relationship targets by class name. Services, views
+    and routes may import any feature's models and services; only `main.py` imports routes,
+    so a route can import from anywhere without a cycle. Entry points
+    (`main.py`, `seed.py`, `migrations/env.py`, `tests/conftest.py`) import `app.models`, so
+    every model is registered before the first query. `__init__.py` files stay empty. Paths
+    come from `BASE_DIR` / `APP_DIR` in `core/config.py`, never from `__file__` elsewhere.
 
 ## Tests
 
