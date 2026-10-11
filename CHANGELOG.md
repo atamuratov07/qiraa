@@ -32,7 +32,7 @@ with an invite code, and the interface in Uzbek, Russian and English.
 - Settings are now read from a `.env` file in the project root. Unknown keys in it are
   ignored.
 
-## [1.0.0] - 2026-10-10
+## [1.0.0]
 
 First release, built from 6 to 8 October 2026.
 
@@ -60,17 +60,17 @@ First release, built from 6 to 8 October 2026.
 
 ### Development log
 
-| Date | Commit | Step |
-|---|---|---|
-| 6 Oct | `337b6d9` | Initial commit: FastAPI app |
-| 6 Oct | `5b85599` | Base and error templates |
-| 7 Oct | `c0d76e0` | SQLAlchemy models, SQLite for development and Postgres for production |
-| 7 Oct | `a72d398` | Custom authentication |
-| 8 Oct | `0f8dcde` | Attempts: start, autosave, heartbeat, submit, discard, tests |
-| 8 Oct | `4665cc8` | Migrations reset to a single initial schema |
-| 8 Oct | `4fba51d` | Profile page, streaks, statistics, account and result deletion, tests |
-| 8 Oct | `f0294e2` | Real passages |
-| 8 Oct | `6c2decb` | Russian interface |
+| Commit    | Step                                                                  |
+| --------- | --------------------------------------------------------------------- |
+| `337b6d9` | Initial commit: FastAPI app                                           |
+| `5b85599` | Base and error templates                                              |
+| `c0d76e0` | SQLAlchemy models, SQLite for development and Postgres for production |
+| `a72d398` | Custom authentication                                                 |
+| `0f8dcde` | Attempts: start, autosave, heartbeat, submit, discard, tests          |
+| `4665cc8` | Migrations reset to a single initial schema                           |
+| `4fba51d` | Profile page, streaks, statistics, account and result deletion, tests |
+| `f0294e2` | Real passages                                                         |
+| `6c2decb` | Russian interface                                                     |
 
 [Unreleased]: https://github.com/atamuratov07/qiraa/compare/v1.0.0...HEAD
 [1.0.0]: https://github.com/atamuratov07/qiraa/releases/tag/v1.0.0

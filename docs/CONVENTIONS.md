@@ -16,8 +16,6 @@ CDN · plain JavaScript (`reader.js`, `attempt.js`, `forms.js`), no build step.
   tests. The app runs on the machine. Settings come from the environment, then `.env`.
 - CI: `.github/workflows/tests.yml` on every push: `alembic upgrade head`, `alembic check`,
   `alembic downgrade base`, then the tests, all on Postgres 18.
-- Free-tier limits: Render sleeps after 15 idle minutes (about a minute to wake). Neon free:
-  0.5 GB per project, 10 branches, 1 manual snapshot, 6-hour restore window.
 
 ## Commands
 

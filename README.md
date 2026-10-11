@@ -1,14 +1,14 @@
 # Qiraa · قراءة
 
 Qiraa is a small web app for practising Arabic reading comprehension. You open a passage,
-read it, answer its multiple-choice questions, and get a score with explanations in Russian.
+read it, answer its multiple-choice questions, and get a score with explanations.
 It also keeps a daily practice streak and a profile with your results. It was built to prepare
 for an Arabic language assessment (similar to IELTS for English) and as a project for learning
 FastAPI, SQLAlchemy and Alembic.
 
-**Version 1.0.0** · 10 October 2026 · live at `https://<your-app>.onrender.com`
+**Version 1.0.0** · live at `https://qiraa-lab2.onrender.com`
 
-The interface is in Russian. Version history: [CHANGELOG.md](CHANGELOG.md).
+Version history: [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
@@ -38,39 +38,36 @@ The interface is in Russian. Version history: [CHANGELOG.md](CHANGELOG.md).
 
 ### Not in 1.0 yet
 
-| Feature | Status |
-|---|---|
-| Word translation inside the popup | planned; the `passages.glossary` column already exists |
-| Adding or editing passages without changing code | planned for 2.0 |
-| Interface in Uzbek and English | planned for 2.0 |
+| Feature                                          | Status                                                 |
+| ------------------------------------------------ | ------------------------------------------------------ |
+| Word translation inside the popup                | planned; the `passages.glossary` column already exists |
+| Adding or editing passages without changing code | planned for 2.0                                        |
+| Interface in Uzbek and English                   | planned for 2.0                                        |
 
 See [Roadmap](#roadmap).
 
 ## Tech stack
 
-| Part | Choice |
-|---|---|
-| Language | Python 3.13 |
-| Web framework | FastAPI, with pages rendered on the server from Jinja2 templates |
-| Database access | SQLAlchemy 2.1 (typed `Mapped[...]` models), Alembic migrations |
-| Validation and settings | Pydantic v2, pydantic-settings |
-| Passwords | Argon2id (argon2-cffi) |
-| Time zones | `zoneinfo` with the `tzdata` package |
-| Database | Postgres 18: Neon in production, Docker Compose locally and for tests |
-| Frontend | Tailwind CSS v4 browser build from a CDN, three plain JavaScript files, no build step |
-| Packages | uv (`pyproject.toml` + `uv.lock`) |
-| Tests | pytest with FastAPI's `TestClient` |
-| Hosting | Docker image on Render |
-
-Exact versions are pinned in `uv.lock`.
+| Part                    | Choice                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------- |
+| Language                | Python 3.13                                                                           |
+| Web framework           | FastAPI, with pages rendered on the server from Jinja2 templates                      |
+| Database access         | SQLAlchemy 2.1 (typed `Mapped[...]` models), Alembic migrations                       |
+| Validation and settings | Pydantic v2, pydantic-settings                                                        |
+| Passwords               | Argon2id (argon2-cffi)                                                                |
+| Time zones              | `zoneinfo` with the `tzdata` package                                                  |
+| Database                | Postgres 18: Neon in production, Docker Compose locally and for tests                 |
+| Frontend                | Tailwind CSS v4 browser build from a CDN, three plain JavaScript files, no build step |
+| Packages                | uv (`pyproject.toml` + `uv.lock`)                                                     |
+| Tests                   | pytest with FastAPI's `TestClient`                                                    |
+| Hosting                 | Docker image on Render                                                                |
 
 ## Hosting
 
-| Part | Service | Notes |
-|---|---|---|
-| App | Render, free web service, Frankfurt | Built from the `Dockerfile` on every push to `main`. The container runs `alembic upgrade head`, then starts Uvicorn. |
-| Database | Neon, free Postgres, Frankfurt | Render's own free Postgres is deleted after 30 days, which is why Neon is used. |
-| Domain | `*.onrender.com` | A free `yourname.is-a.dev` subdomain can be requested through a pull request to github.com/is-a-dev/register and pointed at Render. |
+| Part     | Service                             | Notes                                                                                                                |
+| -------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| App      | Render, free web service, Frankfurt | Built from the `Dockerfile` on every push to `main`. The container runs `alembic upgrade head`, then starts Uvicorn. |
+| Database | Neon, free Postgres, Frankfurt      | Render's own free Postgres is deleted after 30 days, which is why Neon is used.                                      |
 
 On Render, set `DATABASE_URL` (Neon's pooled connection string), `SECURE_COOKIES=true`, and
 optionally `MIGRATION_DATABASE_URL` (Neon's direct connection string, used only by Alembic).
@@ -103,14 +100,14 @@ it creates two databases, `qiraa` for the app and `qiraa_test` for the tests
 Read from environment variables, or from a `.env` file in the project root (copy
 `.env.example`). Environment variables win over `.env`.
 
-| Variable | Default | Meaning |
-|---|---|---|
-| `DATABASE_URL` | `postgresql://qiraa:qiraa@localhost:5432/qiraa` | the app's database; the default is the Compose one; Neon's URL in production |
-| `MIGRATION_DATABASE_URL` | same as `DATABASE_URL` | the database Alembic migrates, if it should differ |
-| `SECURE_COOKIES` | `false` | `true` in production, so the session cookie is only sent over HTTPS |
-| `SESSION_DAYS` | `30` | how long a login lasts |
-| `APP_TIMEZONE` | `Asia/Tashkent` | the time zone that decides what "today" means for streaks and dates |
-| `ALLOW_SIGNUP` | `true` | set to `false` once your own accounts exist |
+| Variable                 | Default                                         | Meaning                                                                      |
+| ------------------------ | ----------------------------------------------- | ---------------------------------------------------------------------------- |
+| `DATABASE_URL`           | `postgresql://qiraa:qiraa@localhost:5432/qiraa` | the app's database; the default is the Compose one; Neon's URL in production |
+| `MIGRATION_DATABASE_URL` | same as `DATABASE_URL`                          | the database Alembic migrates, if it should differ                           |
+| `SECURE_COOKIES`         | `false`                                         | `true` in production, so the session cookie is only sent over HTTPS          |
+| `SESSION_DAYS`           | `30`                                            | how long a login lasts                                                       |
+| `APP_TIMEZONE`           | `Asia/Tashkent`                                 | the time zone that decides what "today" means for streaks and dates          |
+| `ALLOW_SIGNUP`           | `true`                                          | set to `false` once your own accounts exist                                  |
 
 `postgres://` and `postgresql://` URLs are converted to the `postgresql+psycopg://` form
 SQLAlchemy needs, so Neon's connection strings can be pasted as they are.
@@ -130,14 +127,14 @@ tests. When the database can't be reached, the run stops with
 
 The suite has 90 tests:
 
-| File | Tests | Covers |
-|---|---|---|
-| `test_config.py` | 2 | reading settings from `.env` (no database) |
-| `test_attempt_rules.py` | 19 | timer rule, grading, option order (plain objects, no database) |
-| `test_attempt_service.py` | 19 | attempt service functions, including two simulated double-click races |
-| `test_attempt_routes.py` | 9 | the full practice journey over HTTP, access checks, bad input |
-| `test_streaks.py` | 19 | Tashkent dates, streak rules, streaks through submitting |
-| `test_profile.py` | 22 | profile numbers and calendar, profile pages, deleting results |
+| File                      | Tests | Covers                                                                |
+| ------------------------- | ----- | --------------------------------------------------------------------- |
+| `test_config.py`          | 2     | reading settings from `.env` (no database)                            |
+| `test_attempt_rules.py`   | 19    | timer rule, grading, option order (plain objects, no database)        |
+| `test_attempt_service.py` | 19    | attempt service functions, including two simulated double-click races |
+| `test_attempt_routes.py`  | 9     | the full practice journey over HTTP, access checks, bad input         |
+| `test_streaks.py`         | 19    | Tashkent dates, streak rules, streaks through submitting              |
+| `test_profile.py`         | 22    | profile numbers and calendar, profile pages, deleting results         |
 
 A SQLAlchemy warning (for example a query that forgot a join) fails the test run.
 
@@ -215,7 +212,7 @@ POST /passages/{pid}/attempts        POST /attempts/{aid}/submit
 ```
 
 - **One open attempt per passage.** A partial unique index on `attempts (user_id, passage_id)
-  WHERE submitted_at IS NULL` enforces it in the database. A double click on Start returns the
+WHERE submitted_at IS NULL` enforces it in the database. A double click on Start returns the
   attempt that was created first.
 - **Shuffled options.** The order is chosen when the attempt starts and saved in
   `attempts.option_order`, so a reload or the result page shows the same order.
@@ -257,24 +254,24 @@ doesn't change the streak.
 
 ## Routes
 
-| Method | Path | What it does | Response |
-|---|---|---|---|
-| GET | `/` | Sends you to the passage list | 303 to `/passages` |
-| GET, POST | `/signup` | Show the form; create the account and log in | `auth/signup.html`; 303 to `/passages`; 403 when sign-ups are closed |
-| GET, POST | `/login` | Show the form; check the password | `auth/login.html`; 303 to `next` |
-| POST | `/logout` | Delete the session | 303 to `/login` |
-| GET | `/profile` | Streaks, statistics, calendar, latest results, account deletion | `profile/profile.html` |
-| POST | `/account/delete` | Delete the account after checking the password | 303 to `/login`; 400 with the profile page on a wrong password |
-| GET | `/passages` | Streak and passage list with best score, tries and unfinished attempts | `passages/list.html` |
-| GET | `/passages/{pid}` | Start card for a passage | `passages/start.html`; 303 to the open attempt if there is one |
-| POST | `/passages/{pid}/attempts` | Start an attempt (or return the open one) | 303 to `/attempts/{aid}` |
-| GET | `/attempts/{aid}` | Your own attempt: practice page while open, result once submitted | `practice/attempt.html` or `practice/result.html` |
-| POST | `/attempts/{aid}/submit` | Form fields `q<question id>=<option id>`; grade and close | 303 to `/attempts/{aid}` |
-| POST | `/attempts/{aid}/discard` | Delete an open attempt and its answers | 303 to the form's `next`; 409 if already submitted |
-| POST | `/attempts/{aid}/delete` | Delete a result (any attempt of yours) | 303 to the form's `next`, default `/profile` |
-| PUT | `/api/attempts/{attempt_id}/answers/{question_id}` | JSON `{"option_id": 45}`: save or replace one answer | 204; 400 for an option of another question; 409 if submitted |
-| POST | `/api/attempts/{attempt_id}/heartbeat` | Apply the timer rule | `{"elapsed_seconds": 192}`; 409 if submitted |
-| GET | `/healthz` | Health check used by Render | `{"ok": true}` |
+| Method    | Path                                               | What it does                                                           | Response                                                             |
+| --------- | -------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| GET       | `/`                                                | Sends you to the passage list                                          | 303 to `/passages`                                                   |
+| GET, POST | `/signup`                                          | Show the form; create the account and log in                           | `auth/signup.html`; 303 to `/passages`; 403 when sign-ups are closed |
+| GET, POST | `/login`                                           | Show the form; check the password                                      | `auth/login.html`; 303 to `next`                                     |
+| POST      | `/logout`                                          | Delete the session                                                     | 303 to `/login`                                                      |
+| GET       | `/profile`                                         | Streaks, statistics, calendar, latest results, account deletion        | `profile/profile.html`                                               |
+| POST      | `/account/delete`                                  | Delete the account after checking the password                         | 303 to `/login`; 400 with the profile page on a wrong password       |
+| GET       | `/passages`                                        | Streak and passage list with best score, tries and unfinished attempts | `passages/list.html`                                                 |
+| GET       | `/passages/{pid}`                                  | Start card for a passage                                               | `passages/start.html`; 303 to the open attempt if there is one       |
+| POST      | `/passages/{pid}/attempts`                         | Start an attempt (or return the open one)                              | 303 to `/attempts/{aid}`                                             |
+| GET       | `/attempts/{aid}`                                  | Your own attempt: practice page while open, result once submitted      | `practice/attempt.html` or `practice/result.html`                    |
+| POST      | `/attempts/{aid}/submit`                           | Form fields `q<question id>=<option id>`; grade and close              | 303 to `/attempts/{aid}`                                             |
+| POST      | `/attempts/{aid}/discard`                          | Delete an open attempt and its answers                                 | 303 to the form's `next`; 409 if already submitted                   |
+| POST      | `/attempts/{aid}/delete`                           | Delete a result (any attempt of yours)                                 | 303 to the form's `next`, default `/profile`                         |
+| PUT       | `/api/attempts/{attempt_id}/answers/{question_id}` | JSON `{"option_id": 45}`: save or replace one answer                   | 204; 400 for an option of another question; 409 if submitted         |
+| POST      | `/api/attempts/{attempt_id}/heartbeat`             | Apply the timer rule                                                   | `{"elapsed_seconds": 192}`; 409 if submitted                         |
+| GET       | `/healthz`                                         | Health check used by Render                                            | `{"ok": true}`                                                       |
 
 Errors on pages are shown in Russian on `error.html`; errors under `/api` are JSON
 `{"detail": "..."}`. A malformed page URL (for example `/passages/abc`) shows the 404 page.
@@ -410,7 +407,6 @@ Templates are in `app/templates/<feature>/`.
 
 ## Known limitations
 
-- The first request after 15 idle minutes takes about a minute (Render free plan).
 - Tailwind is compiled in the browser from a CDN and logs a "not for production" warning in
   the console.
 - There is no password reset and no limit on login attempts, so sign-ups are best kept closed.
