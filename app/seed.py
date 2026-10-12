@@ -536,6 +536,7 @@ def build_passage(data: PassageData) -> Passage:
         title=data["title"],
         level=data["level"],
         text=data["text"],
+        is_common=True,
         translation_ru=data["translation_ru"],
         questions=questions,
     )
@@ -546,7 +547,9 @@ def seed(db: Session) -> tuple[list[str], list[str]]:
     added: list[str] = []
     skipped: list[str] = []
     for data in PASSAGES:
-        exists = db.scalar(select(Passage.id).where(Passage.slug == data["slug"]))
+        exists = db.scalar(
+            select(Passage.id).where(Passage.slug == data["slug"], Passage.is_common)
+        )
         if exists is not None:
             skipped.append(data["slug"])
             continue

@@ -33,7 +33,12 @@ def make_question(question_id: int, *, correct: int, position: int = 1) -> Quest
 
 
 def make_passage(
-    passage_id: int, questions: list[Question], *, level: str = "A2"
+    passage_id: int,
+    questions: list[Question],
+    *,
+    level: str = "A2",
+    owner: User | None = None,
+    is_common: bool | None = None,
 ) -> Passage:
     for position, question in enumerate(questions, start=1):
         question.position = position
@@ -43,12 +48,18 @@ def make_passage(
         title=f"نص {passage_id}",
         level=level,
         text="الفقرة الأولى.\n\nالفقرة الثانية.",
+        owner_id=owner.id if owner else None,
+        is_common=owner is None if is_common is None else is_common,
         translation_ru=None,
         questions=questions,
     )
 
 
-def make_user(user_id: int, username: str) -> User:
+def make_user(user_id: int, username: str, *, is_admin: bool = False) -> User:
     return User(
-        id=user_id, username=username, password_hash="not-a-real-hash", created_at=T0
+        id=user_id,
+        username=username,
+        password_hash="not-a-real-hash",
+        created_at=T0,
+        is_admin=is_admin,
     )

@@ -77,7 +77,7 @@ def passage_cards(db: Session, user: User) -> list[PassageCard]:
         cards.append(
             PassageCard(
                 id=p.id,
-                title=p.title,
+                title=p.display_title,
                 level=p.level,
                 question_count=question_count[p.id],
                 best=best,
