@@ -92,6 +92,14 @@ def other_user(db: Session) -> User:
 
 
 @pytest.fixture
+def admin(db: Session) -> User:
+    u = make_user(3, "admin", is_admin=True)
+    db.add(u)
+    db.commit()
+    return u
+
+
+@pytest.fixture
 def passage(db: Session) -> Passage:
     p = make_passage(1, [make_question(1, correct=1), make_question(2, correct=2)])
     db.add(p)
