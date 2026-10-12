@@ -41,15 +41,18 @@ DEFAULT_TEST_DATABASE_URL = "postgresql+psycopg://qiraa:qiraa@localhost:5432/qir
 
 
 @pytest.fixture
-def engine() -> Iterator[Engine]:
+def database_url() -> str:
+    return os.environ.get("TEST_DATABASE_URL", DEFAULT_TEST_DATABASE_URL)
+
+
+@pytest.fixture
+def engine(database_url: str) -> Iterator[Engine]:
     """A fresh, empty database for one test.
 
     Tables come from the models (create_all). Alembic is not involved here:
-    these tests check the app's behaviour, and CI checks the migrations.
+    these tests check the app's behaviour; test_migrations.py and CI check the migrations.
     """
-    engine = create_engine(
-        os.environ.get("TEST_DATABASE_URL", DEFAULT_TEST_DATABASE_URL)
-    )
+    engine = create_engine(database_url)
     try:
         Base.metadata.drop_all(engine)
     except OperationalError:
