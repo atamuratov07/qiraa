@@ -31,6 +31,7 @@ def default_settings(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     monkeypatch.setenv("APP_TIMEZONE", "Asia/Tashkent")
     monkeypatch.setenv("SECURE_COOKIES", "false")
     monkeypatch.setenv("ALLOW_SIGNUP", "true")
+    monkeypatch.setenv("SIGNUP_CODE", "")
     monkeypatch.setenv("SESSION_DAYS", "30")
     get_settings.cache_clear()
     yield

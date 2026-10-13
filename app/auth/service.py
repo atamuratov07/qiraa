@@ -1,3 +1,4 @@
+import hmac
 import re
 from datetime import UTC, datetime, timedelta
 
@@ -30,7 +31,18 @@ def normalize_username(raw: str) -> str:
     return raw.strip().lower()
 
 
-def register(db: Session, username: str, password: str, password_confirm: str) -> User:
+def signup_code() -> str:
+    code = get_settings().signup_code
+    return code.get_secret_value() if code else ""
+
+
+def register(
+    db: Session, username: str, password: str, password_confirm: str, code: str = ""
+) -> User:
+    expected = signup_code()
+    if expected and not hmac.compare_digest(code.strip().encode(), expected.encode()):
+        raise AuthError("Неверный код приглашения.")
+
     username = normalize_username(username)
     if not USERNAME_RE.fullmatch(username):
         raise AuthError("Имя пользователя: 3–32 символа, латинские буквы, цифры или _.")

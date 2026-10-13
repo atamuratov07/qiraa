@@ -16,3 +16,4 @@ class SignupPage(TypedDict):
     user: None
     error: str | None
     username: str | None
+    code_required: bool

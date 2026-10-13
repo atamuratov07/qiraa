@@ -47,7 +47,12 @@ def signup_page(request: Request, user: MaybeUser) -> HTMLResponse | RedirectRes
 
     _require_signup_open()
 
-    ctx: SignupPage = {"user": None, "username": None, "error": None}
+    ctx: SignupPage = {
+        "user": None,
+        "username": None,
+        "error": None,
+        "code_required": bool(service.signup_code()),
+    }
     return render(request, "auth/signup.html", ctx)
 
 
@@ -58,13 +63,19 @@ def signup(
     username: Annotated[str, Form()],
     password: Annotated[str, Form()],
     password_confirm: Annotated[str, Form()],
+    code: Annotated[str, Form()] = "",
 ) -> HTMLResponse | RedirectResponse:
     _require_signup_open()
 
     try:
-        user = service.register(db, username, password, password_confirm)
+        user = service.register(db, username, password, password_confirm, code)
     except service.AuthError as exc:
-        ctx: SignupPage = {"user": None, "username": username, "error": str(exc)}
+        ctx: SignupPage = {
+            "user": None,
+            "username": username,
+            "error": str(exc),
+            "code_required": bool(service.signup_code()),
+        }
         return render(request, "auth/signup.html", ctx, status_code=400)
 
     return _login_response(db, user)

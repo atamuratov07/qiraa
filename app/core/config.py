@@ -1,6 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -24,6 +25,7 @@ class Settings(BaseSettings):
     session_days: int = 30
     app_timezone: str = "Asia/Tashkent"
     allow_signup: bool = True
+    signup_code: SecretStr | None = None
 
     @property
     def sqlalchemy_url(self) -> str:
