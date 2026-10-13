@@ -5,6 +5,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.auth.models import User
+from app.core.permissions import visible
 from app.core.timeutils import local_day
 from app.passages.models import Passage
 from app.practice.models import Attempt
@@ -27,7 +28,9 @@ def profile_stats(db: Session, user: User) -> ProfileStats:
 
     answered = answered or 0
     correct = correct or 0
-    passages_total = db.scalar(select(func.count(Passage.id))) or 0
+    passages_total = (
+        db.scalar(select(func.count(Passage.id)).where(visible(Passage, user))) or 0
+    )
 
     return ProfileStats(
         attempts=attempts,

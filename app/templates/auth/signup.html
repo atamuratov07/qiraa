@@ -2,11 +2,12 @@
   auth/signup.html
   Route: GET /signup (show the form), POST /signup (re-render it with an error)
 
-  Context (all optional):
-    error      e.g. "That username is taken."
-    username   refills the field after a failed attempt
+  Context:
+    error           e.g. "That username is taken."; optional
+    username        refills the field after a failed attempt; optional
+    code_required   show the invite code field (SIGNUP_CODE is set); never refilled
 
-  Submits POST /signup with fields: username, password, password_confirm
+  Submits POST /signup with fields: username, password, password_confirm, code
   The browser checks the basic rules below too, but the server must check them again:
   anyone can send a POST without using this form.
 #}
@@ -30,6 +31,12 @@
       <input name="password_confirm" type="password" autocomplete="new-password" minlength="8" required
              class="mt-1 block w-full rounded-lg border border-line bg-paper px-3 py-2 text-ink focus:outline-2 focus:outline-accent">
     </label>
+    {% if code_required %}
+    <label class="block text-sm text-muted">Код приглашения
+      <input name="code" autocomplete="off" required
+             class="mt-1 block w-full rounded-lg border border-line bg-paper px-3 py-2 text-ink focus:outline-2 focus:outline-accent">
+    </label>
+    {% endif %}
     <button class="w-full cursor-pointer rounded-xl bg-accent px-5 py-2.5 font-semibold text-white hover:brightness-110">Создать аккаунт</button>
   </form>
   <p class="mt-4 text-sm text-muted">Уже есть аккаунт? <a href="/login" class="text-accent hover:underline">Войти</a></p>

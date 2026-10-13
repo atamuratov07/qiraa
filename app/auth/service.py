@@ -1,7 +1,8 @@
+import hmac
 import re
 from datetime import UTC, datetime, timedelta
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, not_, select
 from sqlalchemy.orm import Session
 
 from app.auth.models import User, UserSession
@@ -14,6 +15,7 @@ from app.auth.security import (
     waste_equal_time,
 )
 from app.core.config import get_settings
+from app.passages.models import Passage
 
 SESSION_COOKIE = "qiraa_session"
 USERNAME_RE = re.compile(r"^[a-z0-9_]{3,32}$")
@@ -29,7 +31,18 @@ def normalize_username(raw: str) -> str:
     return raw.strip().lower()
 
 
-def register(db: Session, username: str, password: str, password_confirm: str) -> User:
+def signup_code() -> str:
+    code = get_settings().signup_code
+    return code.get_secret_value() if code else ""
+
+
+def register(
+    db: Session, username: str, password: str, password_confirm: str, code: str = ""
+) -> User:
+    expected = signup_code()
+    if expected and not hmac.compare_digest(code.strip().encode(), expected.encode()):
+        raise AuthError("Неверный код приглашения.")
+
     username = normalize_username(username)
     if not USERNAME_RE.fullmatch(username):
         raise AuthError("Имя пользователя: 3–32 символа, латинские буквы, цифры или _.")
@@ -58,6 +71,17 @@ def authenticate(db: Session, username: str, password: str) -> User:
     if needs_rehash(user.password_hash):
         user.password_hash = hash_password(password)
         db.commit()
+    return user
+
+
+def set_admin(db: Session, username: str) -> User | None:
+    """Returns None when there's no such user."""
+    user = db.scalar(select(User).where(User.username == normalize_username(username)))
+    if user is None:
+        return None
+
+    user.is_admin = True
+    db.commit()
     return user
 
 
@@ -104,6 +128,10 @@ def destroy_session(db: Session, token: str | None) -> None:
 def delete_account(db: Session, user: User, password: str) -> None:
     if not verify_password(user.password_hash, password):
         raise AuthError("Неверный пароль.")
+
+    _ = db.execute(
+        delete(Passage).where(Passage.owner_id == user.id, not_(Passage.is_common))
+    )
 
     db.delete(user)
     db.commit()

@@ -31,6 +31,7 @@ def default_settings(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     monkeypatch.setenv("APP_TIMEZONE", "Asia/Tashkent")
     monkeypatch.setenv("SECURE_COOKIES", "false")
     monkeypatch.setenv("ALLOW_SIGNUP", "true")
+    monkeypatch.setenv("SIGNUP_CODE", "")
     monkeypatch.setenv("SESSION_DAYS", "30")
     get_settings.cache_clear()
     yield
@@ -41,15 +42,18 @@ DEFAULT_TEST_DATABASE_URL = "postgresql+psycopg://qiraa:qiraa@localhost:5432/qir
 
 
 @pytest.fixture
-def engine() -> Iterator[Engine]:
+def database_url() -> str:
+    return os.environ.get("TEST_DATABASE_URL", DEFAULT_TEST_DATABASE_URL)
+
+
+@pytest.fixture
+def engine(database_url: str) -> Iterator[Engine]:
     """A fresh, empty database for one test.
 
     Tables come from the models (create_all). Alembic is not involved here:
-    these tests check the app's behaviour, and CI checks the migrations.
+    these tests check the app's behaviour; test_migrations.py and CI check the migrations.
     """
-    engine = create_engine(
-        os.environ.get("TEST_DATABASE_URL", DEFAULT_TEST_DATABASE_URL)
-    )
+    engine = create_engine(database_url)
     try:
         Base.metadata.drop_all(engine)
     except OperationalError:
@@ -83,6 +87,14 @@ def user(db: Session) -> User:
 @pytest.fixture
 def other_user(db: Session) -> User:
     u = make_user(2, "sarah")
+    db.add(u)
+    db.commit()
+    return u
+
+
+@pytest.fixture
+def admin(db: Session) -> User:
+    u = make_user(3, "admin", is_admin=True)
     db.add(u)
     db.commit()
     return u

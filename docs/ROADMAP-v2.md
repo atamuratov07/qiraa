@@ -94,8 +94,9 @@ speaking_sessions (new, only if open decision 2 is yes) id, user_id, set_id, fin
 
 Migrations:
 
-- The ownership migration adds `is_common` with `server_default` false, then sets
-  `is_common = true` on every existing passage (they have no owner yet, so the CHECK needs it).
+- The ownership migration adds `is_common` with `server_default` true, so every existing
+  passage becomes common (they have no owner yet, so the CHECK needs it), then changes the
+  default to false.
 - The attempts migration fills `kind = 'passage'` and `question_ids` from each attempt's
   passage (a data migration, with a test on a copy of real data).
 
@@ -136,18 +137,19 @@ Templates stay in `app/templates/<feature>/`.
 
 ### 3. Ownership, admin role, permissions, invite code
 
-- [ ] Migration: `users.is_admin`, `passages.owner_id` (SET NULL), `passages.is_common`
+- [x] Migration: `users.is_admin`, `passages.owner_id` (SET NULL), `passages.is_common`
       (existing passages become common), the CHECK, nullable `title`, slug unique
       `WHERE is_common`.
-- [ ] `core/permissions.py`: `visible_*()` query filters and `load_visible_*` /
-      `load_editable_*` helpers. Routes never call `db.get()` on owned content.
-- [ ] Account deletion removes private content first, then the user.
-- [ ] `python -m app.cli make-admin <username>`.
-- [ ] `SIGNUP_CODE` setting: when set, the sign-up form has a code field, compared with
+- [x] `core/permissions.py`: `visible()` / `editable()` query filters and `load_visible()` /
+      `load_editable()` loaders, generic over the `Owned` mixin. Routes never call `db.get()`
+      on owned content.
+- [x] Account deletion removes private content first, then the user.
+- [x] `python -m app.cli make-admin <username>`.
+- [x] `SIGNUP_CODE` setting: when set, the sign-up form has a code field, compared with
       `hmac.compare_digest`; a wrong code gives the same kind of form error as a taken username.
-- [ ] Parametrised tests: owner / other user / admin × view / edit / delete / practise for
-      every content type.
-- [ ] Deletion tests: private content is gone; common content stays with no owner; another
+- [x] Parametrised tests: owner / other user / admin × view / edit / delete / practise for
+      every content type (passages now; route tests for edit and delete come with step 6).
+- [x] Deletion tests: private content is gone; common content stays with no owner; another
       user's attempts on it stay; deleting the user without removing private content first
       fails on the CHECK.
       Done when: the permission and deletion tests pass, another user's private passage is a 404

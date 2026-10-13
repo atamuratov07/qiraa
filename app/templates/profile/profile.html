@@ -13,7 +13,7 @@
                        .passages_done    distinct passages attempted
                        .passages_total   passages in the bank
     recent           the latest SUBMITTED attempts, each with .id .score .total
-                     .submitted_at (datetime) .elapsed_seconds and .passage.title
+                     .submitted_at (datetime) .elapsed_seconds and .passage.display_title
     calendar         optional; list of {"date": date, "count": int}, oldest first,
                      e.g. the last 35 days. Leave it out and the block is hidden.
     delete_error     message to show on the account delete form
@@ -64,7 +64,7 @@
   {% set pct = (100 * a.score / a.total) if a.total else 0 %}
     <div class="flex items-center gap-2 border-b border-line last:border-0">
     <a href="/attempts/{{ a.id }}" class="flex flex-1 items-center gap-4 py-2.5 hover:bg-paper">
-      <span class="flex-1 font-arabic text-lg" lang="ar" dir="rtl">{{ a.passage.title }}</span>
+      <span class="flex-1 font-arabic text-lg" lang="ar" dir="rtl">{{ a.passage.display_title }}</span>
       <span class="text-sm text-muted">{{ a.submitted_at | local_date("%-d %b") }}</span>
       <span class="w-12 text-end text-sm tabular-nums text-muted">{{ mmss(a.elapsed_seconds) }}</span>
       <span class="w-12 text-end text-sm font-semibold {{ 'text-accent' if pct >= 80 else ('text-gold' if pct >= 50 else 'text-bad') }}">{{ a.score }}/{{ a.total }}</span>

@@ -29,7 +29,7 @@ def passages(request: Request, db: DB, user: CurrentUser) -> HTMLResponse:
 def passage_start(
     request: Request, pid: int, db: DB, user: CurrentUser
 ) -> HTMLResponse | RedirectResponse:
-    passage = load_passage(db, pid)
+    passage = load_passage(db, user, pid)
     if passage is None:
         raise HTTPException(404, "Текст не найден")
 
@@ -50,7 +50,7 @@ def passage_start(
 
 @router.post("/passages/{pid}/attempts")
 def start_attempt(pid: int, db: DB, user: CurrentUser) -> RedirectResponse:
-    passage = load_passage(db, pid)
+    passage = load_passage(db, user, pid)
     if passage is None:
         raise HTTPException(404, "Текст не найден")
 

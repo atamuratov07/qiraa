@@ -2,16 +2,19 @@ from sqlalchemy import Select, func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.auth.models import User
+from app.core.permissions import load_visible, visible
 from app.passages.models import Passage
 from app.passages.views import PassageCard, UnfinishedInfo
 from app.practice.models import Attempt, Question
 
 
-def load_passage(db: Session, passage_id: int) -> Passage | None:
-    return db.get(
+def load_passage(db: Session, user: User, passage_id: int) -> Passage | None:
+    return load_visible(
+        db,
+        user,
         Passage,
         passage_id,
-        options=[selectinload(Passage.questions).selectinload(Question.options)],
+        selectinload(Passage.questions).selectinload(Question.options),
     )
 
 
@@ -46,6 +49,7 @@ def passage_stats(db: Session, user: User, passage: Passage) -> tuple[int | None
 def passage_cards(db: Session, user: User) -> list[PassageCard]:
     passages = db.scalars(
         select(Passage)
+        .where(visible(Passage, user))
         .options(selectinload(Passage.questions))
         .order_by(Passage.level, Passage.title)
     ).all()
@@ -77,7 +81,7 @@ def passage_cards(db: Session, user: User) -> list[PassageCard]:
         cards.append(
             PassageCard(
                 id=p.id,
-                title=p.title,
+                title=p.display_title,
                 level=p.level,
                 question_count=question_count[p.id],
                 best=best,
