@@ -1,7 +1,7 @@
 import re
 from datetime import UTC, datetime, timedelta
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, not_, select
 from sqlalchemy.orm import Session
 
 from app.auth.models import User, UserSession
@@ -14,6 +14,7 @@ from app.auth.security import (
     waste_equal_time,
 )
 from app.core.config import get_settings
+from app.passages.models import Passage
 
 SESSION_COOKIE = "qiraa_session"
 USERNAME_RE = re.compile(r"^[a-z0-9_]{3,32}$")
@@ -104,6 +105,10 @@ def destroy_session(db: Session, token: str | None) -> None:
 def delete_account(db: Session, user: User, password: str) -> None:
     if not verify_password(user.password_hash, password):
         raise AuthError("Неверный пароль.")
+
+    _ = db.execute(
+        delete(Passage).where(Passage.owner_id == user.id, not_(Passage.is_common))
+    )
 
     db.delete(user)
     db.commit()
