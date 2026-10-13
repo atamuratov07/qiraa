@@ -62,6 +62,17 @@ def authenticate(db: Session, username: str, password: str) -> User:
     return user
 
 
+def set_admin(db: Session, username: str) -> User | None:
+    """Returns None when there's no such user."""
+    user = db.scalar(select(User).where(User.username == normalize_username(username)))
+    if user is None:
+        return None
+
+    user.is_admin = True
+    db.commit()
+    return user
+
+
 def create_session(db: Session, user: User) -> str:
     token, token_hash = new_session_token()
     days = get_settings().session_days
