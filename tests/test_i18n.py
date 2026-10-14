@@ -4,9 +4,13 @@ from pathlib import Path
 
 import httpx
 import pytest
+from babel.messages.extract import extract_from_dir
+from babel.messages.frontend import parse_mapping_cfg
+from babel.messages.pofile import read_po
 from fastapi import FastAPI
 
 from app.core import i18n
+from app.core.config import BASE_DIR
 from app.core.i18n import (
     LocaleMiddleware,
     _,
@@ -131,3 +135,30 @@ def test_concurrent_requests_keep_their_own_language() -> None:
 
     codes = ["ru", "uz", "en"] * 10
     assert asyncio.run(ask_all(codes)) == codes
+
+
+def test_russian_catalog_has_every_message_in_the_code() -> None:
+    """The same extraction as pybabel. Fails on a message nobody translated, a fuzzy one
+    (shown in English), a stale one (pybabel update not run) or a broken placeholder."""
+    with (BASE_DIR / "babel.cfg").open() as cfg:
+        method_map, options_map = parse_mapping_cfg(cfg)
+    in_code = {
+        message if isinstance(message, str) else message[0]
+        for _file, _line, message, _comments, _context in extract_from_dir(
+            BASE_DIR, method_map, options_map
+        )
+    }
+    with (i18n.LOCALE_DIR / "ru" / "LC_MESSAGES" / "messages.po").open("rb") as po:
+        catalog = read_po(po)
+    entries = {(m.id if isinstance(m.id, str) else m.id[0]): m for m in catalog if m.id}
+
+    missing = sorted(in_code - entries.keys())
+    stale = sorted(entries.keys() - in_code)
+    fuzzy = sorted(key for key, m in entries.items() if m.fuzzy)
+    untranslated = sorted(
+        key
+        for key, m in entries.items()
+        if not all(m.string if isinstance(m.string, tuple) else [m.string])
+    )
+    broken = sorted(str(m.id) for m, errors in catalog.check() if errors)
+    assert (missing, stale, fuzzy, untranslated, broken) == ([], [], [], [], [])

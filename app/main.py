@@ -12,7 +12,7 @@ from app import models  # noqa: F401  registers every model before the first que
 from app.auth.deps import LoginRequired
 from app.auth.routes import router as auth_router
 from app.core.config import APP_DIR
-from app.core.i18n import LocaleMiddleware
+from app.core.i18n import N_, LocaleMiddleware, _
 from app.core.templating import render
 from app.core.views import ErrorPage
 from app.passages.routes import router as passages_router
@@ -48,16 +48,17 @@ def _is_api(request: Request) -> bool:
     return request.url.path.startswith("/api/")
 
 
-# Starlette's own errors (unknown URL, wrong method) carry the English status phrase.
-RU_STATUS_PHRASES = {
-    400: "Некорректный запрос",
-    401: "Требуется вход",
-    403: "Доступ запрещён",
-    404: "Страница не найдена",
-    405: "Метод не поддерживается",
-    409: "Конфликт",
-    500: "Внутренняя ошибка сервера",
-}
+# Starlette's own errors (unknown URL, wrong method) carry the English status phrase,
+# which is then the msgid. Listed here only so that pybabel extracts them.
+STATUS_PHRASES = (
+    N_("Bad Request"),
+    N_("Unauthorized"),
+    N_("Forbidden"),
+    N_("Not Found"),
+    N_("Method Not Allowed"),
+    N_("Conflict"),
+    N_("Internal Server Error"),
+)
 
 
 def _error_page(request: Request, status_code: int, message: str) -> Response:
@@ -74,7 +75,7 @@ async def http_error(request: Request, exc: StarletteHTTPException) -> Response:
 
     message = str(exc.detail)
     if message == HTTPStatus(exc.status_code).phrase:
-        message = RU_STATUS_PHRASES.get(exc.status_code, message)
+        message = _(message)
 
     return _error_page(request, exc.status_code, message)
 
@@ -84,13 +85,13 @@ async def invalid_request(request: Request, exc: RequestValidationError) -> Resp
     if _is_api(request):
         return await request_validation_exception_handler(request, exc)
 
-    return _error_page(request, 404, "Страница не найдена")
+    return _error_page(request, 404, _("Not Found"))
 
 
 @app.exception_handler(LoginRequired)
 async def login_required(request: Request, _exc: LoginRequired) -> Response:
     if _is_api(request):
-        return JSONResponse({"detail": "Требуется вход"}, status_code=401)
+        return JSONResponse({"detail": "Not authenticated"}, status_code=401)
 
     target = request.url.path + (f"?{request.url.query}" if request.url.query else "")
     next_query = "" if target == "/" else f"?next={quote(target, safe='/')}"

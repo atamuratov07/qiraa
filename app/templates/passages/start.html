@@ -8,8 +8,8 @@
     user
     passage    needs .id .display_title; optional .level
     question_count   int
-    best       optional, 0-100 int or None (best submitted score)
-    tries      optional, int
+    best       0-100 int or None (best submitted score)
+    tries      int
 
   The real text is deliberately NOT sent yet: nothing to read before the timer starts.
   The grey bars behind the blur are fake.
@@ -43,16 +43,16 @@
     {% endif %}
     <h1 class="mt-3 font-arabic text-3xl font-bold leading-relaxed" lang="ar" dir="rtl">{{ passage.display_title }}</h1>
     <p class="mt-1 text-sm text-muted">
-      {{ question_count }} {{ question_count | plural("вопрос", "вопроса", "вопросов") }}
-      {% if best is defined and best is not none %} · лучший результат {{ best }}%{% if tries is defined %} за {{ tries }} {{ tries | plural("попытку", "попытки", "попыток") }}{% endif %}{% endif %}
+      {% trans count=question_count %}{{ count }} question{% pluralize %}{{ count }} questions{% endtrans %}
+      {%- if best is not none %} · {% trans best=best, count=tries %}best score {{ best }}% in {{ count }} attempt{% pluralize count %}best score {{ best }}% in {{ count }} attempts{% endtrans %}{% endif %}
     </p>
     <form method="post" action="/passages/{{ passage.id }}/attempts" class="mt-5">
       <button autofocus class="w-full cursor-pointer rounded-xl bg-accent px-5 py-3 font-semibold text-white hover:brightness-110">
-        Начать
+        {{ _("Start") }}
       </button>
     </form>
-    <p class="mt-3 text-xs text-muted">Таймер запустится после нажатия «Начать» и встанет на паузу, если вы уйдёте со страницы.</p>
-    <a href="/passages" class="mt-4 inline-block text-sm text-accent hover:underline">← Все тексты</a>
+    <p class="mt-3 text-xs text-muted">{{ _("The timer starts when you press “Start” and pauses if you leave the page.") }}</p>
+    <a href="/passages" class="mt-4 inline-block text-sm text-accent hover:underline">← {{ _("All passages") }}</a>
   </div>
 </div>
 {% endblock %}

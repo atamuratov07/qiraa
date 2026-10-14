@@ -8,6 +8,7 @@ from app.auth.deps import CurrentUser
 from app.auth.models import User
 from app.core.db import DB
 from app.core.deps import FormFields
+from app.core.i18n import _
 from app.core.redirects import safe_next
 from app.core.templating import render
 from app.practice import service
@@ -20,7 +21,7 @@ router = APIRouter(tags=["attempts"])
 def _own_attempt(db: DB, user: User, attempt_id: int) -> Attempt:
     attempt = service.load_attempt(db, user, attempt_id)
     if attempt is None:
-        raise HTTPException(404, "Попытка не найдена")
+        raise HTTPException(404, _("Attempt not found"))
 
     return attempt
 
@@ -88,7 +89,7 @@ def discard_attempt(
     try:
         service.discard(db, attempt)
     except service.AttemptClosed as exc:
-        raise HTTPException(409, str(exc)) from exc
+        raise HTTPException(409, _("This attempt is already submitted.")) from exc
 
     return RedirectResponse(safe_next(next), status_code=303)
 
@@ -102,7 +103,7 @@ def delete_attempt(
 ) -> RedirectResponse:
     attempt = service.load_attempt(db, user, aid, with_content=False)
     if attempt is None:
-        raise HTTPException(404, "Попытка не найдена")
+        raise HTTPException(404, _("Attempt not found"))
 
     service.delete(db, attempt)
 

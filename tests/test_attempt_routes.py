@@ -149,7 +149,7 @@ def test_autosave_rejects_bad_answers(logged_in: TestClient) -> None:
     )  # option of passage 2's question
     assert (
         response.status_code == 400
-        and "не относится к вопросу" in response.json()["detail"]
+        and "does not belong to question" in response.json()["detail"]
     )
     assert logged_in.put(url, json={"option_id": "x"}).status_code == 422  # Pydantic
     assert logged_in.put(url, json={}).status_code == 422
@@ -188,7 +188,7 @@ def test_someone_elses_attempt_is_404(
     page = client.get(f"/attempts/{attempt_id}")
     assert page.status_code == 404 and "text/html" in page.headers["content-type"]
     api = client.post(f"/api/attempts/{attempt_id}/heartbeat")
-    assert (api.status_code, api.json()) == (404, {"detail": "Попытка не найдена"})
+    assert (api.status_code, api.json()) == (404, {"detail": "Attempt not found"})
     assert client.post(f"/attempts/{attempt_id}/discard").status_code == 404
 
 

@@ -9,7 +9,8 @@ from sqlalchemy.orm import Session
 
 from app.auth.models import User
 from app.auth.service import SESSION_COOKIE, create_session
-from app.core.templating import local_date, plural, ru_date
+from app.core.i18n import use_locale
+from app.core.templating import local_date
 from app.passages.models import Passage
 from app.practice.models import Attempt, AttemptAnswer
 from app.profile.service import CALENDAR_DAYS, profile_context
@@ -158,8 +159,11 @@ def test_wrong_password_on_delete_shows_the_real_profile(
 
 
 def test_local_date_filter_shows_the_tashkent_date() -> None:
-    assert local_date(NIGHT, "%d %b") == "08 окт"
-    assert local_date(NIGHT.replace(tzinfo=None)) == "8 окт 2026"
+    with use_locale("ru"):
+        assert local_date(NIGHT, "MMMd") == "8 окт."
+        assert local_date(NIGHT.replace(tzinfo=None)) == "8 окт. 2026\u202fг."
+        assert local_date(date(2026, 10, 8), "MMMEd") == "чт, 8 окт."
+    assert local_date(NIGHT) == "Oct 8, 2026"
 
 
 def test_deleting_a_result(
@@ -205,27 +209,3 @@ def test_delete_only_redirects_within_the_site(logged_in: TestClient) -> None:
     logged_in.post(f"{attempt_url}/submit", data={"q1": "11"})
     response = logged_in.post(f"{attempt_url}/delete", data={"next": "//evil.example"})
     assert response.headers["location"] == "/profile"
-
-
-def test_ru_date_uses_russian_names() -> None:
-    assert ru_date(date(2026, 10, 8), "%a, %-d %b") == "чт, 8 окт"
-
-
-@pytest.mark.parametrize(
-    ("n", "word"),
-    [
-        (0, "дней"),
-        (1, "день"),
-        (2, "дня"),
-        (4, "дня"),
-        (5, "дней"),
-        (11, "дней"),
-        (14, "дней"),
-        (21, "день"),
-        (22, "дня"),
-        (111, "дней"),
-        (101, "день"),
-    ],
-)
-def test_plural(n: int, word: str) -> None:
-    assert plural(n, "день", "дня", "дней") == word

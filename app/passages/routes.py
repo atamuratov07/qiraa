@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 
 from app.auth.deps import CurrentUser
 from app.core.db import DB
+from app.core.i18n import _
 from app.core.templating import render
 from app.core.timeutils import local_day
 from app.passages.service import load_passage, passage_cards, passage_stats
@@ -31,7 +32,7 @@ def passage_start(
 ) -> HTMLResponse | RedirectResponse:
     passage = load_passage(db, user, pid)
     if passage is None:
-        raise HTTPException(404, "Текст не найден")
+        raise HTTPException(404, _("Passage not found"))
 
     existing = open_attempt_for(db, user, passage)
     if existing is not None:
@@ -52,7 +53,7 @@ def passage_start(
 def start_attempt(pid: int, db: DB, user: CurrentUser) -> RedirectResponse:
     passage = load_passage(db, user, pid)
     if passage is None:
-        raise HTTPException(404, "Текст не найден")
+        raise HTTPException(404, _("Passage not found"))
 
     attempt = start(db, user, passage, now=datetime.now(UTC))
     return RedirectResponse(f"/attempts/{attempt.id}", status_code=303)

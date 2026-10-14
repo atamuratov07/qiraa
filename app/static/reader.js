@@ -10,6 +10,9 @@
 (() => {
   const pop = document.getElementById("tr-pop");
   if (!pop) return;
+  const messages = JSON.parse(document.getElementById("i18n").textContent);
+  const t = (key, values = {}) =>
+    messages[key].replace(/\{(\w+)\}/g, (_, name) => values[name]);
   const qEl = pop.querySelector("[data-q]");
   const aEl = pop.querySelector("[data-a]");
   const srcEl = pop.querySelector("[data-src]");
@@ -90,16 +93,15 @@
       const res = await fetch(`/api/translate?${params}`);
       if (id !== requestId) return; // the user already tapped something else
       if (res.status === 401) return void (location.href = "/login");
-      if (res.status === 404)
-        return void show("Перевод пока недоступен.", "", true);
-      if (!res.ok) return void show(`Ошибка сервера (${res.status}).`, "", true);
+      if (res.status === 404) return void show(t("noTranslator"), "", true);
+      if (!res.ok)
+        return void show(t("serverError", { code: res.status }), "", true);
       const data = await res.json();
       if (id !== requestId) return;
       if (data.translation) show(data.translation, data.source, false);
-      else show("Перевод не найден.", "", true);
+      else show(t("noTranslation"), "", true);
     } catch {
-      if (id === requestId)
-        show("Ошибка сети. Попробуйте ссылку ниже.", "", true);
+      if (id === requestId) show(t("networkError"), "", true);
     }
     place(rect);
   }

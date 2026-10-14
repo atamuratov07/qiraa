@@ -1,0 +1,450 @@
+# Russian translations of Qiraa.
+msgid ""
+msgstr ""
+"Project-Id-Version: Qiraa 2.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
+"POT-Creation-Date: 2026-10-15 00:56+0500\n"
+"PO-Revision-Date: 2026-10-15 00:55+0500\n"
+"Last-Translator: Damir\n"
+"Language: ru\n"
+"Language-Team: Russian\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && "
+"(n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/main.py:54
+msgid "Bad Request"
+msgstr "Некорректный запрос"
+
+#: app/main.py:55
+msgid "Unauthorized"
+msgstr "Требуется вход"
+
+#: app/main.py:56
+msgid "Forbidden"
+msgstr "Доступ запрещён"
+
+#: app/main.py:57 app/main.py:88
+msgid "Not Found"
+msgstr "Страница не найдена"
+
+#: app/main.py:58
+msgid "Method Not Allowed"
+msgstr "Метод не поддерживается"
+
+#: app/main.py:59
+msgid "Conflict"
+msgstr "Конфликт"
+
+#: app/main.py:60
+msgid "Internal Server Error"
+msgstr "Внутренняя ошибка сервера"
+
+#: app/auth/routes.py:41
+msgid "Sign-up is closed."
+msgstr "Регистрация закрыта."
+
+#: app/auth/service.py:45
+msgid "Wrong invite code."
+msgstr "Неверный код приглашения."
+
+#: app/auth/service.py:49
+msgid "Username: 3–32 characters, Latin letters, digits or _."
+msgstr "Имя пользователя: 3–32 символа, латинские буквы, цифры или _."
+
+#: app/auth/service.py:53
+#, python-format
+msgid "The password must be %(min)d–%(max)d characters long."
+msgstr "Пароль должен содержать %(min)d–%(max)d символов."
+
+#: app/auth/service.py:59
+msgid "The passwords don't match."
+msgstr "Пароли не совпадают."
+
+#: app/auth/service.py:61
+msgid "This username is already taken."
+msgstr "Это имя пользователя уже занято."
+
+#: app/auth/service.py:73 app/auth/service.py:75
+msgid "Wrong username or password."
+msgstr "Неверное имя пользователя или пароль."
+
+#: app/auth/service.py:135
+msgid "Wrong password."
+msgstr "Неверный пароль."
+
+#: app/passages/routes.py:35 app/passages/routes.py:56
+msgid "Passage not found"
+msgstr "Текст не найден"
+
+#: app/practice/routes.py:24 app/practice/routes.py:106
+msgid "Attempt not found"
+msgstr "Попытка не найдена"
+
+#: app/practice/routes.py:92
+msgid "This attempt is already submitted."
+msgstr "Эта попытка уже отправлена на проверку."
+
+#: app/templates/_popover.html:8
+msgid "Google Translate"
+msgstr "Google Переводчик"
+
+#: app/templates/base.html:53 app/templates/passages/list.html:19
+msgid "Passages"
+msgstr "Тексты"
+
+#: app/templates/base.html:54 app/templates/profile/profile.html:26
+msgid "Profile"
+msgstr "Профиль"
+
+#: app/templates/base.html:56
+msgid "Log out"
+msgstr "Выйти"
+
+#: app/templates/base.html:69
+msgid "show"
+msgstr "показать"
+
+#: app/templates/base.html:70 app/templates/practice/attempt.html:37
+msgid "hide"
+msgstr "скрыть"
+
+#: app/templates/base.html:71
+msgid "Show timer"
+msgstr "Показать таймер"
+
+#: app/templates/base.html:72 app/templates/practice/attempt.html:37
+msgid "Hide timer"
+msgstr "Скрыть таймер"
+
+#: app/templates/base.html:73
+#, python-brace-format
+msgid "Answered {answered} of {total} · {status}"
+msgstr "Отвечено {answered} из {total} · {status}"
+
+#: app/templates/base.html:74
+msgid "saving…"
+msgstr "сохранение…"
+
+#: app/templates/base.html:75
+msgid "saved"
+msgstr "сохранено"
+
+#: app/templates/base.html:76
+#, python-brace-format
+msgid "not saved ({code}); the answer will be sent when you submit"
+msgstr "не сохранено ({code}); ответ отправится при проверке"
+
+#: app/templates/base.html:77
+msgid "no connection: not saved; the answer will be sent when you submit"
+msgstr "нет сети: не сохранено; ответ отправится при проверке"
+
+#: app/templates/base.html:78
+#, python-brace-format
+msgid "Questions without an answer: {count}. Submit anyway?"
+msgstr "Вопросов без ответа: {count}. Всё равно проверить?"
+
+#: app/templates/base.html:79
+msgid "Checking…"
+msgstr "Проверяем…"
+
+#: app/templates/base.html:80
+msgid "Translation is not available yet."
+msgstr "Перевод пока недоступен."
+
+#: app/templates/base.html:81
+#, python-brace-format
+msgid "Server error ({code})."
+msgstr "Ошибка сервера ({code})."
+
+#: app/templates/base.html:82
+msgid "Translation not found."
+msgstr "Перевод не найден."
+
+#: app/templates/base.html:83
+msgid "Network error. Try the link below."
+msgstr "Ошибка сети. Попробуйте ссылку ниже."
+
+#: app/templates/error.html:10
+msgid "Something went wrong"
+msgstr "Что-то пошло не так"
+
+#: app/templates/error.html:11
+msgid "Back to passages"
+msgstr "Вернуться к текстам"
+
+#: app/templates/auth/login.html:13 app/templates/auth/login.html:16
+msgid "Login"
+msgstr "Вход"
+
+#: app/templates/auth/login.html:20 app/templates/auth/signup.html:21
+msgid "Username"
+msgstr "Имя пользователя"
+
+#: app/templates/auth/login.html:24 app/templates/auth/signup.html:26
+msgid "Password"
+msgstr "Пароль"
+
+#: app/templates/auth/login.html:28 app/templates/auth/signup.html:42
+msgid "Log in"
+msgstr "Войти"
+
+#: app/templates/auth/login.html:30
+msgid "No account yet?"
+msgstr "Нет аккаунта?"
+
+#: app/templates/auth/login.html:30
+msgid "Sign up"
+msgstr "Зарегистрироваться"
+
+#: app/templates/auth/signup.html:15 app/templates/auth/signup.html:18
+msgid "Sign-up"
+msgstr "Регистрация"
+
+#: app/templates/auth/signup.html:23
+msgid "3–32 characters: Latin letters, digits or _"
+msgstr "3–32 символа: латинские буквы, цифры или _"
+
+#: app/templates/auth/signup.html:30
+msgid "Repeat the password"
+msgstr "Повторите пароль"
+
+#: app/templates/auth/signup.html:35
+msgid "Invite code"
+msgstr "Код приглашения"
+
+#: app/templates/auth/signup.html:40
+msgid "Create account"
+msgstr "Создать аккаунт"
+
+#: app/templates/auth/signup.html:42
+msgid "Already have an account?"
+msgstr "Уже есть аккаунт?"
+
+#: app/templates/passages/list.html:26
+msgid "day in a row"
+msgid_plural "days in a row"
+msgstr[0] "день подряд"
+msgstr[1] "дня подряд"
+msgstr[2] "дней подряд"
+
+#: app/templates/passages/list.html:29
+#, python-format
+msgid "Marhaba, %(name)s"
+msgstr "Мархаба, %(name)s"
+
+#: app/templates/passages/list.html:30
+msgid "Pick a passage. Tap any Arabic word while reading to see its translation."
+msgstr "Выбери текст. Нажми на любое арабское слово во время чтения, чтобы увидеть перевод."
+
+#: app/templates/passages/list.html:38
+msgid "Other"
+msgstr "Другое"
+
+#: app/templates/passages/list.html:44 app/templates/passages/start.html:46
+#, python-format
+msgid "%(count)s question"
+msgid_plural "%(count)s questions"
+msgstr[0] "%(count)s вопрос"
+msgstr[1] "%(count)s вопроса"
+msgstr[2] "%(count)s вопросов"
+
+#: app/templates/passages/list.html:48
+#, python-format
+msgid "Best score %(best)s%% · %(count)s attempt"
+msgid_plural "Best score %(best)s%% · %(count)s attempts"
+msgstr[0] "Лучший результат %(best)s%% · %(count)s попытка"
+msgstr[1] "Лучший результат %(best)s%% · %(count)s попытки"
+msgstr[2] "Лучший результат %(best)s%% · %(count)s попыток"
+
+#: app/templates/passages/list.html:51
+msgid "New"
+msgstr "Новый"
+
+#: app/templates/passages/list.html:59
+#, python-format
+msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
+msgstr "Не завершён · отвечено %(answered)s/%(total)s · %(time)s"
+
+#: app/templates/passages/list.html:61 app/templates/practice/attempt.html:100
+msgid "Continue"
+msgstr "Продолжить"
+
+#: app/templates/passages/list.html:63
+msgid "Discard this unfinished attempt? Saved answers will be deleted."
+msgstr "Сбросить эту незавершённую попытку? Сохранённые ответы будут удалены."
+
+#: app/templates/passages/list.html:65
+msgid "Discard"
+msgstr "Сбросить"
+
+#: app/templates/passages/list.html:74
+msgid "No passages yet."
+msgstr "Текстов пока нет."
+
+#: app/templates/passages/start.html:47
+#, python-format
+msgid "best score %(best)s%% in %(count)s attempt"
+msgid_plural "best score %(best)s%% in %(count)s attempts"
+msgstr[0] "лучший результат %(best)s%% за %(count)s попытку"
+msgstr[1] "лучший результат %(best)s%% за %(count)s попытки"
+msgstr[2] "лучший результат %(best)s%% за %(count)s попыток"
+
+#: app/templates/passages/start.html:51
+msgid "Start"
+msgstr "Начать"
+
+#: app/templates/passages/start.html:54
+msgid "The timer starts when you press “Start” and pauses if you leave the page."
+msgstr ""
+"Таймер запустится после нажатия «Начать» и встанет на паузу, если вы уйдёте со "
+"страницы."
+
+#: app/templates/passages/start.html:55 app/templates/practice/attempt.html:107
+#: app/templates/practice/result.html:32
+msgid "All passages"
+msgstr "Все тексты"
+
+#: app/templates/practice/attempt.html:53
+msgid "Tap a word or select several to see the translation into Russian."
+msgstr "Нажмите на слово или выделите несколько, чтобы увидеть перевод на русский."
+
+#: app/templates/practice/attempt.html:77
+#, python-format
+msgid "Answered %(answered)s of %(total)s · saved"
+msgstr "Отвечено %(answered)s из %(total)s · сохранено"
+
+#: app/templates/practice/attempt.html:80
+msgid "Check answers"
+msgstr "Проверить ответы"
+
+#: app/templates/practice/attempt.html:90
+msgid "Paused"
+msgstr "Пауза"
+
+#: app/templates/practice/attempt.html:93
+#, python-format
+msgid ""
+"Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"
+"time>%(time)s</span> elapsed"
+msgstr ""
+"Отвечено <span data-answered>%(answered)s</span>/%(total)s · прошло <span data-pause-"
+"time>%(time)s</span>"
+
+#: app/templates/practice/attempt.html:103
+msgid "Discard this attempt and its saved answers?"
+msgstr "Сбросить эту попытку и сохранённые ответы?"
+
+#: app/templates/practice/attempt.html:105
+msgid "Discard and start over"
+msgstr "Сбросить и начать заново"
+
+#: app/templates/practice/result.html:15
+msgid "Result"
+msgstr "Результат"
+
+#: app/templates/practice/result.html:26
+#, python-format
+msgid "%(percent)s%% correct in %(time)s. Mistakes are marked below."
+msgstr "%(percent)s%% верно за %(time)s. Ошибки отмечены ниже."
+
+#: app/templates/practice/result.html:30
+msgid "Try again"
+msgstr "Пройти ещё раз"
+
+#: app/templates/practice/result.html:56
+msgid "your answer"
+msgstr "ваш ответ"
+
+#: app/templates/practice/result.html:60
+msgid "No answer"
+msgstr "Нет ответа"
+
+#: app/templates/practice/result.html:77
+msgid "Russian translation"
+msgstr "Перевод на русский"
+
+#: app/templates/profile/profile.html:29
+#, python-format
+msgid "Member since %(since)s"
+msgstr "С нами с %(since)s"
+
+#: app/templates/profile/profile.html:32
+msgid "current streak"
+msgstr "текущая серия"
+
+#: app/templates/profile/profile.html:33
+msgid "longest streak"
+msgstr "лучшая серия"
+
+#: app/templates/profile/profile.html:34
+msgid "passages started"
+msgstr "текстов начато"
+
+#: app/templates/profile/profile.html:35
+msgid "quizzes taken"
+msgstr "тестов пройдено"
+
+#: app/templates/profile/profile.html:36
+msgid "questions answered"
+msgstr "ответов на вопросы"
+
+#: app/templates/profile/profile.html:37
+msgid "accuracy"
+msgstr "точность"
+
+#: app/templates/profile/profile.html:50
+msgid "Activity"
+msgstr "Активность"
+
+#: app/templates/profile/profile.html:54
+#, python-format
+msgid "%(count)s quiz"
+msgid_plural "%(count)s quizzes"
+msgstr[0] "%(count)s тест"
+msgstr[1] "%(count)s теста"
+msgstr[2] "%(count)s тестов"
+
+#: app/templates/profile/profile.html:57
+msgid "One square is one day, oldest first. The darker, the more quizzes."
+msgstr "Один квадрат — один день, от старых к новым. Чем темнее, тем больше тестов."
+
+#: app/templates/profile/profile.html:62
+msgid "Recent quizzes"
+msgstr "Последние тесты"
+
+#: app/templates/profile/profile.html:74
+msgid "Delete this result"
+msgstr "Удалить этот результат"
+
+#: app/templates/profile/profile.html:78
+msgid "Nothing here yet."
+msgstr "Пока ничего нет."
+
+#: app/templates/profile/profile.html:78
+msgid "Pick a passage"
+msgstr "Выберите текст"
+
+#: app/templates/profile/profile.html:83
+msgid "Account deletion"
+msgstr "Удаление аккаунта"
+
+#: app/templates/profile/profile.html:84
+msgid "Deletes your account and all your attempts and answers. This can't be undone."
+msgstr "Удаляет ваш аккаунт, все попытки и ответы. Это действие нельзя отменить."
+
+#: app/templates/profile/profile.html:87
+msgid "Delete your account and all progress for good?"
+msgstr "Удалить аккаунт и весь прогресс безвозвратно?"
+
+#: app/templates/profile/profile.html:88
+msgid "Confirm with your password"
+msgstr "Подтвердите паролем"
+
+#: app/templates/profile/profile.html:92
+msgid "Delete account"
+msgstr "Удалить аккаунт"
+

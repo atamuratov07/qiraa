@@ -1,0 +1,439 @@
+# Interface messages of Qiraa.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Qiraa 2.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
+"POT-Creation-Date: 2026-10-15 00:56+0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/main.py:54
+msgid "Bad Request"
+msgstr ""
+
+#: app/main.py:55
+msgid "Unauthorized"
+msgstr ""
+
+#: app/main.py:56
+msgid "Forbidden"
+msgstr ""
+
+#: app/main.py:57 app/main.py:88
+msgid "Not Found"
+msgstr ""
+
+#: app/main.py:58
+msgid "Method Not Allowed"
+msgstr ""
+
+#: app/main.py:59
+msgid "Conflict"
+msgstr ""
+
+#: app/main.py:60
+msgid "Internal Server Error"
+msgstr ""
+
+#: app/auth/routes.py:41
+msgid "Sign-up is closed."
+msgstr ""
+
+#: app/auth/service.py:45
+msgid "Wrong invite code."
+msgstr ""
+
+#: app/auth/service.py:49
+msgid "Username: 3–32 characters, Latin letters, digits or _."
+msgstr ""
+
+#: app/auth/service.py:53
+#, python-format
+msgid "The password must be %(min)d–%(max)d characters long."
+msgstr ""
+
+#: app/auth/service.py:59
+msgid "The passwords don't match."
+msgstr ""
+
+#: app/auth/service.py:61
+msgid "This username is already taken."
+msgstr ""
+
+#: app/auth/service.py:73 app/auth/service.py:75
+msgid "Wrong username or password."
+msgstr ""
+
+#: app/auth/service.py:135
+msgid "Wrong password."
+msgstr ""
+
+#: app/passages/routes.py:35 app/passages/routes.py:56
+msgid "Passage not found"
+msgstr ""
+
+#: app/practice/routes.py:24 app/practice/routes.py:106
+msgid "Attempt not found"
+msgstr ""
+
+#: app/practice/routes.py:92
+msgid "This attempt is already submitted."
+msgstr ""
+
+#: app/templates/_popover.html:8
+msgid "Google Translate"
+msgstr ""
+
+#: app/templates/base.html:53 app/templates/passages/list.html:19
+msgid "Passages"
+msgstr ""
+
+#: app/templates/base.html:54 app/templates/profile/profile.html:26
+msgid "Profile"
+msgstr ""
+
+#: app/templates/base.html:56
+msgid "Log out"
+msgstr ""
+
+#: app/templates/base.html:69
+msgid "show"
+msgstr ""
+
+#: app/templates/base.html:70 app/templates/practice/attempt.html:37
+msgid "hide"
+msgstr ""
+
+#: app/templates/base.html:71
+msgid "Show timer"
+msgstr ""
+
+#: app/templates/base.html:72 app/templates/practice/attempt.html:37
+msgid "Hide timer"
+msgstr ""
+
+#: app/templates/base.html:73
+#, python-brace-format
+msgid "Answered {answered} of {total} · {status}"
+msgstr ""
+
+#: app/templates/base.html:74
+msgid "saving…"
+msgstr ""
+
+#: app/templates/base.html:75
+msgid "saved"
+msgstr ""
+
+#: app/templates/base.html:76
+#, python-brace-format
+msgid "not saved ({code}); the answer will be sent when you submit"
+msgstr ""
+
+#: app/templates/base.html:77
+msgid "no connection: not saved; the answer will be sent when you submit"
+msgstr ""
+
+#: app/templates/base.html:78
+#, python-brace-format
+msgid "Questions without an answer: {count}. Submit anyway?"
+msgstr ""
+
+#: app/templates/base.html:79
+msgid "Checking…"
+msgstr ""
+
+#: app/templates/base.html:80
+msgid "Translation is not available yet."
+msgstr ""
+
+#: app/templates/base.html:81
+#, python-brace-format
+msgid "Server error ({code})."
+msgstr ""
+
+#: app/templates/base.html:82
+msgid "Translation not found."
+msgstr ""
+
+#: app/templates/base.html:83
+msgid "Network error. Try the link below."
+msgstr ""
+
+#: app/templates/error.html:10
+msgid "Something went wrong"
+msgstr ""
+
+#: app/templates/error.html:11
+msgid "Back to passages"
+msgstr ""
+
+#: app/templates/auth/login.html:13 app/templates/auth/login.html:16
+msgid "Login"
+msgstr ""
+
+#: app/templates/auth/login.html:20 app/templates/auth/signup.html:21
+msgid "Username"
+msgstr ""
+
+#: app/templates/auth/login.html:24 app/templates/auth/signup.html:26
+msgid "Password"
+msgstr ""
+
+#: app/templates/auth/login.html:28 app/templates/auth/signup.html:42
+msgid "Log in"
+msgstr ""
+
+#: app/templates/auth/login.html:30
+msgid "No account yet?"
+msgstr ""
+
+#: app/templates/auth/login.html:30
+msgid "Sign up"
+msgstr ""
+
+#: app/templates/auth/signup.html:15 app/templates/auth/signup.html:18
+msgid "Sign-up"
+msgstr ""
+
+#: app/templates/auth/signup.html:23
+msgid "3–32 characters: Latin letters, digits or _"
+msgstr ""
+
+#: app/templates/auth/signup.html:30
+msgid "Repeat the password"
+msgstr ""
+
+#: app/templates/auth/signup.html:35
+msgid "Invite code"
+msgstr ""
+
+#: app/templates/auth/signup.html:40
+msgid "Create account"
+msgstr ""
+
+#: app/templates/auth/signup.html:42
+msgid "Already have an account?"
+msgstr ""
+
+#: app/templates/passages/list.html:26
+msgid "day in a row"
+msgid_plural "days in a row"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/passages/list.html:29
+#, python-format
+msgid "Marhaba, %(name)s"
+msgstr ""
+
+#: app/templates/passages/list.html:30
+msgid "Pick a passage. Tap any Arabic word while reading to see its translation."
+msgstr ""
+
+#: app/templates/passages/list.html:38
+msgid "Other"
+msgstr ""
+
+#: app/templates/passages/list.html:44 app/templates/passages/start.html:46
+#, python-format
+msgid "%(count)s question"
+msgid_plural "%(count)s questions"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/passages/list.html:48
+#, python-format
+msgid "Best score %(best)s%% · %(count)s attempt"
+msgid_plural "Best score %(best)s%% · %(count)s attempts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/passages/list.html:51
+msgid "New"
+msgstr ""
+
+#: app/templates/passages/list.html:59
+#, python-format
+msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
+msgstr ""
+
+#: app/templates/passages/list.html:61 app/templates/practice/attempt.html:100
+msgid "Continue"
+msgstr ""
+
+#: app/templates/passages/list.html:63
+msgid "Discard this unfinished attempt? Saved answers will be deleted."
+msgstr ""
+
+#: app/templates/passages/list.html:65
+msgid "Discard"
+msgstr ""
+
+#: app/templates/passages/list.html:74
+msgid "No passages yet."
+msgstr ""
+
+#: app/templates/passages/start.html:47
+#, python-format
+msgid "best score %(best)s%% in %(count)s attempt"
+msgid_plural "best score %(best)s%% in %(count)s attempts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/passages/start.html:51
+msgid "Start"
+msgstr ""
+
+#: app/templates/passages/start.html:54
+msgid "The timer starts when you press “Start” and pauses if you leave the page."
+msgstr ""
+
+#: app/templates/passages/start.html:55 app/templates/practice/attempt.html:107
+#: app/templates/practice/result.html:32
+msgid "All passages"
+msgstr ""
+
+#: app/templates/practice/attempt.html:53
+msgid "Tap a word or select several to see the translation into Russian."
+msgstr ""
+
+#: app/templates/practice/attempt.html:77
+#, python-format
+msgid "Answered %(answered)s of %(total)s · saved"
+msgstr ""
+
+#: app/templates/practice/attempt.html:80
+msgid "Check answers"
+msgstr ""
+
+#: app/templates/practice/attempt.html:90
+msgid "Paused"
+msgstr ""
+
+#: app/templates/practice/attempt.html:93
+#, python-format
+msgid ""
+"Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"
+"time>%(time)s</span> elapsed"
+msgstr ""
+
+#: app/templates/practice/attempt.html:103
+msgid "Discard this attempt and its saved answers?"
+msgstr ""
+
+#: app/templates/practice/attempt.html:105
+msgid "Discard and start over"
+msgstr ""
+
+#: app/templates/practice/result.html:15
+msgid "Result"
+msgstr ""
+
+#: app/templates/practice/result.html:26
+#, python-format
+msgid "%(percent)s%% correct in %(time)s. Mistakes are marked below."
+msgstr ""
+
+#: app/templates/practice/result.html:30
+msgid "Try again"
+msgstr ""
+
+#: app/templates/practice/result.html:56
+msgid "your answer"
+msgstr ""
+
+#: app/templates/practice/result.html:60
+msgid "No answer"
+msgstr ""
+
+#: app/templates/practice/result.html:77
+msgid "Russian translation"
+msgstr ""
+
+#: app/templates/profile/profile.html:29
+#, python-format
+msgid "Member since %(since)s"
+msgstr ""
+
+#: app/templates/profile/profile.html:32
+msgid "current streak"
+msgstr ""
+
+#: app/templates/profile/profile.html:33
+msgid "longest streak"
+msgstr ""
+
+#: app/templates/profile/profile.html:34
+msgid "passages started"
+msgstr ""
+
+#: app/templates/profile/profile.html:35
+msgid "quizzes taken"
+msgstr ""
+
+#: app/templates/profile/profile.html:36
+msgid "questions answered"
+msgstr ""
+
+#: app/templates/profile/profile.html:37
+msgid "accuracy"
+msgstr ""
+
+#: app/templates/profile/profile.html:50
+msgid "Activity"
+msgstr ""
+
+#: app/templates/profile/profile.html:54
+#, python-format
+msgid "%(count)s quiz"
+msgid_plural "%(count)s quizzes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/profile/profile.html:57
+msgid "One square is one day, oldest first. The darker, the more quizzes."
+msgstr ""
+
+#: app/templates/profile/profile.html:62
+msgid "Recent quizzes"
+msgstr ""
+
+#: app/templates/profile/profile.html:74
+msgid "Delete this result"
+msgstr ""
+
+#: app/templates/profile/profile.html:78
+msgid "Nothing here yet."
+msgstr ""
+
+#: app/templates/profile/profile.html:78
+msgid "Pick a passage"
+msgstr ""
+
+#: app/templates/profile/profile.html:83
+msgid "Account deletion"
+msgstr ""
+
+#: app/templates/profile/profile.html:84
+msgid "Deletes your account and all your attempts and answers. This can't be undone."
+msgstr ""
+
+#: app/templates/profile/profile.html:87
+msgid "Delete your account and all progress for good?"
+msgstr ""
+
+#: app/templates/profile/profile.html:88
+msgid "Confirm with your password"
+msgstr ""
+
+#: app/templates/profile/profile.html:92
+msgid "Delete account"
+msgstr ""
+
