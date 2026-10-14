@@ -7,11 +7,31 @@ from fastapi.templating import Jinja2Templates
 from jinja2 import StrictUndefined
 
 from app.core.config import APP_DIR
+from app.core.i18n import translations
 from app.core.timeutils import local_day
 
 templates = Jinja2Templates(directory=APP_DIR / "templates")
 
 templates.env.undefined = StrictUndefined
+
+
+def _jinja_gettext(message: str) -> str:
+    return translations().gettext(message)
+
+
+def _jinja_ngettext(singular: str, plural: str, n: int) -> str:
+    return translations().ngettext(singular, plural, n)
+
+
+# _() and {% trans %} look up the current request's language on every call. Installed
+# once, before any template compiles: Jinja fixes "newstyle" gettext at compile time.
+# Newstyle fills in %(name)s placeholders and escapes the values, so it gets the raw
+# catalog lookups.
+templates.env.add_extension("jinja2.ext.i18n")
+templates.env.policies["ext.i18n.trimmed"] = True
+templates.env.install_gettext_callables(  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]
+    gettext=_jinja_gettext, ngettext=_jinja_ngettext, newstyle=True
+)
 
 
 RU_MONTHS = (

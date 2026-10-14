@@ -119,7 +119,7 @@ def user_from_token(db: Session, token: str | None) -> User | None:
 
 def destroy_session(db: Session, token: str | None) -> None:
     if token:
-        _ = db.execute(
+        db.execute(
             delete(UserSession).where(UserSession.token_hash == hash_token(token))
         )
         db.commit()
@@ -129,7 +129,7 @@ def delete_account(db: Session, user: User, password: str) -> None:
     if not verify_password(user.password_hash, password):
         raise AuthError("Неверный пароль.")
 
-    _ = db.execute(
+    db.execute(
         delete(Passage).where(Passage.owner_id == user.id, not_(Passage.is_common))
     )
 
