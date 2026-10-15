@@ -13,6 +13,7 @@ from app.auth.deps import LoginRequired
 from app.auth.routes import router as auth_router
 from app.core.config import APP_DIR
 from app.core.i18n import N_, LocaleMiddleware, _
+from app.core.redirects import return_path
 from app.core.templating import render
 from app.core.views import ErrorPage
 from app.passages.routes import router as passages_router
@@ -93,6 +94,6 @@ async def login_required(request: Request, _exc: LoginRequired) -> Response:
     if _is_api(request):
         return JSONResponse({"detail": "Not authenticated"}, status_code=401)
 
-    target = request.url.path + (f"?{request.url.query}" if request.url.query else "")
+    target = return_path(request)
     next_query = "" if target == "/" else f"?next={quote(target, safe='/')}"
     return RedirectResponse(f"/login{next_query}", status_code=303)
