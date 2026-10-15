@@ -15,7 +15,7 @@ from app.auth.security import (
     waste_equal_time,
 )
 from app.core.config import get_settings
-from app.core.i18n import _
+from app.core.i18n import _, current_locale
 from app.passages.models import Passage
 
 SESSION_COOKIE = "qiraa_session"
@@ -60,7 +60,11 @@ def register(
     if db.scalar(select(User.id).where(User.username == username)):
         raise AuthError(_("This username is already taken."))
 
-    user = User(username=username, password_hash=hash_password(password))
+    user = User(
+        username=username,
+        password_hash=hash_password(password),
+        locale=current_locale(),
+    )
     db.add(user)
     db.commit()
     return user
@@ -88,6 +92,11 @@ def set_admin(db: Session, username: str) -> User | None:
     user.is_admin = True
     db.commit()
     return user
+
+
+def set_locale(db: Session, user: User, code: str) -> None:
+    user.locale = code
+    db.commit()
 
 
 def create_session(db: Session, user: User) -> str:

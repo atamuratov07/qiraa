@@ -3,7 +3,8 @@
   and fills in {% block content %}.
 
   Context: user (optional). When present, the header shows the nav and "Log out".
-  render() adds current_locale ("uz", "ru" or "en").
+  render() adds current_locale ("uz", "ru" or "en"), languages and return_path, used by
+  the language menu (_language_menu.html).
 #}
 <!doctype html>
 <html lang="{{ current_locale }}">
@@ -48,15 +49,18 @@
         <span class="font-arabic text-2xl leading-none text-accent" lang="ar">قراءة</span>
         <span>Qiraa Diyaraa</span>
       </a>
-      {% if user %}
-      <nav class="flex items-center gap-5 text-sm">
-        <a href="/passages" class="hover:text-accent">{{ _("Passages") }}</a>
-        <a href="/profile" class="hover:text-accent">{{ _("Profile") }}</a>
-        <form method="post" action="/logout">
-          <button class="cursor-pointer text-muted hover:text-bad">{{ _("Log out") }}</button>
-        </form>
-      </nav>
-      {% endif %}
+      <div class="flex items-center gap-5">
+        {% if user %}
+        <nav class="flex items-center gap-5 text-sm">
+          <a href="/passages" class="hover:text-accent">{{ _("Passages") }}</a>
+          <a href="/profile" class="hover:text-accent">{{ _("Profile") }}</a>
+          <form method="post" action="/logout">
+            <button class="cursor-pointer text-muted hover:text-bad">{{ _("Log out") }}</button>
+          </form>
+        </nav>
+        {% endif %}
+        {% include "_language_menu.html" %}
+      </div>
     </div>
   </header>
 

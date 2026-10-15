@@ -14,11 +14,13 @@ from babel.messages.mofile import write_mo
 from babel.messages.pofile import read_po
 from babel.support import NullTranslations, Translations
 from starlette.requests import Request
+from starlette.responses import Response
 from starlette.types import ASGIApp, Receive, Scope, Send
 
-from app.core.config import APP_DIR
+from app.core.config import APP_DIR, get_settings
 
-LOCALES = ("uz", "ru", "en")
+LANGUAGES = {"uz": "Oʻzbekcha", "ru": "Русский", "en": "English"}
+LOCALES = tuple(LANGUAGES)
 DEFAULT_LOCALE = "en"
 LOCALE_COOKIE = "qiraa_lang"
 LOCALE_DIR = APP_DIR / "locale"
@@ -102,6 +104,18 @@ def _accept_language(header: str | None) -> list[str]:
             ranked.append((weight, tag))
 
     return [tag for _weight, tag in sorted(ranked, key=lambda item: -item[0])]
+
+
+def set_locale_cookie(response: Response, code: str) -> None:
+    settings = get_settings()
+    response.set_cookie(
+        LOCALE_COOKIE,
+        code,
+        max_age=60 * 60 * 24 * 365,
+        httponly=True,
+        secure=settings.secure_cookies,
+        samesite="lax",
+    )
 
 
 class LocaleMiddleware:

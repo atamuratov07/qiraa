@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-15 00:56+0500\n"
+"POT-Creation-Date: 2026-10-15 13:30+0500\n"
 "PO-Revision-Date: 2026-10-15 00:55+0500\n"
 "Last-Translator: Damir\n"
 "Language: ru\n"
@@ -15,35 +15,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:54
+#: app/main.py:55
 msgid "Bad Request"
 msgstr "Некорректный запрос"
 
-#: app/main.py:55
+#: app/main.py:56
 msgid "Unauthorized"
 msgstr "Требуется вход"
 
-#: app/main.py:56
+#: app/main.py:57
 msgid "Forbidden"
 msgstr "Доступ запрещён"
 
-#: app/main.py:57 app/main.py:88
+#: app/main.py:58 app/main.py:89
 msgid "Not Found"
 msgstr "Страница не найдена"
 
-#: app/main.py:58
+#: app/main.py:59
 msgid "Method Not Allowed"
 msgstr "Метод не поддерживается"
 
-#: app/main.py:59
+#: app/main.py:60
 msgid "Conflict"
 msgstr "Конфликт"
 
-#: app/main.py:60
+#: app/main.py:61
 msgid "Internal Server Error"
 msgstr "Внутренняя ошибка сервера"
 
-#: app/auth/routes.py:41
+#: app/auth/routes.py:45
 msgid "Sign-up is closed."
 msgstr "Регистрация закрыта."
 
@@ -68,11 +68,11 @@ msgstr "Пароли не совпадают."
 msgid "This username is already taken."
 msgstr "Это имя пользователя уже занято."
 
-#: app/auth/service.py:73 app/auth/service.py:75
+#: app/auth/service.py:77 app/auth/service.py:79
 msgid "Wrong username or password."
 msgstr "Неверное имя пользователя или пароль."
 
-#: app/auth/service.py:135
+#: app/auth/service.py:144
 msgid "Wrong password."
 msgstr "Неверный пароль."
 
@@ -88,83 +88,87 @@ msgstr "Попытка не найдена"
 msgid "This attempt is already submitted."
 msgstr "Эта попытка уже отправлена на проверку."
 
+#: app/templates/_language_menu.html:16
+msgid "Language"
+msgstr "Язык"
+
 #: app/templates/_popover.html:8
 msgid "Google Translate"
 msgstr "Google Переводчик"
 
-#: app/templates/base.html:53 app/templates/passages/list.html:19
+#: app/templates/base.html:55 app/templates/passages/list.html:19
 msgid "Passages"
 msgstr "Тексты"
 
-#: app/templates/base.html:54 app/templates/profile/profile.html:26
+#: app/templates/base.html:56 app/templates/profile/profile.html:26
 msgid "Profile"
 msgstr "Профиль"
 
-#: app/templates/base.html:56
+#: app/templates/base.html:58
 msgid "Log out"
 msgstr "Выйти"
 
-#: app/templates/base.html:69
+#: app/templates/base.html:73
 msgid "show"
 msgstr "показать"
 
-#: app/templates/base.html:70 app/templates/practice/attempt.html:37
+#: app/templates/base.html:74 app/templates/practice/attempt.html:37
 msgid "hide"
 msgstr "скрыть"
 
-#: app/templates/base.html:71
+#: app/templates/base.html:75
 msgid "Show timer"
 msgstr "Показать таймер"
 
-#: app/templates/base.html:72 app/templates/practice/attempt.html:37
+#: app/templates/base.html:76 app/templates/practice/attempt.html:37
 msgid "Hide timer"
 msgstr "Скрыть таймер"
 
-#: app/templates/base.html:73
+#: app/templates/base.html:77
 #, python-brace-format
 msgid "Answered {answered} of {total} · {status}"
 msgstr "Отвечено {answered} из {total} · {status}"
 
-#: app/templates/base.html:74
+#: app/templates/base.html:78
 msgid "saving…"
 msgstr "сохранение…"
 
-#: app/templates/base.html:75
+#: app/templates/base.html:79
 msgid "saved"
 msgstr "сохранено"
 
-#: app/templates/base.html:76
+#: app/templates/base.html:80
 #, python-brace-format
 msgid "not saved ({code}); the answer will be sent when you submit"
 msgstr "не сохранено ({code}); ответ отправится при проверке"
 
-#: app/templates/base.html:77
+#: app/templates/base.html:81
 msgid "no connection: not saved; the answer will be sent when you submit"
 msgstr "нет сети: не сохранено; ответ отправится при проверке"
 
-#: app/templates/base.html:78
+#: app/templates/base.html:82
 #, python-brace-format
 msgid "Questions without an answer: {count}. Submit anyway?"
 msgstr "Вопросов без ответа: {count}. Всё равно проверить?"
 
-#: app/templates/base.html:79
+#: app/templates/base.html:83
 msgid "Checking…"
 msgstr "Проверяем…"
 
-#: app/templates/base.html:80
+#: app/templates/base.html:84
 msgid "Translation is not available yet."
 msgstr "Перевод пока недоступен."
 
-#: app/templates/base.html:81
+#: app/templates/base.html:85
 #, python-brace-format
 msgid "Server error ({code})."
 msgstr "Ошибка сервера ({code})."
 
-#: app/templates/base.html:82
+#: app/templates/base.html:86
 msgid "Translation not found."
 msgstr "Перевод не найден."
 
-#: app/templates/base.html:83
+#: app/templates/base.html:87
 msgid "Network error. Try the link below."
 msgstr "Ошибка сети. Попробуйте ссылку ниже."
 

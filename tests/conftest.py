@@ -139,7 +139,8 @@ def client(engine: Engine) -> Iterator[TestClient]:
 
     app.dependency_overrides[get_db] = get_test_db
     with TestClient(app, follow_redirects=False) as test_client:
-        test_client.cookies.set(LOCALE_COOKIE, "ru")
+        # The domain the server's own cookies get, so a Set-Cookie replaces this one.
+        test_client.cookies.set(LOCALE_COOKIE, "ru", domain="testserver.local")
         yield test_client
     app.dependency_overrides.clear()
 

@@ -84,9 +84,13 @@ def test_someone_elses_private_passage_looks_like_a_missing_one(
         missing = client.request(method, path.format(999))
         private = client.request(method, path.format(5))
         assert missing.status_code == 404
-        assert (private.status_code, private.text) == (
+        # The pages differ only in the URL they echo back (the language menu's "next").
+        assert (
+            private.status_code,
+            private.text.replace(path.format(5), path.format("ID")),
+        ) == (
             missing.status_code,
-            missing.text,
+            missing.text.replace(path.format(999), path.format("ID")),
         )
 
     assert "نص 5" not in client.get("/passages").text

@@ -137,7 +137,8 @@ def test_concurrent_requests_keep_their_own_language() -> None:
     assert asyncio.run(ask_all(codes)) == codes
 
 
-def test_russian_catalog_has_every_message_in_the_code() -> None:
+@pytest.mark.parametrize("code", [c for c in i18n.LOCALES if c != i18n.DEFAULT_LOCALE])
+def test_catalog_has_every_message_in_the_code(code: str) -> None:
     """The same extraction as pybabel. Fails on a message nobody translated, a fuzzy one
     (shown in English), a stale one (pybabel update not run) or a broken placeholder."""
     with (BASE_DIR / "babel.cfg").open() as cfg:
@@ -148,7 +149,7 @@ def test_russian_catalog_has_every_message_in_the_code() -> None:
             BASE_DIR, method_map, options_map
         )
     }
-    with (i18n.LOCALE_DIR / "ru" / "LC_MESSAGES" / "messages.po").open("rb") as po:
+    with (i18n.LOCALE_DIR / code / "LC_MESSAGES" / "messages.po").open("rb") as po:
         catalog = read_po(po)
     entries = {(m.id if isinstance(m.id, str) else m.id[0]): m for m in catalog if m.id}
 

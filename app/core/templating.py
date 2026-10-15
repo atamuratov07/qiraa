@@ -8,7 +8,8 @@ from fastapi.templating import Jinja2Templates
 from jinja2 import StrictUndefined
 
 from app.core.config import APP_DIR
-from app.core.i18n import current_locale, translations
+from app.core.i18n import LANGUAGES, current_locale, translations
+from app.core.redirects import return_path
 from app.core.timeutils import local_day
 
 templates = Jinja2Templates(directory=APP_DIR / "templates")
@@ -51,5 +52,10 @@ def render(
     context: Mapping[str, object],
     status_code: int = 200,
 ) -> HTMLResponse:
-    page = {**context, "current_locale": current_locale()}
+    page = {
+        **context,
+        "current_locale": current_locale(),
+        "languages": LANGUAGES,
+        "return_path": return_path(request),
+    }
     return templates.TemplateResponse(request, name, page, status_code=status_code)

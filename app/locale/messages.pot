@@ -1,10 +1,14 @@
-# Interface messages of Qiraa.
+# Translations template for Qiraa.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the Qiraa project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
-"Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-15 00:56+0500\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-10-15 13:30+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13,35 +17,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:54
+#: app/main.py:55
 msgid "Bad Request"
 msgstr ""
 
-#: app/main.py:55
+#: app/main.py:56
 msgid "Unauthorized"
 msgstr ""
 
-#: app/main.py:56
+#: app/main.py:57
 msgid "Forbidden"
 msgstr ""
 
-#: app/main.py:57 app/main.py:88
+#: app/main.py:58 app/main.py:89
 msgid "Not Found"
 msgstr ""
 
-#: app/main.py:58
+#: app/main.py:59
 msgid "Method Not Allowed"
 msgstr ""
 
-#: app/main.py:59
+#: app/main.py:60
 msgid "Conflict"
 msgstr ""
 
-#: app/main.py:60
+#: app/main.py:61
 msgid "Internal Server Error"
 msgstr ""
 
-#: app/auth/routes.py:41
+#: app/auth/routes.py:45
 msgid "Sign-up is closed."
 msgstr ""
 
@@ -66,11 +70,11 @@ msgstr ""
 msgid "This username is already taken."
 msgstr ""
 
-#: app/auth/service.py:73 app/auth/service.py:75
+#: app/auth/service.py:77 app/auth/service.py:79
 msgid "Wrong username or password."
 msgstr ""
 
-#: app/auth/service.py:135
+#: app/auth/service.py:144
 msgid "Wrong password."
 msgstr ""
 
@@ -86,83 +90,87 @@ msgstr ""
 msgid "This attempt is already submitted."
 msgstr ""
 
+#: app/templates/_language_menu.html:16
+msgid "Language"
+msgstr ""
+
 #: app/templates/_popover.html:8
 msgid "Google Translate"
 msgstr ""
 
-#: app/templates/base.html:53 app/templates/passages/list.html:19
+#: app/templates/base.html:55 app/templates/passages/list.html:19
 msgid "Passages"
 msgstr ""
 
-#: app/templates/base.html:54 app/templates/profile/profile.html:26
+#: app/templates/base.html:56 app/templates/profile/profile.html:26
 msgid "Profile"
 msgstr ""
 
-#: app/templates/base.html:56
+#: app/templates/base.html:58
 msgid "Log out"
 msgstr ""
 
-#: app/templates/base.html:69
+#: app/templates/base.html:73
 msgid "show"
 msgstr ""
 
-#: app/templates/base.html:70 app/templates/practice/attempt.html:37
+#: app/templates/base.html:74 app/templates/practice/attempt.html:37
 msgid "hide"
 msgstr ""
 
-#: app/templates/base.html:71
+#: app/templates/base.html:75
 msgid "Show timer"
 msgstr ""
 
-#: app/templates/base.html:72 app/templates/practice/attempt.html:37
+#: app/templates/base.html:76 app/templates/practice/attempt.html:37
 msgid "Hide timer"
 msgstr ""
 
-#: app/templates/base.html:73
+#: app/templates/base.html:77
 #, python-brace-format
 msgid "Answered {answered} of {total} · {status}"
 msgstr ""
 
-#: app/templates/base.html:74
+#: app/templates/base.html:78
 msgid "saving…"
 msgstr ""
 
-#: app/templates/base.html:75
+#: app/templates/base.html:79
 msgid "saved"
 msgstr ""
 
-#: app/templates/base.html:76
+#: app/templates/base.html:80
 #, python-brace-format
 msgid "not saved ({code}); the answer will be sent when you submit"
 msgstr ""
 
-#: app/templates/base.html:77
+#: app/templates/base.html:81
 msgid "no connection: not saved; the answer will be sent when you submit"
 msgstr ""
 
-#: app/templates/base.html:78
+#: app/templates/base.html:82
 #, python-brace-format
 msgid "Questions without an answer: {count}. Submit anyway?"
 msgstr ""
 
-#: app/templates/base.html:79
+#: app/templates/base.html:83
 msgid "Checking…"
 msgstr ""
 
-#: app/templates/base.html:80
+#: app/templates/base.html:84
 msgid "Translation is not available yet."
 msgstr ""
 
-#: app/templates/base.html:81
+#: app/templates/base.html:85
 #, python-brace-format
 msgid "Server error ({code})."
 msgstr ""
 
-#: app/templates/base.html:82
+#: app/templates/base.html:86
 msgid "Translation not found."
 msgstr ""
 
-#: app/templates/base.html:83
+#: app/templates/base.html:87
 msgid "Network error. Try the link below."
 msgstr ""
 
