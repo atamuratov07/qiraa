@@ -1,0 +1,452 @@
+# Uzbek (Latin) translations of Qiraa.
+msgid ""
+msgstr ""
+"Project-Id-Version: Qiraa 2.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
+"POT-Creation-Date: 2026-10-15 13:30+0500\n"
+"PO-Revision-Date: 2026-10-15 13:30+0500\n"
+"Last-Translator: Damir\n"
+"Language: uz\n"
+"Language-Team: Uzbek\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/main.py:55
+msgid "Bad Request"
+msgstr "Notoʻgʻri soʻrov"
+
+#: app/main.py:56
+msgid "Unauthorized"
+msgstr "Kirish talab qilinadi"
+
+#: app/main.py:57
+msgid "Forbidden"
+msgstr "Ruxsat yoʻq"
+
+#: app/main.py:58 app/main.py:89
+msgid "Not Found"
+msgstr "Sahifa topilmadi"
+
+#: app/main.py:59
+msgid "Method Not Allowed"
+msgstr "Bu usulga ruxsat berilmagan"
+
+#: app/main.py:60
+msgid "Conflict"
+msgstr "Ziddiyat"
+
+#: app/main.py:61
+msgid "Internal Server Error"
+msgstr "Serverda ichki xatolik"
+
+#: app/auth/routes.py:45
+msgid "Sign-up is closed."
+msgstr "Roʻyxatdan oʻtish yopiq."
+
+#: app/auth/service.py:45
+msgid "Wrong invite code."
+msgstr "Taklif kodi notoʻgʻri."
+
+#: app/auth/service.py:49
+msgid "Username: 3–32 characters, Latin letters, digits or _."
+msgstr "Foydalanuvchi nomi: 3–32 ta belgi, lotin harflari, raqamlar yoki _."
+
+#: app/auth/service.py:53
+#, python-format
+msgid "The password must be %(min)d–%(max)d characters long."
+msgstr "Parol %(min)d–%(max)d ta belgidan iborat boʻlishi kerak."
+
+#: app/auth/service.py:59
+msgid "The passwords don't match."
+msgstr "Parollar mos kelmadi."
+
+#: app/auth/service.py:61
+msgid "This username is already taken."
+msgstr "Bu foydalanuvchi nomi band."
+
+#: app/auth/service.py:77 app/auth/service.py:79
+msgid "Wrong username or password."
+msgstr "Foydalanuvchi nomi yoki parol notoʻgʻri."
+
+#: app/auth/service.py:144
+msgid "Wrong password."
+msgstr "Parol notoʻgʻri."
+
+#: app/passages/routes.py:35 app/passages/routes.py:56
+msgid "Passage not found"
+msgstr "Matn topilmadi"
+
+#: app/practice/routes.py:24 app/practice/routes.py:106
+msgid "Attempt not found"
+msgstr "Urinish topilmadi"
+
+#: app/practice/routes.py:92
+msgid "This attempt is already submitted."
+msgstr "Bu urinish allaqachon tekshirishga yuborilgan."
+
+#: app/templates/_language_menu.html:16
+msgid "Language"
+msgstr "Til"
+
+#: app/templates/_popover.html:8
+msgid "Google Translate"
+msgstr "Google Tarjimon"
+
+#: app/templates/base.html:55 app/templates/passages/list.html:19
+msgid "Passages"
+msgstr "Matnlar"
+
+#: app/templates/base.html:56 app/templates/profile/profile.html:26
+msgid "Profile"
+msgstr "Profil"
+
+#: app/templates/base.html:58
+msgid "Log out"
+msgstr "Chiqish"
+
+#: app/templates/base.html:73
+msgid "show"
+msgstr "koʻrsatish"
+
+#: app/templates/base.html:74 app/templates/practice/attempt.html:37
+msgid "hide"
+msgstr "yashirish"
+
+#: app/templates/base.html:75
+msgid "Show timer"
+msgstr "Taymerni koʻrsatish"
+
+#: app/templates/base.html:76 app/templates/practice/attempt.html:37
+msgid "Hide timer"
+msgstr "Taymerni yashirish"
+
+#: app/templates/base.html:77
+#, python-brace-format
+msgid "Answered {answered} of {total} · {status}"
+msgstr "Javob berildi: {answered}/{total} · {status}"
+
+#: app/templates/base.html:78
+msgid "saving…"
+msgstr "saqlanmoqda…"
+
+#: app/templates/base.html:79
+msgid "saved"
+msgstr "saqlandi"
+
+#: app/templates/base.html:80
+#, python-brace-format
+msgid "not saved ({code}); the answer will be sent when you submit"
+msgstr "saqlanmadi ({code}); javob tekshirishda yuboriladi"
+
+#: app/templates/base.html:81
+msgid "no connection: not saved; the answer will be sent when you submit"
+msgstr "internet yoʻq: saqlanmadi; javob tekshirishda yuboriladi"
+
+#: app/templates/base.html:82
+#, python-brace-format
+msgid "Questions without an answer: {count}. Submit anyway?"
+msgstr "Javobsiz savollar: {count}. Baribir tekshirilsinmi?"
+
+#: app/templates/base.html:83
+msgid "Checking…"
+msgstr "Tekshirilmoqda…"
+
+#: app/templates/base.html:84
+msgid "Translation is not available yet."
+msgstr "Tarjima hozircha mavjud emas."
+
+#: app/templates/base.html:85
+#, python-brace-format
+msgid "Server error ({code})."
+msgstr "Server xatosi ({code})."
+
+#: app/templates/base.html:86
+msgid "Translation not found."
+msgstr "Tarjima topilmadi."
+
+#: app/templates/base.html:87
+msgid "Network error. Try the link below."
+msgstr "Tarmoq xatosi. Quyidagi havoladan foydalanib koʻring."
+
+#: app/templates/error.html:10
+msgid "Something went wrong"
+msgstr "Nimadir notoʻgʻri ketdi"
+
+#: app/templates/error.html:11
+msgid "Back to passages"
+msgstr "Matnlarga qaytish"
+
+#: app/templates/auth/login.html:13 app/templates/auth/login.html:16
+msgid "Login"
+msgstr "Kirish"
+
+#: app/templates/auth/login.html:20 app/templates/auth/signup.html:21
+msgid "Username"
+msgstr "Foydalanuvchi nomi"
+
+#: app/templates/auth/login.html:24 app/templates/auth/signup.html:26
+msgid "Password"
+msgstr "Parol"
+
+#: app/templates/auth/login.html:28 app/templates/auth/signup.html:42
+msgid "Log in"
+msgstr "Kirish"
+
+#: app/templates/auth/login.html:30
+msgid "No account yet?"
+msgstr "Hisobingiz yoʻqmi?"
+
+#: app/templates/auth/login.html:30
+msgid "Sign up"
+msgstr "Roʻyxatdan oʻtish"
+
+#: app/templates/auth/signup.html:15 app/templates/auth/signup.html:18
+msgid "Sign-up"
+msgstr "Roʻyxatdan oʻtish"
+
+#: app/templates/auth/signup.html:23
+msgid "3–32 characters: Latin letters, digits or _"
+msgstr "3–32 ta belgi: lotin harflari, raqamlar yoki _"
+
+#: app/templates/auth/signup.html:30
+msgid "Repeat the password"
+msgstr "Parolni takrorlang"
+
+#: app/templates/auth/signup.html:35
+msgid "Invite code"
+msgstr "Taklif kodi"
+
+#: app/templates/auth/signup.html:40
+msgid "Create account"
+msgstr "Hisob yaratish"
+
+#: app/templates/auth/signup.html:42
+msgid "Already have an account?"
+msgstr "Hisobingiz bormi?"
+
+#: app/templates/passages/list.html:26
+msgid "day in a row"
+msgid_plural "days in a row"
+msgstr[0] "ketma-ket kun"
+msgstr[1] "ketma-ket kun"
+
+#: app/templates/passages/list.html:29
+#, python-format
+msgid "Marhaba, %(name)s"
+msgstr "Marhaba, %(name)s"
+
+#: app/templates/passages/list.html:30
+msgid "Pick a passage. Tap any Arabic word while reading to see its translation."
+msgstr ""
+"Matnni tanlang. Oʻqish paytida tarjimasini koʻrish uchun istalgan arabcha soʻzni "
+"bosing."
+
+#: app/templates/passages/list.html:38
+msgid "Other"
+msgstr "Boshqa"
+
+#: app/templates/passages/list.html:44 app/templates/passages/start.html:46
+#, python-format
+msgid "%(count)s question"
+msgid_plural "%(count)s questions"
+msgstr[0] "%(count)s ta savol"
+msgstr[1] "%(count)s ta savol"
+
+#: app/templates/passages/list.html:48
+#, python-format
+msgid "Best score %(best)s%% · %(count)s attempt"
+msgid_plural "Best score %(best)s%% · %(count)s attempts"
+msgstr[0] "Eng yaxshi natija %(best)s%% · %(count)s ta urinish"
+msgstr[1] "Eng yaxshi natija %(best)s%% · %(count)s ta urinish"
+
+#: app/templates/passages/list.html:51
+msgid "New"
+msgstr "Yangi"
+
+#: app/templates/passages/list.html:59
+#, python-format
+msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
+msgstr "Tugallanmagan · javob berildi %(answered)s/%(total)s · %(time)s"
+
+#: app/templates/passages/list.html:61 app/templates/practice/attempt.html:100
+msgid "Continue"
+msgstr "Davom etish"
+
+#: app/templates/passages/list.html:63
+msgid "Discard this unfinished attempt? Saved answers will be deleted."
+msgstr "Bu tugallanmagan urinish bekor qilinsinmi? Saqlangan javoblar oʻchiriladi."
+
+#: app/templates/passages/list.html:65
+msgid "Discard"
+msgstr "Bekor qilish"
+
+#: app/templates/passages/list.html:74
+msgid "No passages yet."
+msgstr "Hozircha matnlar yoʻq."
+
+#: app/templates/passages/start.html:47
+#, python-format
+msgid "best score %(best)s%% in %(count)s attempt"
+msgid_plural "best score %(best)s%% in %(count)s attempts"
+msgstr[0] "%(count)s ta urinishda eng yaxshi natija %(best)s%%"
+msgstr[1] "%(count)s ta urinishda eng yaxshi natija %(best)s%%"
+
+#: app/templates/passages/start.html:51
+msgid "Start"
+msgstr "Boshlash"
+
+#: app/templates/passages/start.html:54
+msgid "The timer starts when you press “Start” and pauses if you leave the page."
+msgstr "Taymer «Boshlash» bosilgach ishga tushadi va sahifadan chiqsangiz toʻxtab turadi."
+
+#: app/templates/passages/start.html:55 app/templates/practice/attempt.html:107
+#: app/templates/practice/result.html:32
+msgid "All passages"
+msgstr "Barcha matnlar"
+
+#: app/templates/practice/attempt.html:53
+msgid "Tap a word or select several to see the translation into Russian."
+msgstr "Rus tilidagi tarjimani koʻrish uchun soʻzni bosing yoki bir nechtasini belgilang."
+
+#: app/templates/practice/attempt.html:77
+#, python-format
+msgid "Answered %(answered)s of %(total)s · saved"
+msgstr "Javob berildi: %(answered)s/%(total)s · saqlandi"
+
+#: app/templates/practice/attempt.html:80
+msgid "Check answers"
+msgstr "Javoblarni tekshirish"
+
+#: app/templates/practice/attempt.html:90
+msgid "Paused"
+msgstr "Pauza"
+
+#: app/templates/practice/attempt.html:93
+#, python-format
+msgid ""
+"Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"
+"time>%(time)s</span> elapsed"
+msgstr ""
+"Javob berildi: <span data-answered>%(answered)s</span>/%(total)s · oʻtgan vaqt <span "
+"data-pause-time>%(time)s</span>"
+
+#: app/templates/practice/attempt.html:103
+msgid "Discard this attempt and its saved answers?"
+msgstr "Bu urinish va saqlangan javoblar bekor qilinsinmi?"
+
+#: app/templates/practice/attempt.html:105
+msgid "Discard and start over"
+msgstr "Bekor qilib, qaytadan boshlash"
+
+#: app/templates/practice/result.html:15
+msgid "Result"
+msgstr "Natija"
+
+#: app/templates/practice/result.html:26
+#, python-format
+msgid "%(percent)s%% correct in %(time)s. Mistakes are marked below."
+msgstr "%(time)s ichida %(percent)s%% toʻgʻri. Xatolar quyida belgilangan."
+
+#: app/templates/practice/result.html:30
+msgid "Try again"
+msgstr "Qayta urinish"
+
+#: app/templates/practice/result.html:56
+msgid "your answer"
+msgstr "sizning javobingiz"
+
+#: app/templates/practice/result.html:60
+msgid "No answer"
+msgstr "Javob yoʻq"
+
+#: app/templates/practice/result.html:77
+msgid "Russian translation"
+msgstr "Rus tilidagi tarjima"
+
+#: app/templates/profile/profile.html:29
+#, python-format
+msgid "Member since %(since)s"
+msgstr "Roʻyxatdan oʻtgan sana: %(since)s"
+
+#: app/templates/profile/profile.html:32
+msgid "current streak"
+msgstr "joriy seriya"
+
+#: app/templates/profile/profile.html:33
+msgid "longest streak"
+msgstr "eng uzun seriya"
+
+#: app/templates/profile/profile.html:34
+msgid "passages started"
+msgstr "boshlangan matnlar"
+
+#: app/templates/profile/profile.html:35
+msgid "quizzes taken"
+msgstr "topshirilgan testlar"
+
+#: app/templates/profile/profile.html:36
+msgid "questions answered"
+msgstr "javob berilgan savollar"
+
+#: app/templates/profile/profile.html:37
+msgid "accuracy"
+msgstr "aniqlik"
+
+#: app/templates/profile/profile.html:50
+msgid "Activity"
+msgstr "Faollik"
+
+#: app/templates/profile/profile.html:54
+#, python-format
+msgid "%(count)s quiz"
+msgid_plural "%(count)s quizzes"
+msgstr[0] "%(count)s ta test"
+msgstr[1] "%(count)s ta test"
+
+#: app/templates/profile/profile.html:57
+msgid "One square is one day, oldest first. The darker, the more quizzes."
+msgstr ""
+"Bir katak bir kunga teng, eskisidan boshlab. Qanchalik toʻq boʻlsa, testlar "
+"shunchalik koʻp."
+
+#: app/templates/profile/profile.html:62
+msgid "Recent quizzes"
+msgstr "Soʻnggi testlar"
+
+#: app/templates/profile/profile.html:74
+msgid "Delete this result"
+msgstr "Bu natijani oʻchirish"
+
+#: app/templates/profile/profile.html:78
+msgid "Nothing here yet."
+msgstr "Hozircha hech narsa yoʻq."
+
+#: app/templates/profile/profile.html:78
+msgid "Pick a passage"
+msgstr "Matn tanlang"
+
+#: app/templates/profile/profile.html:83
+msgid "Account deletion"
+msgstr "Hisobni oʻchirish"
+
+#: app/templates/profile/profile.html:84
+msgid "Deletes your account and all your attempts and answers. This can't be undone."
+msgstr ""
+"Hisobingiz, barcha urinishlaringiz va javoblaringiz oʻchiriladi. Buni ortga qaytarib "
+"boʻlmaydi."
+
+#: app/templates/profile/profile.html:87
+msgid "Delete your account and all progress for good?"
+msgstr "Hisobingiz va butun natijalaringiz butunlay oʻchirilsinmi?"
+
+#: app/templates/profile/profile.html:88
+msgid "Confirm with your password"
+msgstr "Parolingiz bilan tasdiqlang"
+
+#: app/templates/profile/profile.html:92
+msgid "Delete account"
+msgstr "Hisobni oʻchirish"
+

@@ -15,6 +15,7 @@ from app.auth.security import (
     waste_equal_time,
 )
 from app.core.config import get_settings
+from app.core.i18n import _, current_locale
 from app.passages.models import Passage
 
 SESSION_COOKIE = "qiraa_session"
@@ -41,21 +42,29 @@ def register(
 ) -> User:
     expected = signup_code()
     if expected and not hmac.compare_digest(code.strip().encode(), expected.encode()):
-        raise AuthError("Неверный код приглашения.")
+        raise AuthError(_("Wrong invite code."))
 
     username = normalize_username(username)
     if not USERNAME_RE.fullmatch(username):
-        raise AuthError("Имя пользователя: 3–32 символа, латинские буквы, цифры или _.")
+        raise AuthError(_("Username: 3–32 characters, Latin letters, digits or _."))
     if not MIN_PASSWORD <= len(password) <= MAX_PASSWORD:
         raise AuthError(
-            f"Пароль должен содержать {MIN_PASSWORD}–{MAX_PASSWORD} символов."
+            _(
+                "The password must be %(min)d–%(max)d characters long.",
+                min=MIN_PASSWORD,
+                max=MAX_PASSWORD,
+            )
         )
     if password != password_confirm:
-        raise AuthError("Пароли не совпадают.")
+        raise AuthError(_("The passwords don't match."))
     if db.scalar(select(User.id).where(User.username == username)):
-        raise AuthError("Это имя пользователя уже занято.")
+        raise AuthError(_("This username is already taken."))
 
-    user = User(username=username, password_hash=hash_password(password))
+    user = User(
+        username=username,
+        password_hash=hash_password(password),
+        locale=current_locale(),
+    )
     db.add(user)
     db.commit()
     return user
@@ -65,9 +74,9 @@ def authenticate(db: Session, username: str, password: str) -> User:
     user = db.scalar(select(User).where(User.username == normalize_username(username)))
     if user is None:
         waste_equal_time(password)
-        raise AuthError("Неверное имя пользователя или пароль.")
+        raise AuthError(_("Wrong username or password."))
     if not verify_password(user.password_hash, password):
-        raise AuthError("Неверное имя пользователя или пароль.")
+        raise AuthError(_("Wrong username or password."))
     if needs_rehash(user.password_hash):
         user.password_hash = hash_password(password)
         db.commit()
@@ -83,6 +92,11 @@ def set_admin(db: Session, username: str) -> User | None:
     user.is_admin = True
     db.commit()
     return user
+
+
+def set_locale(db: Session, user: User, code: str) -> None:
+    user.locale = code
+    db.commit()
 
 
 def create_session(db: Session, user: User) -> str:
@@ -119,7 +133,7 @@ def user_from_token(db: Session, token: str | None) -> User | None:
 
 def destroy_session(db: Session, token: str | None) -> None:
     if token:
-        _ = db.execute(
+        db.execute(
             delete(UserSession).where(UserSession.token_hash == hash_token(token))
         )
         db.commit()
@@ -127,9 +141,9 @@ def destroy_session(db: Session, token: str | None) -> None:
 
 def delete_account(db: Session, user: User, password: str) -> None:
     if not verify_password(user.password_hash, password):
-        raise AuthError("Неверный пароль.")
+        raise AuthError(_("Wrong password."))
 
-    _ = db.execute(
+    db.execute(
         delete(Passage).where(Passage.owner_id == user.id, not_(Passage.is_common))
     )
 

@@ -3,9 +3,11 @@
   and fills in {% block content %}.
 
   Context: user (optional). When present, the header shows the nav and "Log out".
+  render() adds current_locale ("uz", "ru" or "en"), languages and return_path, used by
+  the language menu (_language_menu.html).
 #}
 <!doctype html>
-<html lang="ru">
+<html lang="{{ current_locale }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -47,15 +49,18 @@
         <span class="font-arabic text-2xl leading-none text-accent" lang="ar">قراءة</span>
         <span>Qiraa Diyaraa</span>
       </a>
-      {% if user %}
-      <nav class="flex items-center gap-5 text-sm">
-        <a href="/passages" class="hover:text-accent">Тексты</a>
-        <a href="/profile" class="hover:text-accent">Профиль</a>
-        <form method="post" action="/logout">
-          <button class="cursor-pointer text-muted hover:text-bad">Выйти</button>
-        </form>
-      </nav>
-      {% endif %}
+      <div class="flex items-center gap-5">
+        {% if user %}
+        <nav class="flex items-center gap-5 text-sm">
+          <a href="/passages" class="hover:text-accent">{{ _("Passages") }}</a>
+          <a href="/profile" class="hover:text-accent">{{ _("Profile") }}</a>
+          <form method="post" action="/logout">
+            <button class="cursor-pointer text-muted hover:text-bad">{{ _("Log out") }}</button>
+          </form>
+        </nav>
+        {% endif %}
+        {% include "_language_menu.html" %}
+      </div>
     </div>
   </header>
 
@@ -63,6 +68,24 @@
     {% block content %}{% endblock %}
   </main>
 
+  {# Text for attempt.js and reader.js; the scripts fill in the {name} placeholders. #}
+  <script type="application/json" id="i18n">{{ {
+    "show": _("show"),
+    "hide": _("hide"),
+    "showTimer": _("Show timer"),
+    "hideTimer": _("Hide timer"),
+    "status": _("Answered {answered} of {total} · {status}"),
+    "saving": _("saving…"),
+    "saved": _("saved"),
+    "notSaved": _("not saved ({code}); the answer will be sent when you submit"),
+    "offline": _("no connection: not saved; the answer will be sent when you submit"),
+    "unanswered": _("Questions without an answer: {count}. Submit anyway?"),
+    "checking": _("Checking…"),
+    "noTranslator": _("Translation is not available yet."),
+    "serverError": _("Server error ({code})."),
+    "noTranslation": _("Translation not found."),
+    "networkError": _("Network error. Try the link below."),
+  } | tojson }}</script>
   <script src="/static/forms.js" defer></script>
   {% block scripts %}{% endblock %}
 </body>

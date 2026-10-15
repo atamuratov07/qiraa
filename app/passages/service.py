@@ -42,7 +42,7 @@ def passage_stats(db: Session, user: User, passage: Passage) -> tuple[int | None
     if row is None:
         return None, 0
 
-    _, best, tries = row
+    _passage_id, best, tries = row
     return int(best), tries
 
 

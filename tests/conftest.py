@@ -16,6 +16,7 @@ from app.auth.models import User
 from app.auth.service import SESSION_COOKIE, create_session
 from app.core.config import get_settings
 from app.core.db import get_db
+from app.core.i18n import LOCALE_COOKIE
 from app.main import app
 from app.models import Base
 from app.passages.models import Passage
@@ -128,6 +129,7 @@ def client(engine: Engine) -> Iterator[TestClient]:
     `dependency_overrides` swaps get_db for one that uses the test database, so every
     route, and every dependency built on get_db (like CurrentUser), sees the test data.
     `follow_redirects=False` lets tests check a redirect's status and Location header.
+    The Russian cookie makes the page tests check the Russian catalog: the text of 1.0.
     """
     test_sessions = sessionmaker(bind=engine)
 
@@ -137,6 +139,8 @@ def client(engine: Engine) -> Iterator[TestClient]:
 
     app.dependency_overrides[get_db] = get_test_db
     with TestClient(app, follow_redirects=False) as test_client:
+        # The domain the server's own cookies get, so a Set-Cookie replaces this one.
+        test_client.cookies.set(LOCALE_COOKIE, "ru", domain="testserver.local")
         yield test_client
     app.dependency_overrides.clear()
 

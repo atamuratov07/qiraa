@@ -16,6 +16,10 @@
   const root = document.getElementById("attempt-root");
   if (!root) return;
 
+  const messages = JSON.parse(document.getElementById("i18n").textContent);
+  const t = (key, values = {}) =>
+    messages[key].replace(/\{(\w+)\}/g, (_, name) => values[name]);
+
   const id = root.dataset.attemptId;
   const total = Number(root.dataset.total);
   const HEARTBEAT_MS = 15_000; // must be well under the server's 30 s gap limit
@@ -36,16 +40,6 @@
   let base = Number(root.dataset.elapsed) || 0; // seconds last confirmed by the server
   let runningSince = null; // performance.now() when the clock last started, null if stopped
   let beat = null;
-
-  // Russian plural: 1 вопрос, 2 вопроса, 5 вопросов, 21 вопрос, 11 вопросов
-  const plural = (n, one, few, many) => {
-    const n100 = n % 100;
-    const n10 = n % 10;
-    if (n100 >= 11 && n100 <= 14) return many;
-    if (n10 === 1) return one;
-    if (n10 >= 2 && n10 <= 4) return few;
-    return many;
-  };
 
   const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   const seconds = () =>
@@ -128,8 +122,8 @@
   const STORAGE_KEY = "qiraa.timerHidden";
   function setTimerHidden(hidden) {
     timeEl.hidden = hidden;
-    toggleBtn.textContent = hidden ? "показать" : "скрыть";
-    toggleBtn.title = hidden ? "Показать таймер" : "Скрыть таймер";
+    toggleBtn.textContent = hidden ? t("show") : t("hide");
+    toggleBtn.title = hidden ? t("showTimer") : t("hideTimer");
     try {
       localStorage.setItem(STORAGE_KEY, hidden ? "1" : "0");
     } catch {}
@@ -142,8 +136,8 @@
   // ---- autosave every pick ----------------------------------------------------------
   const answered = () =>
     form.querySelectorAll("input[type=radio]:checked").length;
-  function setStatus(text, bad = false) {
-    statusEl.textContent = `Отвечено ${answered()} из ${total} · ${text}`;
+  function setStatus(status, bad = false) {
+    statusEl.textContent = t("status", { answered: answered(), total, status });
     statusEl.classList.toggle("text-bad", bad);
     statusEl.classList.toggle("text-muted", !bad);
     overlay.querySelector("[data-answered]").textContent = answered();
@@ -155,7 +149,7 @@
     if (input.type !== "radio") return;
     const questionId = input.closest("[data-question-id]").dataset.questionId;
     const mine = ++saveId;
-    setStatus("сохранение…");
+    setStatus(t("saving"));
     try {
       const res = await fetch(`/api/attempts/${id}/answers/${questionId}`, {
         method: "PUT",
@@ -163,15 +157,10 @@
         body: JSON.stringify({ option_id: Number(input.value) }),
       });
       if (handleGone(res) || mine !== saveId) return;
-      if (res.ok) setStatus("сохранено");
-      else
-        setStatus(
-          `не сохранено (${res.status}); ответ отправится при проверке`,
-          true,
-        );
+      if (res.ok) setStatus(t("saved"));
+      else setStatus(t("notSaved", { code: res.status }), true);
     } catch {
-      if (mine === saveId)
-        setStatus("нет сети: не сохранено; ответ отправится при проверке", true);
+      if (mine === saveId) setStatus(t("offline"), true);
     }
   });
 
@@ -179,14 +168,12 @@
   form.addEventListener("submit", (e) => {
     const missing = total - answered();
     if (missing > 0) {
-      const ok = confirm(
-        `${missing} ${plural(missing, "вопрос остался", "вопроса остались", "вопросов остались")} без ответа. Всё равно проверить?`,
-      );
-      if (!ok) return e.preventDefault();
+      if (!confirm(t("unanswered", { count: missing })))
+        return e.preventDefault();
     }
     clearInterval(beat); // the submit route does the final time calculation itself
     submitBtn.disabled = true; // no double submit
-    submitBtn.textContent = "Проверяем…";
+    submitBtn.textContent = t("checking");
   });
 
   // ---- the attempt changed elsewhere (another tab, another device) --------------------

@@ -11,6 +11,7 @@ from app.auth.models import User
 from app.auth.views import LoginPage, SignupPage
 from app.core.config import get_settings
 from app.core.db import DB
+from app.core.i18n import LOCALES, _, set_locale_cookie
 from app.core.redirects import safe_next
 from app.core.templating import render
 from app.profile.service import profile_context
@@ -32,12 +33,16 @@ def _login_response(
         secure=settings.secure_cookies,
         samesite="lax",
     )
+
+    if user.locale is not None:
+        set_locale_cookie(response, user.locale)
+
     return response
 
 
 def _require_signup_open() -> None:
     if not get_settings().allow_signup:
-        raise HTTPException(403, "Регистрация закрыта.")
+        raise HTTPException(403, _("Sign-up is closed."))
 
 
 @router.get("/signup", response_model=None)
@@ -124,6 +129,24 @@ def logout(request: Request, db: DB) -> RedirectResponse:
     service.destroy_session(db, request.cookies.get(service.SESSION_COOKIE))
     response = RedirectResponse("/login", status_code=303)
     response.delete_cookie(service.SESSION_COOKIE)
+    return response
+
+
+@router.post("/settings/language")
+def set_language(
+    db: DB,
+    user: MaybeUser,
+    locale: Annotated[str, Form()],
+    next: Annotated[str, Form()] = "/passages",
+) -> RedirectResponse:
+    if locale not in LOCALES:
+        raise HTTPException(400)
+
+    if user is not None:
+        service.set_locale(db, user, locale)
+
+    response = RedirectResponse(safe_next(next), status_code=303)
+    set_locale_cookie(response, locale)
     return response
 
 

@@ -36,6 +36,7 @@ class User(Base):
     current_streak: Mapped[int] = mapped_column(Integer, server_default="0")
     longest_streak: Mapped[int] = mapped_column(Integer, server_default="0")
     last_active_on: Mapped[date | None] = mapped_column(Date)
+    locale: Mapped[str | None] = mapped_column(String(8))
 
     sessions: Mapped[list[UserSession]] = relationship(
         back_populates="user", cascade="all, delete-orphan", passive_deletes=True

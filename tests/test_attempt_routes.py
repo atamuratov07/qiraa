@@ -149,7 +149,7 @@ def test_autosave_rejects_bad_answers(logged_in: TestClient) -> None:
     )  # option of passage 2's question
     assert (
         response.status_code == 400
-        and "не относится к вопросу" in response.json()["detail"]
+        and "does not belong to question" in response.json()["detail"]
     )
     assert logged_in.put(url, json={"option_id": "x"}).status_code == 422  # Pydantic
     assert logged_in.put(url, json={}).status_code == 422
@@ -188,7 +188,7 @@ def test_someone_elses_attempt_is_404(
     page = client.get(f"/attempts/{attempt_id}")
     assert page.status_code == 404 and "text/html" in page.headers["content-type"]
     api = client.post(f"/api/attempts/{attempt_id}/heartbeat")
-    assert (api.status_code, api.json()) == (404, {"detail": "Попытка не найдена"})
+    assert (api.status_code, api.json()) == (404, {"detail": "Attempt not found"})
     assert client.post(f"/attempts/{attempt_id}/discard").status_code == 404
 
 
@@ -201,6 +201,23 @@ def test_logged_out_pages_redirect_and_api_says_401(client: TestClient) -> None:
     )
     api = client.post("/api/attempts/1/heartbeat")
     assert api.status_code == 401
+
+
+def test_a_logged_out_post_returns_to_the_page_it_was_sent_from(
+    client: TestClient,
+) -> None:
+    # 1.0 put the POST path into next; after login the browser opened it with GET: 405.
+    sent_from_attempt = client.post(
+        "/attempts/1/submit",
+        data={"q1": "11"},
+        headers={"referer": "http://testserver/attempts/1"},
+    )
+    without_referer = client.post("/attempts/1/submit", data={"q1": "11"})
+
+    assert [r.headers["location"] for r in (sent_from_attempt, without_referer)] == [
+        "/login?next=/attempts/1",
+        "/login?next=/passages",
+    ]
 
 
 def test_unknown_passage_is_404(logged_in: TestClient) -> None:

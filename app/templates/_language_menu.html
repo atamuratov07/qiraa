@@ -1,0 +1,38 @@
+{#
+  The language menu in the header. <details> opens and closes without JavaScript;
+  forms.js also closes it on a click outside or on Escape.
+
+  Each language is a submit button: the form sends locale=<the clicked button's code> and
+  next=<this page>, and POST /settings/language redirects back here in that language.
+  Language names are written in their own language and never translated.
+
+  Context (added by render()): languages, current_locale, return_path
+#}
+<details class="group relative" data-menu>
+  <summary class="flex cursor-pointer list-none items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 py-1.5 text-sm text-muted hover:border-accent hover:text-ink [&::-webkit-details-marker]:hidden">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="size-4">
+      <circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/>
+    </svg>
+    <span class="sr-only">{{ _("Language") }}:</span>
+    <span lang="{{ current_locale }}">{{ languages[current_locale] }}</span>
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-3.5 transition-transform group-open:rotate-180">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
+  </summary>
+  <form method="post" action="/settings/language"
+        class="absolute end-0 z-50 mt-2 w-44 rounded-xl border border-line bg-white p-1 shadow-lg">
+    <input type="hidden" name="next" value="{{ return_path }}">
+    {% for code, name in languages.items() %}
+    <button name="locale" value="{{ code }}" lang="{{ code }}"
+            {% if code == current_locale %}aria-current="true"{% endif %}
+            class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-start text-sm hover:bg-paper aria-[current=true]:font-semibold aria-[current=true]:text-accent">
+      {{ name }}
+      {% if code == current_locale %}
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-4">
+        <path d="m5 12 5 5 9-10"/>
+      </svg>
+      {% endif %}
+    </button>
+    {% endfor %}
+  </form>
+</details>

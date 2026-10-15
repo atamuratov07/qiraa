@@ -7,7 +7,7 @@ from app.core.config import BASE_DIR, Settings
 
 def write_env(tmp_path: Path, text: str) -> Path:
     path = tmp_path / ".env"
-    _ = path.write_text(text)
+    path.write_text(text)
     return path
 
 

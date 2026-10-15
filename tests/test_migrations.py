@@ -32,8 +32,8 @@ def empty_db(database_url: str, monkeypatch: pytest.MonkeyPatch) -> Iterator[Eng
 
     engine = create_engine(database_url)
     with engine.begin() as conn:
-        _ = conn.execute(text("DROP SCHEMA public CASCADE"))
-        _ = conn.execute(text("CREATE SCHEMA public"))
+        conn.execute(text("DROP SCHEMA public CASCADE"))
+        conn.execute(text("CREATE SCHEMA public"))
     yield engine
     engine.dispose()
 
@@ -42,7 +42,7 @@ def test_existing_passages_become_common(empty_db: Engine) -> None:
     upgrade(INITIAL)
     # Raw SQL: the models describe the newest schema, not this revision's.
     with empty_db.begin() as conn:
-        _ = conn.execute(
+        conn.execute(
             text(
                 "INSERT INTO passages (slug, title, level, text, glossary) "
                 "VALUES ('old', 'نص', 'A2', 'الفقرة.', '{}')"
@@ -56,13 +56,13 @@ def test_existing_passages_become_common(empty_db: Engine) -> None:
             None,
             True,
         )
-        _ = conn.execute(
+        conn.execute(
             text(
                 "INSERT INTO users (id, username, password_hash, created_at) "
                 "VALUES (1, 'peter', 'x', now())"
             )
         )
-        _ = conn.execute(
+        conn.execute(
             text(
                 "INSERT INTO passages (title, level, text, glossary, owner_id) "
                 "VALUES ('new', 'A2', 'الفقرة.', '{}', 1)"

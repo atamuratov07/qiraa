@@ -81,7 +81,7 @@ def _shuffled_option_order(passage: Passage) -> dict[str, list[int]]:
 
 def _require_open(attempt: Attempt) -> None:
     if attempt.submitted_at is not None:
-        raise AttemptClosed(f"Попытка {attempt.id} уже отправлена на проверку.")
+        raise AttemptClosed(f"Attempt {attempt.id} is already submitted.")
 
 
 def open_attempt_for(db: Session, user: User, passage: Passage) -> Attempt | None:
@@ -161,7 +161,9 @@ def save_answer(
     )
 
     if belongs is None:
-        raise BadAnswer(f"Вариант {option_id} не относится к вопросу {question_id}.")
+        raise BadAnswer(
+            f"Option {option_id} does not belong to question {question_id}."
+        )
 
     _set_answer(db, attempt_id, question_id, option_id)
 

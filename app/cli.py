@@ -26,7 +26,7 @@ def build_parser() -> argparse.ArgumentParser:
     make_admin = commands.add_parser(
         "make-admin", help="let a user publish and edit common content"
     )
-    _ = make_admin.add_argument("username")
+    make_admin.add_argument("username")
 
     return parser
 

@@ -1,4 +1,4 @@
-"""Errors come back as JSON: {"detail": "..."}"""
+"""JSON errors {"detail": "..."}, in English: the scripts show their own text."""
 
 from datetime import UTC, datetime
 
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api", tags=["api"])
 def _own_attempt(db: DB, user: User, attempt_id: int) -> Attempt:
     attempt = service.load_attempt(db, user, attempt_id, with_content=False)
     if attempt is None:
-        raise HTTPException(404, "Попытка не найдена")
+        raise HTTPException(404, "Attempt not found")
 
     return attempt
 

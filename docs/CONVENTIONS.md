@@ -6,7 +6,7 @@ is in [ROADMAP-v2.md](ROADMAP-v2.md); the user-facing description is in
 
 ## Stack and hosting
 
-Python 3.13 · FastAPI with Jinja2 server-rendered pages · SQLAlchemy 2.1 · Alembic ·
+Python 3.13 · FastAPI with Jinja2 server-rendered pages · SQLAlchemy 2.1 · Alembic · Babel ·
 Pydantic v2 + pydantic-settings · argon2-cffi · uv · pytest · Tailwind v4 browser build from a
 CDN · plain JavaScript (`reader.js`, `attempt.js`, `forms.js`), no build step.
 
@@ -29,6 +29,8 @@ uv run fastapi dev app/main.py
 uv run pytest                             # on qiraa_test; tables recreated per test
 uv run alembic revision --autogenerate -m "..."   # read the file before upgrading
 uv run alembic check                      # models and migrations agree
+uv run pybabel extract -F babel.cfg --project=Qiraa --version=2.0.0 --width=88 -o app/locale/messages.pot .
+uv run pybabel update -i app/locale/messages.pot -d app/locale --width=88 --ignore-obsolete
 docker compose down -v                    # delete the local databases
 ```
 
@@ -39,14 +41,15 @@ throwaway database: every test drops all tables.
 
 Organised by feature. `app/main.py` creates the app, includes every router and handles errors.
 `app/models.py` imports every model. `app/seed.py` loads the real passages (until step 5).
-`app/cli.py` holds commands for running the site (`make-admin`).
+`app/cli.py` holds commands for running the site (`make-admin`). `app/locale/` holds the
+`.po` catalogs, read at startup (no compiled `.mo` files).
 
 - `core/`: `base.py` `Base`, `utcnow()`, `unique_where()`, `Owned`, `common_or_owned()` ·
   `config.py` settings, `BASE_DIR`, `APP_DIR` · `permissions.py` `visible()`, `editable()`,
   `load_visible()`, `load_editable()` · `db.py` engine, `get_db`, `DB` alias · `deps.py`
-  `FormFields` · `templating.py` Jinja, `render()`, Russian `local_date`/`plural` filters ·
-  `timeutils.py` `as_utc()`, `local_day()` · `redirects.py` `safe_next()` · `views.py`
-  `ErrorPage`.
+  `FormFields` · `i18n.py` `_()`, `ngettext()`, `N_()`, `use_locale()`, `LocaleMiddleware` ·
+  `templating.py` Jinja, `render()`, `local_date` filter · `timeutils.py` `as_utc()`,
+  `local_day()` · `redirects.py` `safe_next()`, `return_path()` · `views.py` `ErrorPage`.
 - `auth/`: `User`, `UserSession` · `deps.py` `CurrentUser`, `MaybeUser`, `LoginRequired` ·
   `security.py` password hashing, session tokens.
 - `passages/`: `Passage` · passage list statistics, start card.
@@ -56,7 +59,8 @@ Organised by feature. `app/main.py` creates the app, includes every router and h
 
 A feature has `models.py`, `service.py`, `routes.py` and `views.py` (dataclasses and one
 `TypedDict` per page) where it needs them. Templates are in `app/templates/<feature>/`; shared
-ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`) stay at the top.
+ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_menu.html`) stay
+at the top.
 `migrations/versions/6ad753184ecc_initial_schema.py` is the single initial schema.
 
 ## Rules
@@ -104,6 +108,12 @@ ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`) stay at the to
     `cli.py`, `migrations/env.py`, `tests/conftest.py`) import `app.models`, so every model is
     registered before the first query. `__init__.py` files stay empty. Paths
     come from `BASE_DIR` / `APP_DIR` in `core/config.py`, never from `__file__` elsewhere.
+14. **Translations.** Messages are English. Python calls `_()` and `ngettext()`, templates
+    `_()` and `{% trans %}`; `_` is never a throwaway name. Text defined at import time is
+    marked with `N_()` and translated where it is shown. Write whole sentences with named
+    placeholders, never fragments glued together. JS text goes through the JSON block in
+    `base.html`, with `{name}` placeholders. `/api` errors stay English. After changing any
+    text, run `pybabel extract` and `update`, then translate `ru` and `uz`.
 
 ## Tests
 
@@ -116,10 +126,11 @@ ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`) stay at the to
 - Merge only when CI is green. SQLAlchemy warnings fail the run (`filterwarnings` in
   `pyproject.toml`).
 - `tests/conftest.py` pins the settings tests depend on, so a local `.env` can't change them.
+  The test client sends the `ru` language cookie, so page tests check the Russian text.
+- `tests/test_i18n.py` fails when a catalog misses a message from the code, or has a fuzzy,
+  stale or untranslated entry, or a broken placeholder.
 
 ## Known issues in 1.0 (to fix in 2.0)
 
 - `passages.glossary` exists but nothing uses it yet.
-- When logged out, a POST redirects to `/login?next=<POST path>`; after login that path is
-  opened with GET and returns 405. Only GET paths should go into `next`.
 - The × that deletes a result on the profile has no confirm dialog (Discard has one).

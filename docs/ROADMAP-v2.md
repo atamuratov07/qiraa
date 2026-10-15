@@ -43,8 +43,8 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 | Grammar session       | `/grammar` is a start form only (no page that lists the whole bank): pool "common + mine" or "only mine", any size, both remembered in the browser; the size is capped at the number of questions in the pool                                   |
 | Speaking timer        | one timer for the whole list: a preparation countdown, then a speaking countdown. Each set stores default `prepare_seconds` and `speak_seconds`; the session page lets me change both before starting and remembers them in the browser per set |
 | Word translation      | passage glossary, then MyMemory; no cache table in 2.0                                                                                                                                                                                          |
-| Translations          | gettext with Babel and Jinja's i18n extension; English msgids; catalogs for `ru`, `uz`, `en`                                                                                                                                                    |
-| Language choice       | user setting, then cookie, then `Accept-Language`, then English                                                                                                                                                                                 |
+| Translations          | gettext with Babel and Jinja's i18n extension; English msgids, so English needs no catalog; catalogs for `ru` and `uz`                                                                                                                          |
+| Language choice       | the `qiraa_lang` cookie (set from `users.locale` at login), then `Accept-Language`, then English                                                                                                                                                |
 | Dates                 | Babel's date formatting replaces the hand-written Russian month names                                                                                                                                                                           |
 | Local database        | Postgres in Docker Compose for development and tests; the app itself runs on the machine, not in a container; SQLite support removed                                                                                                            |
 | Code layout           | organise by feature (see step 2)                                                                                                                                                                                                                |
@@ -157,12 +157,15 @@ Templates stay in `app/templates/<feature>/`.
 
 ### 4. Translation setup
 
-- [ ] Babel + Jinja i18n extension; `_()`/`ngettext` in templates, services and JS strings
+- [x] Babel + Jinja i18n extension; `_()`/`ngettext` in templates, services and JS strings
       (passed to the page as a small JSON block).
-- [ ] Wrap existing pages with English msgids; the `ru` catalog reproduces today's Russian text.
-- [ ] Language switch in the header; `users.locale`; cookie for logged-out pages.
-- [ ] Error keys instead of finished sentences in `AuthError`, `AttemptClosed`, `BadAnswer`.
-      Done when: switching ru ↔ en changes every page; the Russian interface looks as it does in 1.0.
+- [x] Wrap existing pages with English msgids; the `ru` catalog reproduces today's Russian text.
+- [x] Language switch in the header; `users.locale`; cookie for logged-out pages.
+- [x] Messages are translated where they are raised (the request's language is known there);
+      `/api` errors stay English.
+- [x] `uz` catalog filled.
+      Done when: switching changes every page; the Russian interface reads as in 1.0, except
+      dates, which follow CLDR.
 
 ### 5. Content format and import
 
@@ -232,12 +235,7 @@ Templates stay in `app/templates/<feature>/`.
 - [ ] Arabic normalisation: strip vowel marks, unify alef forms, try without و/ف/ب/ك/ل/ال prefixes.
       Done when: tapping a glossary word and a new word each return Russian.
 
-### 12. Uzbek and English translations
-
-- [ ] Fill `uz` and `en` catalogs; Uzbek checked by a native speaker.
-      Done when: no untranslated msgid in any catalog (`pybabel` reports none).
-
-### 13. Release 2.0.0
+### 12. Release 2.0.0
 
 - [ ] Take a fresh Neon snapshot; rehearse `alembic upgrade head` on a Neon branch.
 - [ ] Set `SIGNUP_CODE` on Render.
