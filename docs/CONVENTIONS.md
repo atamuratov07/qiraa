@@ -40,7 +40,7 @@ throwaway database: every test drops all tables.
 ## Code layout
 
 Organised by feature. `app/main.py` creates the app, includes every router and handles errors.
-`app/models.py` imports every model. `app/seed.py` loads the real passages (until step 5).
+`app/models.py` imports every model. `app/seed.py` loads the real passages (until step 6).
 `app/cli.py` holds commands for running the site (`make-admin`). `app/locale/` holds the
 `.po` catalogs, read at startup (no compiled `.mo` files).
 
