@@ -6,11 +6,10 @@ from sqlalchemy import JSON, CheckConstraint, Index, String, Text, column
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.base import Base, Owned, common_or_owned, unique_where
-
-UNTITLED_WORDS = 6
+from app.core.text import display_title
 
 if TYPE_CHECKING:
-    from app.practice.models import Attempt, Question
+    from app.practice.models import Question
 
 
 class Passage(Owned, Base):
@@ -34,18 +33,7 @@ class Passage(Owned, Base):
         order_by="Question.position",
         passive_deletes=True,
     )
-    attempts: Mapped[list[Attempt]] = relationship(
-        back_populates="passage",
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-    )
 
     @property
     def display_title(self) -> str:
-        """The title, or the first words of the text when there is none."""
-        if self.title:
-            return self.title
-        words = self.text.split()
-        if len(words) <= UNTITLED_WORDS:
-            return " ".join(words)
-        return " ".join(words[:UNTITLED_WORDS]) + "…"
+        return display_title(self.title, self.text)

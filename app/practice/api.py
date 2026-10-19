@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api", tags=["api"])
 
 
 def _own_attempt(db: DB, user: User, attempt_id: int) -> Attempt:
-    attempt = service.load_attempt(db, user, attempt_id, with_content=False)
+    attempt = service.load_attempt(db, user, attempt_id)
     if attempt is None:
         raise HTTPException(404, "Attempt not found")
 

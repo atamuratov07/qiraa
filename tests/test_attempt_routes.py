@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.auth.models import User
 from app.auth.service import SESSION_COOKIE, create_session
 from app.passages.models import Passage
-from app.practice.models import Attempt
+from app.practice.models import Attempt, Question
 
 
 def start(client: TestClient, passage_id: int = 1) -> int:
@@ -223,3 +223,25 @@ def test_a_logged_out_post_returns_to_the_page_it_was_sent_from(
 def test_unknown_passage_is_404(logged_in: TestClient) -> None:
     assert logged_in.get("/passages/999").status_code == 404
     assert logged_in.post("/passages/999/attempts").status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Results keep the content they were taken on
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.usefixtures("passage")
+def test_changing_a_question_after_submitting_keeps_the_result(
+    logged_in: TestClient, db: Session
+) -> None:
+    attempt_id = start(logged_in)
+    logged_in.post(f"/attempts/{attempt_id}/submit", data={"q1": "11", "q2": "22"})
+    before = logged_in.get(f"/attempts/{attempt_id}").text
+
+    question = db.get_one(Question, 1)
+    question.prompt = "سؤال جديد؟"
+    for option in question.options:
+        option.is_correct = option.id == 13
+    db.commit()
+
+    assert logged_in.get(f"/attempts/{attempt_id}").text == before

@@ -69,7 +69,7 @@ def passage_cards(db: Session, user: User) -> list[PassageCard]:
         a.passage_id: UnfinishedInfo(
             id=a.id,
             answered=len(a.answers),
-            total=question_count.get(a.passage_id, 0),
+            total=len(a.content["questions"]),
             elapsed_seconds=a.elapsed_seconds,
         )
         for a in open_attempts

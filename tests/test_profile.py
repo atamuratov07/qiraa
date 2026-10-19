@@ -13,6 +13,7 @@ from app.core.i18n import use_locale
 from app.core.templating import local_date
 from app.passages.models import Passage
 from app.practice.models import Attempt, AttemptAnswer
+from app.practice.service import copy_passage
 from app.profile.service import CALENDAR_DAYS, profile_context
 from app.profile.views import ProfileStats
 from tests.factories import T0
@@ -27,7 +28,7 @@ def submitted(
     return Attempt(
         user_id=user.id,
         passage_id=passage.id,
-        option_order={},
+        content=copy_passage(passage),
         started_at=at,
         last_seen_at=at,
         elapsed_seconds=90,
@@ -67,7 +68,7 @@ def test_profile_numbers_and_calendar(
             Attempt(  # still open: counted nowhere
                 user_id=user.id,
                 passage_id=passage2.id,
-                option_order={},
+                content=copy_passage(passage2),
                 started_at=NIGHT,
                 last_seen_at=NIGHT,
             ),

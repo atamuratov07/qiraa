@@ -4,15 +4,17 @@
 
   Context:
     user
+    title       the passage title, or the start of its text
+    passage_id  for "Try again" and the word translation lookup
+    content     the copy taken when the attempt started: .text, .translation_ru, and
+                .questions in display order, each with .id .prompt .explanation and
+                .options in the attempt's shuffled order, each with .id .text .is_correct
     attempt     needs .id .score .total .elapsed_seconds
-    passage     needs .id .display_title .text; optional .translation_ru
-    questions   list in display order, each with .id .prompt, optional .explanation, and
-                .options in the attempt's saved order, each with .id .text .is_correct
     answers     dict {question id: chosen option id}; a skipped question is missing or None
 #}
 {% extends "base.html" %}
 {% from "_macros.html" import mmss %}
-{% block title %}{{ _("Result") }} · {{ passage.display_title }}{% endblock %}
+{% block title %}{{ _("Result") }} · {{ title }}{% endblock %}
 {% block content %}
 {% set percent = ((100 * attempt.score / attempt.total) | round | int) if attempt.total else 0 %}
 {% set tone = 'text-accent' if percent >= 80 else ('text-gold' if percent >= 50 else 'text-bad') %}
@@ -22,11 +24,11 @@
     {{ attempt.score }}<span class="text-2xl text-muted">/{{ attempt.total }}</span>
   </div>
   <div>
-    <h1 class="w-fit font-arabic text-2xl font-bold" lang="ar" dir="rtl">{{ passage.display_title }}</h1>
+    <h1 class="w-fit font-arabic text-2xl font-bold" lang="ar" dir="rtl">{{ title }}</h1>
     <p class="text-muted">{% trans time=mmss(attempt.elapsed_seconds) %}{{ percent }}% correct in {{ time }}. Mistakes are marked below.{% endtrans %}</p>
     <div class="mt-3 flex flex-wrap gap-2">
       {# a new attempt is created on the server, so this is a POST form, not a link #}
-      <form method="post" action="/passages/{{ passage.id }}/attempts">
+      <form method="post" action="/passages/{{ passage_id }}/attempts">
         <button class="cursor-pointer rounded-xl bg-accent px-4 py-2 font-semibold text-white hover:brightness-110">{{ _("Try again") }}</button>
       </form>
       <a href="/passages" class="rounded-xl border border-accent px-4 py-2 font-semibold text-accent hover:bg-accent-soft">{{ _("All passages") }}</a>
@@ -37,12 +39,12 @@
 <div class="grid items-start gap-6 lg:grid-cols-[1fr_1.15fr]">
 
   <section class="rounded-2xl border border-line bg-white p-6">
-    {% for q in questions %}
+    {% for q in content.questions %}
     {% set chosen = answers.get(q.id) %}
     {% set chosen_option = q.options | selectattr("id", "equalto", chosen) | first %}
     {% set right = chosen_option is defined and chosen_option.is_correct %}
     <div class="mb-5 border-s-4 ps-4 pb-1 {{ 'border-accent' if right else 'border-bad' }}" dir="rtl" lang="ar">
-      <p class="mb-2 font-arabic text-xl font-semibold leading-loose" data-tappable data-passage-id="{{ passage.id }}">
+      <p class="mb-2 font-arabic text-xl font-semibold leading-loose" data-tappable data-passage-id="{{ passage_id }}">
         <span class="me-1 inline-grid size-7 place-items-center rounded-full bg-accent-soft align-middle font-sans text-sm font-bold text-accent">{{ loop.index }}</span>
         {{ q.prompt }}
       </p>
@@ -67,16 +69,16 @@
 
   <article class="rounded-2xl border border-line bg-white p-6 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-auto">
     <div class="font-arabic text-2xl leading-[2.2]" lang="ar" dir="rtl"
-         data-tappable data-passage-id="{{ passage.id }}">
-      {% for para in passage.text.strip().split("\n\n") %}
+         data-tappable data-passage-id="{{ passage_id }}">
+      {% for para in content.text.strip().split("\n\n") %}
       <p class="mb-4">{{ para }}</p>
       {% endfor %}
     </div>
-    {% if passage.translation_ru %}
+    {% if content.translation_ru %}
     <details class="mt-2">
       <summary class="cursor-pointer font-semibold text-accent">{{ _("Russian translation") }}</summary>
       <div lang="ru" class="mt-2 space-y-3">
-        {% for para in passage.translation_ru.strip().split("\n\n") %}<p>{{ para }}</p>{% endfor %}
+        {% for para in content.translation_ru.strip().split("\n\n") %}<p>{{ para }}</p>{% endfor %}
       </div>
     </details>
     {% endif %}

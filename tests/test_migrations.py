@@ -97,3 +97,53 @@ def test_migrations_create_every_check_and_partial_index(empty_db: Engine) -> No
         }
 
     assert actual == expected
+
+
+def test_existing_attempts_get_a_copy_of_their_passage(empty_db: Engine) -> None:
+    upgrade("350b8310a972")
+    with empty_db.begin() as conn:
+        conn.execute(
+            text(
+                "INSERT INTO users (id, username, password_hash, created_at) "
+                "VALUES (1, 'peter', 'x', now());"
+                "INSERT INTO passages (id, title, level, text, glossary, is_common) "
+                "VALUES (1, 'نص', 'A2', 'الفقرة.', '{}', true);"
+                "INSERT INTO questions (id, passage_id, position, prompt, explanation) "
+                "VALUES (1, 1, 1, 'سؤال؟', 'Because.');"
+                "INSERT INTO options (id, question_id, position, text, is_correct) "
+                "VALUES (11, 1, 1, 'أ', false), (12, 1, 2, 'ب', true), "
+                "(13, 1, 3, 'ج', false);"
+                "INSERT INTO attempts (id, user_id, passage_id, option_order, "
+                "started_at, last_seen_at, elapsed_seconds) "
+                """VALUES (1, 1, 1, '{"1": [13, 11]}', now(), now(), 0);"""
+                "INSERT INTO attempt_answers (attempt_id, question_id, option_id) "
+                "VALUES (1, 1, 13)"
+            )
+        )
+
+    upgrade("head")
+
+    with empty_db.begin() as conn:
+        content = conn.scalar(text("SELECT content FROM attempts"))
+        answer = conn.execute(
+            text("SELECT question_id, option_id FROM attempt_answers")
+        ).one()
+    assert content == {
+        "title": "نص",
+        "level": "A2",
+        "text": "الفقرة.",
+        "translation_ru": None,
+        "questions": [
+            {
+                "id": 1,
+                "prompt": "سؤال؟",
+                "explanation": "Because.",
+                "options": [  # the saved order, then 12, added after the attempt began
+                    {"id": 13, "text": "ج", "is_correct": False},
+                    {"id": 11, "text": "أ", "is_correct": False},
+                    {"id": 12, "text": "ب", "is_correct": True},
+                ],
+            }
+        ],
+    }
+    assert tuple(answer) == (1, 13)

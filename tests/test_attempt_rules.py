@@ -8,13 +8,13 @@ from datetime import timedelta
 
 import pytest
 
-from app.practice.models import Attempt, AttemptAnswer
+from app.practice.models import Attempt
 from app.practice.service import (
     apply_heartbeat,
+    copy_passage,
     grade,
+    has_option,
     is_paused,
-    ordered_questions,
-    saved_answers,
 )
 from tests.factories import T0, make_passage, make_question
 
@@ -61,7 +61,10 @@ def test_is_paused(seconds_later: int, paused: bool) -> None:
 # Grading
 # ---------------------------------------------------------------------------
 
-QUESTIONS = [make_question(1, correct=1), make_question(2, correct=2)]
+CONTENT = copy_passage(
+    make_passage(1, [make_question(1, correct=1), make_question(2, correct=2)]),
+    shuffle=lambda options: None,
+)
 
 
 @pytest.mark.parametrize(
@@ -76,55 +79,34 @@ QUESTIONS = [make_question(1, correct=1), make_question(2, correct=2)]
     ],
 )
 def test_grade(answers: dict[int, int], expected_score: int) -> None:
-    assert grade(QUESTIONS, answers) == expected_score
+    assert grade(CONTENT["questions"], answers) == expected_score
+
+
+@pytest.mark.parametrize(
+    ("question_id", "option_id", "expected"),
+    [(1, 12, True), (1, 22, False), (3, 31, False)],
+    ids=["its own option", "another question's option", "not in this attempt"],
+)
+def test_has_option(question_id: int, option_id: int, expected: bool) -> None:
+    assert has_option(CONTENT, question_id, option_id) is expected
 
 
 # ---------------------------------------------------------------------------
-# What the pages show
+# The copy an attempt keeps
 # ---------------------------------------------------------------------------
 
 
-def test_saved_answers_skips_answers_whose_option_was_removed() -> None:
-    attempt = Attempt(
-        answers=[
-            AttemptAnswer(question_id=1, option_id=12),
-            AttemptAnswer(
-                question_id=2, option_id=None
-            ),  # option deleted from the bank
-        ]
-    )
-    assert saved_answers(attempt) == {1: 12}
-
-
-def test_ordered_questions_use_the_saved_order() -> None:
+def test_copy_passage_keeps_the_questions_in_order_and_shuffles_options() -> None:
     passage = make_passage(
         1, [make_question(1, correct=1), make_question(2, correct=2)]
     )
-    attempt = Attempt(
-        passage=passage, option_order={"1": [13, 11, 12], "2": [22, 23, 21]}
-    )
 
-    views = ordered_questions(attempt)
+    content = copy_passage(passage, shuffle=lambda options: options.reverse())
 
-    assert [v.id for v in views] == [1, 2]  # questions keep their own order
-    assert [o.id for o in views[0].options] == [13, 11, 12]
-    assert [o.id for o in views[1].options] == [22, 23, 21]
-
-
-def test_ordered_questions_survive_changes_to_the_question_bank() -> None:
-    passage = make_passage(1, [make_question(1, correct=1)])
-    # saved before option 12 was added, and while a since-deleted option 19 existed
-    attempt = Attempt(passage=passage, option_order={"1": [13, 19, 11]})
-
-    [view] = ordered_questions(attempt)
-
-    assert [o.id for o in view.options] == [13, 11, 12]  # 19 dropped, 12 appended
-
-
-def test_ordered_questions_never_reorder_the_models_own_list() -> None:
-    passage = make_passage(1, [make_question(1, correct=1)])
-    attempt = Attempt(passage=passage, option_order={"1": [13, 12, 11]})
-
-    ordered_questions(attempt)
-
-    assert [o.id for o in passage.questions[0].options] == [11, 12, 13]
+    assert (content["title"], content["level"]) == ("نص 1", "A2")
+    assert [q["id"] for q in content["questions"]] == [1, 2]
+    assert content["questions"][0]["options"] == [
+        {"id": 13, "text": "خيار 3", "is_correct": False},
+        {"id": 12, "text": "خيار 2", "is_correct": False},
+        {"id": 11, "text": "خيار 1", "is_correct": True},
+    ]

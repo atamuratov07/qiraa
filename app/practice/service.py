@@ -1,4 +1,5 @@
 import random
+from collections.abc import Callable
 from datetime import datetime, timedelta
 
 from sqlalchemy import select
@@ -8,8 +9,13 @@ from sqlalchemy.orm import Session, selectinload
 from app.auth.models import User
 from app.core.timeutils import as_utc, local_day
 from app.passages.models import Passage
-from app.practice.models import Attempt, AttemptAnswer, Option, Question
-from app.practice.views import QuestionView
+from app.practice.models import (
+    Attempt,
+    AttemptAnswer,
+    AttemptContent,
+    OptionCopy,
+    QuestionCopy,
+)
 from app.profile.streaks import record_activity
 
 AWAY_LIMIT = timedelta(seconds=30)
@@ -36,47 +42,50 @@ def is_paused(attempt: Attempt, now: datetime) -> bool:
     return now - as_utc(attempt.last_seen_at) > AWAY_LIMIT
 
 
-def grade(questions: list[Question], answers: dict[int, int]) -> int:
+def grade(questions: list[QuestionCopy], answers: dict[int, int]) -> int:
     return sum(
         1
         for q in questions
-        if answers.get(q.id) in {o.id for o in q.options if o.is_correct}
+        if answers.get(q["id"]) in {o["id"] for o in q["options"] if o["is_correct"]}
     )
 
 
 def saved_answers(attempt: Attempt) -> dict[int, int]:
-    return {
-        a.question_id: a.option_id for a in attempt.answers if a.option_id is not None
-    }
+    return {a.question_id: a.option_id for a in attempt.answers}
 
 
-def ordered_questions(attempt: Attempt) -> list[QuestionView]:
-    views: list[QuestionView] = []
-    for q in attempt.passage.questions:
-        by_id = {o.id: o for o in q.options}
-        saved_order = attempt.option_order.get(str(q.id), [])
+def has_option(content: AttemptContent, question_id: int, option_id: int) -> bool:
+    return any(
+        q["id"] == question_id and option_id in {o["id"] for o in q["options"]}
+        for q in content["questions"]
+    )
 
-        ordered = [by_id[oid] for oid in saved_order if oid in by_id]
-        ordered += [o for o in q.options if o.id not in set(saved_order)]
 
-        views.append(
-            QuestionView(
-                id=q.id, prompt=q.prompt, explanation=q.explanation, options=ordered
-            )
+def copy_passage(
+    passage: Passage, shuffle: Callable[[list[OptionCopy]], None] = random.shuffle
+) -> AttemptContent:
+    questions: list[QuestionCopy] = []
+    for q in passage.questions:
+        options: list[OptionCopy] = [
+            {"id": o.id, "text": o.text, "is_correct": o.is_correct} for o in q.options
+        ]
+        shuffle(options)
+        questions.append(
+            {
+                "id": q.id,
+                "prompt": q.prompt,
+                "explanation": q.explanation,
+                "options": options,
+            }
         )
 
-    return views
-
-
-def _shuffled_option_order(passage: Passage) -> dict[str, list[int]]:
-    order: dict[str, list[int]] = {}
-
-    for q in passage.questions:
-        option_ids = [o.id for o in q.options]
-        random.shuffle(option_ids)
-        order[str(q.id)] = option_ids
-
-    return order
+    return {
+        "title": passage.title,
+        "level": passage.level,
+        "text": passage.text,
+        "translation_ru": passage.translation_ru,
+        "questions": questions,
+    }
 
 
 def _require_open(attempt: Attempt) -> None:
@@ -94,21 +103,9 @@ def open_attempt_for(db: Session, user: User, passage: Passage) -> Attempt | Non
     )
 
 
-def load_attempt(
-    db: Session, user: User, attempt_id: int, *, with_content: bool = True
-) -> Attempt | None:
-    options = (
-        [
-            selectinload(Attempt.passage)
-            .selectinload(Passage.questions)
-            .selectinload(Question.options),
-            selectinload(Attempt.answers),
-        ]
-        if with_content
-        else []
-    )
+def load_attempt(db: Session, user: User, attempt_id: int) -> Attempt | None:
+    attempt = db.get(Attempt, attempt_id, options=[selectinload(Attempt.answers)])
 
-    attempt = db.get(Attempt, attempt_id, options=options)
     if attempt is None or attempt.user_id != user.id:
         return None
 
@@ -123,7 +120,7 @@ def start(db: Session, user: User, passage: Passage, now: datetime) -> Attempt:
     attempt = Attempt(
         user_id=user.id,
         passage_id=passage.id,
-        option_order=_shuffled_option_order(passage),
+        content=copy_passage(passage),
         started_at=now,
         last_seen_at=now,
         elapsed_seconds=0,
@@ -150,17 +147,7 @@ def save_answer(
         attempt.id
     )  # read now: after a rollback, the object is reloaded on access
 
-    belongs = db.scalar(
-        select(Option.id)
-        .join(Option.question)
-        .where(
-            Option.id == option_id,
-            Option.question_id == question_id,
-            Question.passage_id == attempt.passage_id,
-        )
-    )
-
-    if belongs is None:
+    if not has_option(attempt.content, question_id, option_id):
         raise BadAnswer(
             f"Option {option_id} does not belong to question {question_id}."
         )
@@ -207,18 +194,18 @@ def submit(
     if attempt.submitted_at is not None:
         return
 
-    questions = attempt.passage.questions
+    questions = attempt.content["questions"]
     saved = {a.question_id: a for a in attempt.answers}
 
     for q in questions:
-        chosen = answers.get(q.id)
-        if chosen is None or chosen not in {o.id for o in q.options}:
+        chosen = answers.get(q["id"])
+        if chosen is None or chosen not in {o["id"] for o in q["options"]}:
             continue
 
-        if q.id in saved:
-            saved[q.id].option_id = chosen
+        if q["id"] in saved:
+            saved[q["id"]].option_id = chosen
         else:
-            attempt.answers.append(AttemptAnswer(question_id=q.id, option_id=chosen))
+            attempt.answers.append(AttemptAnswer(question_id=q["id"], option_id=chosen))
 
     apply_heartbeat(attempt, now)
 
