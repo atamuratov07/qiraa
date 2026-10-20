@@ -9,7 +9,7 @@ class AttemptPage(TypedDict):
 
     user: User
     title: str
-    passage_id: int
+    passage_id: int | None
     content: AttemptContent
     attempt: Attempt
     answers: dict[int, int]
@@ -21,7 +21,7 @@ class ResultPage(TypedDict):
 
     user: User
     title: str
-    passage_id: int
+    passage_id: int | None
     content: AttemptContent
     attempt: Attempt
     answers: dict[int, int]

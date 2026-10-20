@@ -17,10 +17,18 @@ from app.models import Base
 INITIAL = "6ad753184ecc"
 
 
-def upgrade(revision: str) -> None:
+def alembic_config() -> Config:
     config = Config()  # without alembic.ini, env.py leaves pytest's logging alone
     config.set_main_option("script_location", str(BASE_DIR / "migrations"))
-    command.upgrade(config, revision)
+    return config
+
+
+def upgrade(revision: str) -> None:
+    command.upgrade(alembic_config(), revision)
+
+
+def downgrade(revision: str) -> None:
+    command.downgrade(alembic_config(), revision)
 
 
 @pytest.fixture
@@ -147,3 +155,51 @@ def test_existing_attempts_get_a_copy_of_their_passage(empty_db: Engine) -> None
         ],
     }
     assert tuple(answer) == (1, 13)
+
+
+def test_downgrading_drops_what_the_old_schema_cannot_hold(empty_db: Engine) -> None:
+    upgrade("head")
+    copy = (
+        '{"title": "نص", "level": "A2", "text": "الفقرة.", "translation_ru": null, '
+        '"questions": [{"id": 1, "prompt": "سؤال؟", "explanation": null, "options": '
+        '[{"id": 12, "text": "ب", "is_correct": true}, '
+        '{"id": 11, "text": "أ", "is_correct": false}]}]}'
+    )
+    with empty_db.begin() as conn:
+        conn.execute(
+            text(
+                "INSERT INTO users (id, username, password_hash, created_at) "
+                "VALUES (1, 'peter', 'x', now());"
+                "INSERT INTO passages (id, title, level, text, glossary, is_common) "
+                "VALUES (1, 'نص', 'A2', 'الفقرة.', '{}', true);"
+                "INSERT INTO questions (id, passage_id, position, prompt) "
+                "VALUES (1, 1, 1, 'سؤال؟');"
+                "INSERT INTO options (id, question_id, position, text, is_correct) "
+                "VALUES (11, 1, 1, 'أ', false), (12, 1, 2, 'ب', true)"
+            )
+        )
+        conn.execute(
+            text(
+                "INSERT INTO attempts (id, user_id, passage_id, content, started_at, "
+                "last_seen_at, elapsed_seconds) "
+                "VALUES (1, 1, 1, :copy, now(), now(), 0), "
+                "(2, 1, NULL, :copy, now(), now(), 0)"  # its passage was deleted
+            ),
+            {"copy": copy},
+        )
+        conn.execute(
+            text(
+                "INSERT INTO attempt_answers (attempt_id, question_id, option_id) "
+                "VALUES (1, 1, 12), (1, 2, 21), (2, 1, 11)"  # question 2 was deleted
+            )
+        )
+
+    downgrade("6d1acc8cc6ab")
+
+    with empty_db.begin() as conn:
+        kept = conn.execute(text("SELECT id, option_order FROM attempts")).all()
+        answers = conn.execute(
+            text("SELECT attempt_id, question_id, option_id FROM attempt_answers")
+        ).all()
+    assert [tuple(row) for row in kept] == [(1, {"1": [12, 11]})]
+    assert [tuple(row) for row in answers] == [(1, 1, 12)]

@@ -18,7 +18,7 @@ def load_passage(db: Session, user: User, passage_id: int) -> Passage | None:
     )
 
 
-def _best_and_tries_query(user: User) -> Select[int, int, int]:
+def _best_and_tries_query(user: User) -> Select[int | None, int, int]:
     return (
         select(
             Attempt.passage_id,
@@ -55,7 +55,7 @@ def passage_cards(db: Session, user: User) -> list[PassageCard]:
     ).all()
     question_count = {p.id: len(p.questions) for p in passages}
 
-    stats: dict[int, tuple[int, int]] = {
+    stats: dict[int | None, tuple[int, int]] = {
         passage_id: (int(best), tries)
         for passage_id, best, tries in db.execute(_best_and_tries_query(user)).all()
     }

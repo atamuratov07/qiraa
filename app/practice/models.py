@@ -104,11 +104,10 @@ class Attempt(Base):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
-    passage_id: Mapped[int] = mapped_column(
-        ForeignKey("passages.id", ondelete="CASCADE"), index=True
+    passage_id: Mapped[int | None] = mapped_column(
+        ForeignKey("passages.id", ondelete="SET NULL"), index=True
     )
-    content: Mapped[AttemptContent] = mapped_column(JSON, nullable=True)
-    option_order: Mapped[dict[str, list[int]]] = mapped_column(JSON, default=dict)
+    content: Mapped[AttemptContent] = mapped_column(JSON)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     elapsed_seconds: Mapped[int] = mapped_column(default=0)
@@ -139,11 +138,7 @@ class AttemptAnswer(Base):
     attempt_id: Mapped[int] = mapped_column(
         ForeignKey("attempts.id", ondelete="CASCADE"),
     )
-    question_id: Mapped[int] = mapped_column(
-        ForeignKey("questions.id", ondelete="CASCADE"), index=True
-    )
-    option_id: Mapped[int] = mapped_column(
-        ForeignKey("options.id", ondelete="CASCADE"), index=True
-    )
+    question_id: Mapped[int] = mapped_column()
+    option_id: Mapped[int] = mapped_column()
 
     attempt: Mapped[Attempt] = relationship(back_populates="answers")

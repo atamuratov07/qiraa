@@ -5,7 +5,8 @@
   Context:
     user
     title       the passage title, or the start of its text
-    passage_id  for "Try again" and the word translation lookup
+    passage_id  for "Try again" and the word translation lookup; None once the passage
+                is deleted (no "Try again" then)
     content     the copy taken when the attempt started: .text, .translation_ru, and
                 .questions in display order, each with .id .prompt .explanation and
                 .options in the attempt's shuffled order, each with .id .text .is_correct
@@ -28,9 +29,11 @@
     <p class="text-muted">{% trans time=mmss(attempt.elapsed_seconds) %}{{ percent }}% correct in {{ time }}. Mistakes are marked below.{% endtrans %}</p>
     <div class="mt-3 flex flex-wrap gap-2">
       {# a new attempt is created on the server, so this is a POST form, not a link #}
+      {% if passage_id %}
       <form method="post" action="/passages/{{ passage_id }}/attempts">
         <button class="cursor-pointer rounded-xl bg-accent px-4 py-2 font-semibold text-white hover:brightness-110">{{ _("Try again") }}</button>
       </form>
+      {% endif %}
       <a href="/passages" class="rounded-xl border border-accent px-4 py-2 font-semibold text-accent hover:bg-accent-soft">{{ _("All passages") }}</a>
     </div>
   </div>
@@ -44,7 +47,7 @@
     {% set chosen_option = q.options | selectattr("id", "equalto", chosen) | first %}
     {% set right = chosen_option is defined and chosen_option.is_correct %}
     <div class="mb-5 border-s-4 ps-4 pb-1 {{ 'border-accent' if right else 'border-bad' }}" dir="rtl" lang="ar">
-      <p class="mb-2 font-arabic text-xl font-semibold leading-loose" data-tappable data-passage-id="{{ passage_id }}">
+      <p class="mb-2 font-arabic text-xl font-semibold leading-loose" data-tappable {% if passage_id %}data-passage-id="{{ passage_id }}"{% endif %}>
         <span class="me-1 inline-grid size-7 place-items-center rounded-full bg-accent-soft align-middle font-sans text-sm font-bold text-accent">{{ loop.index }}</span>
         {{ q.prompt }}
       </p>
@@ -69,7 +72,7 @@
 
   <article class="rounded-2xl border border-line bg-white p-6 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-auto">
     <div class="font-arabic text-2xl leading-[2.2]" lang="ar" dir="rtl"
-         data-tappable data-passage-id="{{ passage_id }}">
+         data-tappable {% if passage_id %}data-passage-id="{{ passage_id }}"{% endif %}>
       {% for para in content.text.strip().split("\n\n") %}
       <p class="mb-4">{{ para }}</p>
       {% endfor %}
