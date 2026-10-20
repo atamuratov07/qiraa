@@ -104,9 +104,10 @@ Migrations:
 - The ownership migration adds `is_common` with `server_default` true, so every existing
   passage becomes common (they have no owner yet, so the CHECK needs it), then changes the
   default to false.
-- The attempts migration fills `kind = 'passage'` and `content` from each attempt's passage
-  and its `option_order`, then drops `option_order` and the answers' foreign keys to
-  questions and options (a data migration, with a test).
+- The attempts migrations (step 5) fill `content` from each attempt's passage, with the
+  options in the order its `option_order` showed them (a data migration, with a test), then
+  drop `option_order` and the answers' foreign keys to questions and options. Step 8 adds
+  `kind` with `server_default 'passage'`, so existing attempts need no data migration.
 
 Account deletion is one service function and one commit: delete my private passages,
 grammar questions and speaking sets, then delete the user. The database sets `owner_id` to
@@ -177,12 +178,14 @@ Templates stay in `app/templates/<feature>/`.
 
 ### 5. Attempts keep a copy of their content
 
-- [ ] Migration: `kind`, `content`, nullable `passage_id` with `ON DELETE SET NULL`, new
-      partial indexes, no `option_order`, no foreign keys from `attempt_answers` to questions
-      and options; data migration that builds `content` for existing attempts.
-- [ ] Starting an attempt copies the passage into `content`; the attempt page, grading and the
+- [x] Migrations: `content`, with a data migration that builds it for existing attempts;
+      then `content` NOT NULL, nullable `passage_id` with `ON DELETE SET NULL`, no
+      `option_order`, no foreign keys from `attempt_answers` to questions and options. `kind`
+      and the grammar index moved to step 8, where grammar sessions first need them.
+- [x] Starting an attempt copies the passage into `content`; the attempt page, grading and the
       result page read the copy; autosave checks that the question and option are in it.
-- [ ] Deleting a passage keeps everyone's results on it.
+- [x] Deleting a passage keeps everyone's results on it; an unfinished attempt on it can still
+      be submitted.
       Done when: all existing tests pass unchanged in behaviour; old attempts still show their
       results; changing or deleting a question after an attempt doesn't change that attempt's
       result page.
@@ -207,7 +210,9 @@ Templates stay in `app/templates/<feature>/`.
 
 ### 8. Grammar practice
 
-- [ ] Migration: `questions.owner_id` (SET NULL), `questions.is_common`, both CHECKs.
+- [ ] Migration: `questions.owner_id` (SET NULL), `questions.is_common`, both CHECKs;
+      `attempts.kind` (`server_default 'passage'`), the open-attempt index limited to
+      `kind = 'passage'`, and one open grammar session per user.
 - [ ] `/grammar`: start form with pool ("common + mine" / "only mine") and size, showing how
       many questions the pool has; both choices remembered in the browser. The server caps the
       size at the pool count and shows a message when the pool is empty.
@@ -248,9 +253,11 @@ Templates stay in `app/templates/<feature>/`.
 
 ### 12. Release 2.0.0
 
-- [ ] Take a fresh Neon snapshot; rehearse `alembic upgrade head` on a Neon branch.
+- [ ] Take a fresh Neon snapshot; rehearse `alembic upgrade head` on a Neon branch. While the
+      migrations run, the 1.x instance may still serve for a few seconds and fail.
 - [ ] Set `SIGNUP_CODE` on Render.
-- [ ] Update README (settings table: `SIGNUP_CODE`, `MYMEMORY_EMAIL`), CHANGELOG; merge `v2`
+- [ ] Update README (settings table: `SIGNUP_CODE`, `MYMEMORY_EMAIL`; the data model, where
+      attempts now keep a copy instead of `option_order`), CHANGELOG; merge `v2`
       into `main`; tag `v2.0.0`; GitHub release.
 - [ ] Check production: log in, old results, each practice type, each language, sign-up with
       and without the code.
