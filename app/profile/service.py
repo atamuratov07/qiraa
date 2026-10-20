@@ -2,7 +2,7 @@ from collections import Counter
 from datetime import datetime, timedelta
 
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session
 
 from app.auth.models import User
 from app.core.permissions import visible
@@ -64,7 +64,6 @@ def recent_attempts(db: Session, user: User) -> list[Attempt]:
         db.scalars(
             select(Attempt)
             .where(Attempt.user_id == user.id, Attempt.submitted_at.is_not(None))
-            .options(selectinload(Attempt.passage))
             .order_by(Attempt.submitted_at.desc())
             .limit(RECENT_LIMIT)
         ).all()

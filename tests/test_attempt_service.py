@@ -40,13 +40,20 @@ def test_start_creates_an_attempt_with_every_question_shuffled(
     assert attempt.id is not None
     assert timeutils.as_utc(attempt.started_at) == T0
     assert (attempt.elapsed_seconds, attempt.submitted_at) == (0, None)
-    assert sorted(attempt.option_order) == ["1", "2"]
-    assert sorted(attempt.option_order["1"]) == [
-        11,
-        12,
-        13,
-    ]  # a reordering of the same ids
-    assert sorted(attempt.option_order["2"]) == [21, 22, 23]
+    shown = {
+        q["id"]: sorted(o["id"] for o in q["options"])
+        for q in attempt.content["questions"]
+    }
+    assert shown == {1: [11, 12, 13], 2: [21, 22, 23]}  # a reordering of the same ids
+
+
+def test_start_saves_the_copy(
+    db: Session, engine: Engine, user: User, passage: Passage
+) -> None:
+    attempt = service.start(db, user, passage, T0)
+
+    with Session(engine) as fresh:
+        assert fresh.get_one(Attempt, attempt.id).content == attempt.content
 
 
 def test_start_twice_returns_the_same_open_attempt(
@@ -78,7 +85,7 @@ def test_double_click_race_returns_the_winning_attempt(
     winner = Attempt(
         user_id=user.id,
         passage_id=passage.id,
-        option_order={},
+        content=service.copy_passage(passage),
         started_at=T0,
         last_seen_at=T0,
     )

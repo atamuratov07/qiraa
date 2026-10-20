@@ -17,7 +17,8 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 5. **Interface in Uzbek (Latin), Russian and English.** Interface text and error messages only;
    Arabic content is not translated.
 6. **Managing content in the app.** Editors for passages, grammar questions and speaking sets;
-   YAML import in the app and from the command line.
+   YAML import in the app and from the command line. Editing content never changes past
+   results.
 7. **Word translation** in the popup: passage glossary first, then MyMemory.
 8. **Sign-up with an invite code.**
 
@@ -28,7 +29,8 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 | Version number        | 2.0.0: existing attempts need a data migration and content management changes                                                                                                                                                                   |
 | Branching             | build on `v2`; `main` keeps serving 1.x; merge `main` into `v2` after any fix                                                                                                                                                                   |
 | Question tables       | passage questions and grammar questions share `questions`/`options` (`passage_id` is NULL for grammar questions); speaking gets its own table because it has no options or grading                                                              |
-| Attempts              | one `attempts` table for passages and grammar sessions; a new `question_ids` list stores which questions an attempt contains and in what order                                                                                                  |
+| Attempts              | one `attempts` table for passages and grammar sessions; each attempt keeps a copy of what it shows (`content`: title, text, translation, questions with their options in shuffled order and the correct one marked)                             |
+| Editing content       | allowed at any time, also after attempts; a result shows the copy its attempt was taken on and keeps its score (no regrading); answers point into the copy, so editing or deleting content never removes a result                               |
 | Passage title         | optional; when missing, show the start of the text                                                                                                                                                                                              |
 | Slug                  | only for common passages loaded from YAML (keeps re-imports from duplicating), generated automatically, unique among common passages                                                                                                            |
 | Author and visibility | two separate columns on every content table: `owner_id` is the author, `is_common` is who can see it. A row is never private and authorless (CHECK constraint)                                                                                  |
@@ -51,9 +53,7 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 
 ## Open decisions (likely choice first)
 
-1. Editing content that already has attempts: edit in place (old results show the current
-   question) / lock content with attempts.
-2. Does finishing a speaking session count for the streak? Leaning yes. The streak itself
+1. Does finishing a speaking session count for the streak? Leaning yes. The streak itself
    only needs a call to `record_activity()`, but the profile calendar reads
    `attempts.submitted_at`, so it also needs a small `speaking_sessions` table
    (user, set, finished_at). If no, there is no table.
@@ -78,18 +78,25 @@ questions           passage_id      now nullable (NULL = grammar question)
                          (a passage question takes author and visibility from its passage)
                   CHECK: passage_id IS NOT NULL OR is_common OR owner_id IS NOT NULL
 
-attempts            passage_id      now nullable (NULL = grammar session)
+attempts            passage_id      now nullable (NULL = grammar session),
+                                    ON DELETE SET NULL (was CASCADE)
                   + kind            "passage" | "grammar"
-                  + question_ids    JSON list of question ids, in order
+                  + content         JSON copy of what the attempt shows: title, text,
+                                    translation_ru, and the questions with their options
+                                    in shuffled order, the correct one marked
+                  - option_order    the order is now the order in `content`
                   unique (user_id, passage_id) WHERE open AND kind = 'passage'
                   unique (user_id)            WHERE open AND kind = 'grammar'
+
+attempt_answers     question_id     no foreign key: ids inside attempts.content
+                    option_id       no foreign key: ids inside attempts.content
 
 speaking_sets     (new) id, owner_id → users.id nullable ON DELETE SET NULL,
                   is_common, title, questions JSON list[str],
                   prepare_seconds, speak_seconds, created_at
                   CHECK: is_common OR owner_id IS NOT NULL
 
-speaking_sessions (new, only if open decision 2 is yes) id, user_id, set_id, finished_at
+speaking_sessions (new, only if open decision 1 is yes) id, user_id, set_id, finished_at
 ```
 
 Migrations:
@@ -97,8 +104,10 @@ Migrations:
 - The ownership migration adds `is_common` with `server_default` true, so every existing
   passage becomes common (they have no owner yet, so the CHECK needs it), then changes the
   default to false.
-- The attempts migration fills `kind = 'passage'` and `question_ids` from each attempt's
-  passage (a data migration, with a test on a copy of real data).
+- The attempts migrations (step 5) fill `content` from each attempt's passage, with the
+  options in the order its `option_order` showed them (a data migration, with a test), then
+  drop `option_order` and the answers' foreign keys to questions and options. Step 8 adds
+  `kind` with `server_default 'passage'`, so existing attempts need no data migration.
 
 Account deletion is one service function and one commit: delete my private passages,
 grammar questions and speaking sets, then delete the user. The database sets `owner_id` to
@@ -148,7 +157,7 @@ Templates stay in `app/templates/<feature>/`.
 - [x] `SIGNUP_CODE` setting: when set, the sign-up form has a code field, compared with
       `hmac.compare_digest`; a wrong code gives the same kind of form error as a taken username.
 - [x] Parametrised tests: owner / other user / admin × view / edit / delete / practise for
-      every content type (passages now; route tests for edit and delete come with step 6).
+      every content type (passages now; route tests for edit and delete come with step 7).
 - [x] Deletion tests: private content is gone; common content stays with no owner; another
       user's attempts on it stay; deleting the user without removing private content first
       fails on the CHECK.
@@ -167,36 +176,43 @@ Templates stay in `app/templates/<feature>/`.
       Done when: switching changes every page; the Russian interface reads as in 1.0, except
       dates, which follow CLDR.
 
-### 5. Content format and import
+### 5. Attempts keep a copy of their content
+
+- [x] Migrations: `content`, with a data migration that builds it for existing attempts;
+      then `content` NOT NULL, nullable `passage_id` with `ON DELETE SET NULL`, no
+      `option_order`, no foreign keys from `attempt_answers` to questions and options. `kind`
+      and the grammar index moved to step 8, where grammar sessions first need them.
+- [x] Starting an attempt copies the passage into `content`; the attempt page, grading and the
+      result page read the copy; autosave checks that the question and option are in it.
+- [x] Deleting a passage keeps everyone's results on it; an unfinished attempt on it can still
+      be submitted.
+      Done when: all existing tests pass unchanged in behaviour; old attempts still show their
+      results; changing or deleting a question after an attempt doesn't change that attempt's
+      result page.
+
+### 6. Content format and import
 
 - [ ] Pydantic schemas for passages, grammar questions and speaking sets (shared by editor,
       YAML and CLI).
 - [ ] `python -m app.cli import file.yaml --owner <username> | --common`; `check` command.
-- [ ] Move the four real passages from `seed.py` to `content/*.yaml`; decide what to do with
-      `skill` (drop it, or add the column).
+- [ ] Move the four real passages from `seed.py` to `content/*.yaml`; drop `skills` column.
 - [ ] Import page: paste or upload YAML, see errors per line, save to my area (or common for
       admins).
+- [ ] Re-importing a passage replaces its questions; results keep their copy.
       Done when: re-importing a common file updates it instead of duplicating.
 
-### 6. Passage editor and "Manage" pages
+### 7. Passage editor and "Manage" pages
 
 - [ ] `/manage/passages`: list, new, edit, delete; Alpine editor with dynamic questions and
       2–6 options, correct option as a radio, explanation, optional title and translation.
 - [ ] Admins get a "Common" checkbox.
       Done when: a passage created in the editor can be practised; validation errors show on the form.
 
-### 7. Attempts no longer tied to a passage
-
-- [ ] Migration: `kind`, `question_ids`, nullable `passage_id`, new partial indexes; data
-      migration for existing attempts.
-- [ ] Attempt service reads questions through `question_ids`; autosave checks
-      `question_id in attempt.question_ids`.
-- [ ] Rehearse the migration on a Neon branch of production data.
-      Done when: all existing tests pass unchanged in behaviour; old attempts still show their results.
-
 ### 8. Grammar practice
 
-- [ ] Migration: `questions.owner_id` (SET NULL), `questions.is_common`, both CHECKs.
+- [ ] Migration: `questions.owner_id` (SET NULL), `questions.is_common`, both CHECKs;
+      `attempts.kind` (`server_default 'passage'`), the open-attempt index limited to
+      `kind = 'passage'`, and one open grammar session per user.
 - [ ] `/grammar`: start form with pool ("common + mine" / "only mine") and size, showing how
       many questions the pool has; both choices remembered in the browser. The server caps the
       size at the pool count and shows a message when the pool is empty.
@@ -223,7 +239,7 @@ Templates stay in `app/templates/<feature>/`.
       preparation countdown, then speaking countdown, then a "done" state. Before starting,
       both durations can be changed (defaults from the set, remembered in the browser per set).
 - [ ] `/manage/speaking` editor (one question per line, default durations).
-- [ ] If open decision 2 is yes: `speaking_sessions` table, `POST /speaking/{id}/finish`
+- [ ] If open decision 1 is yes: `speaking_sessions` table, `POST /speaking/{id}/finish`
       calls `record_activity()`, and the profile calendar reads both tables.
       Done when: a set can be created and run with both countdowns (and, if decided, counted for the
       streak and shown on the calendar).
@@ -237,9 +253,11 @@ Templates stay in `app/templates/<feature>/`.
 
 ### 12. Release 2.0.0
 
-- [ ] Take a fresh Neon snapshot; rehearse `alembic upgrade head` on a Neon branch.
+- [ ] Take a fresh Neon snapshot; rehearse `alembic upgrade head` on a Neon branch. While the
+      migrations run, the 1.x instance may still serve for a few seconds and fail.
 - [ ] Set `SIGNUP_CODE` on Render.
-- [ ] Update README (settings table: `SIGNUP_CODE`, `MYMEMORY_EMAIL`), CHANGELOG; merge `v2`
+- [ ] Update README (settings table: `SIGNUP_CODE`, `MYMEMORY_EMAIL`; the data model, where
+      attempts now keep a copy instead of `option_order`), CHANGELOG; merge `v2`
       into `main`; tag `v2.0.0`; GitHub release.
 - [ ] Check production: log in, old results, each practice type, each language, sign-up with
       and without the code.

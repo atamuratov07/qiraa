@@ -42,24 +42,25 @@ def _answers_from_form(fields: dict[str, str]) -> dict[int, int]:
 @router.get("/attempts/{aid}")
 def attempt_page(request: Request, aid: int, db: DB, user: CurrentUser) -> HTMLResponse:
     attempt = _own_attempt(db, user, aid)
-    questions = service.ordered_questions(attempt)
     answers = service.saved_answers(attempt)
 
     if attempt.submitted_at is not None:
         result_ctx: ResultPage = {
             "user": user,
-            "passage": attempt.passage,
+            "title": attempt.display_title,
+            "passage_id": attempt.passage_id,
+            "content": attempt.content,
             "attempt": attempt,
-            "questions": questions,
             "answers": answers,
         }
         return render(request, "practice/result.html", result_ctx)
 
     ctx: AttemptPage = {
         "user": user,
-        "passage": attempt.passage,
+        "title": attempt.display_title,
+        "passage_id": attempt.passage_id,
+        "content": attempt.content,
         "attempt": attempt,
-        "questions": questions,
         "answers": answers,
         "paused": service.is_paused(attempt, datetime.now(UTC)),
     }
@@ -101,7 +102,7 @@ def delete_attempt(
     user: CurrentUser,
     next: Annotated[str, Form()] = "/profile",
 ) -> RedirectResponse:
-    attempt = service.load_attempt(db, user, aid, with_content=False)
+    attempt = service.load_attempt(db, user, aid)
     if attempt is None:
         raise HTTPException(404, _("Attempt not found"))
 
