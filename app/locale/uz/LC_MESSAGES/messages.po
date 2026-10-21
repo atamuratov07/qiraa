@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-21 20:06+0500\n"
+"POT-Creation-Date: 2026-10-22 01:11+0500\n"
 "PO-Revision-Date: 2026-10-15 13:30+0500\n"
 "Last-Translator: Damir\n"
 "Language: uz\n"
@@ -67,11 +67,11 @@ msgstr "Parollar mos kelmadi."
 msgid "This username is already taken."
 msgstr "Bu foydalanuvchi nomi band."
 
-#: app/auth/service.py:77 app/auth/service.py:79
+#: app/auth/service.py:81 app/auth/service.py:84
 msgid "Wrong username or password."
 msgstr "Foydalanuvchi nomi yoki parol notoʻgʻri."
 
-#: app/auth/service.py:144
+#: app/auth/service.py:150
 msgid "Wrong password."
 msgstr "Parol notoʻgʻri."
 
@@ -167,6 +167,10 @@ msgstr ""
 #, python-format
 msgid "The slug %(slug)s is used by more than one passage."
 msgstr "%(slug)s slugi bir nechta matnda koʻrsatilgan."
+
+#: app/content/errors.py:38
+msgid "Someone imported the same passage at the same moment. Import the file again."
+msgstr "Kimdir aynan shu matnni xuddi shu paytda import qildi. Faylni qayta import qiling."
 
 #: app/passages/routes.py:35 app/passages/routes.py:56
 msgid "Passage not found"

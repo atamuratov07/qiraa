@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, CheckConstraint, Index, String, Text, column
+from sqlalchemy import JSON, CheckConstraint, Index, String, Text, column, not_
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.base import Base, Owned, common_or_owned, unique_where
@@ -14,9 +14,15 @@ if TYPE_CHECKING:
 
 class Passage(Owned, Base):
     __tablename__: str = "passages"
-    __table_args__: tuple[CheckConstraint, Index] = (
+    __table_args__: tuple[CheckConstraint, Index, Index] = (
         common_or_owned(),
         unique_where("uq_passages_slug_common", "slug", where=column("is_common")),
+        unique_where(
+            "uq_passages_owner_slug_private",
+            "owner_id",
+            "slug",
+            where=not_(column("is_common")),
+        ),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)

@@ -34,6 +34,9 @@ MESSAGES: dict[str, str] = {
         "Use lowercase Latin letters, digits and single hyphens, like b1-media."
     ),
     "duplicate_slug": N_("The slug %(slug)s is used by more than one passage."),
+    "import_conflict": N_(
+        "Someone imported the same passage at the same moment. Import the file again."
+    ),
 }
 
 type Loc = tuple[int | str, ...]
