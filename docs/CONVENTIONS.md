@@ -23,7 +23,8 @@ CDN · plain JavaScript (`reader.js`, `attempt.js`, `forms.js`), no build step.
 docker compose up -d --wait db
 uv sync
 uv run alembic upgrade head
-uv run python -m app.seed                 # loads the 4 real passages; skips existing slugs
+uv run python -m app.cli import content/<file>.yaml --owner <username>   # adds or updates by slug
+uv run python -m app.cli check content/<file>.yaml                       # no database needed
 uv run python -m app.cli make-admin <username>   # prefix DATABASE_URL=... for Neon
 uv run fastapi dev app/main.py
 uv run pytest                             # on qiraa_test; tables recreated per test
@@ -40,8 +41,9 @@ throwaway database: every test drops all tables.
 ## Code layout
 
 Organised by feature. `app/main.py` creates the app, includes every router and handles errors.
-`app/models.py` imports every model. `app/seed.py` loads the real passages (until step 6).
-`app/cli.py` holds commands for running the site (`make-admin`). `app/locale/` holds the
+`app/models.py` imports every model. `content/` holds YAML content files; only
+`example.yaml` is in git, so real passages stay private and local. `app/cli.py` holds
+commands for running the site (`make-admin`, `import`, `check`). `app/locale/` holds the
 `.po` catalogs, read at startup (no compiled `.mo` files).
 
 - `core/`: `base.py` `Base`, `utcnow()`, `unique_where()`, `Owned`, `common_or_owned()` ·
@@ -108,8 +110,8 @@ at the top.
     with `from __future__ import annotations` and import other features' models only under
     `if TYPE_CHECKING:`; SQLAlchemy finds relationship targets by class name. Services, views
     and routes may import any feature's models and services; only `main.py` imports routes,
-    so a route can import from anywhere without a cycle. Entry points (`main.py`, `seed.py`,
-    `cli.py`, `migrations/env.py`, `tests/conftest.py`) import `app.models`, so every model is
+    so a route can import from anywhere without a cycle. Entry points (`main.py`, `cli.py`,
+    `migrations/env.py`, `tests/conftest.py`) import `app.models`, so every model is
     registered before the first query. `__init__.py` files stay empty. Paths
     come from `BASE_DIR` / `APP_DIR` in `core/config.py`, never from `__file__` elsewhere.
 14. **Translations.** Messages are English. Python calls `_()` and `ngettext()`, templates

@@ -13,3 +13,7 @@ wheels/
 .pytest_cache/
 .ruff_cache/
 
+
+# Content files stay on this machine; only the example is shared
+/content/*.yaml
+!/content/example.yaml

@@ -32,7 +32,8 @@ Version history: [CHANGELOG.md](CHANGELOG.md).
 - **Profile.** Current and longest streak, quizzes taken, questions answered, accuracy and
   passages tried; a calendar of the last 35 days; the 10 latest results, each with a × button
   that deletes it in the background.
-- **Content.** Four real passages (two A2, two B1; 24 questions), loaded by `app/seed.py`.
+- **Content.** Passages are imported from YAML files into a user's private area;
+  `content/example.yaml` shows the format.
 - **Arabic text** is shown right to left in Noto Naskh Arabic. Tapping a word opens a small
   popup with a Google Translate link. The built-in dictionary comes in a later version.
 
@@ -84,11 +85,16 @@ on your machine.
 docker compose up -d --wait db   # Postgres 18 on port 5432, returns once it accepts connections
 uv sync                          # creates .venv and installs everything from uv.lock
 uv run alembic upgrade head      # creates the tables in the qiraa database
-uv run python -m app.seed        # loads the four passages
 uv run fastapi dev app/main.py   # http://127.0.0.1:8000, restarts on every save
 ```
 
-Open the address, sign up, and pick a passage. The interactive API page is at `/docs`.
+Open the address and sign up. Then load the example passage into your account and pick it:
+
+```bash
+uv run python -m app.cli import content/example.yaml --owner <username>
+```
+
+The interactive API page is at `/docs`.
 
 The Compose database keeps its data in a Docker volume between restarts. On the first start
 it creates two databases, `qiraa` for the app and `qiraa_test` for the tests
@@ -167,20 +173,23 @@ deploy. Never edit a migration that has already run on Neon; write a new one ins
 column on a table that already has rows needs a `server_default` (or must be nullable),
 otherwise the migration fails on existing rows.
 
-**Adding passages:** passages are entries of the `PASSAGES` list in `app/seed.py`. Each entry
-has a `slug`, `title`, `level`, `text`, `translation_ru` and its questions; each question has
-a `prompt`, its `options`, the correct `answer` as a letter, and an `explanation`. Then run the
-seed locally and against Neon:
+**Adding passages:** passages are entries of the `passages` list in a YAML file in
+`content/`, written like `content/example.yaml`. Every other `.yaml` file there is ignored by
+git, so real passages stay on your machine. Each entry has a `slug`, `title`, `level`, `text`,
+`translation_ru` and its questions; each question has a `prompt`, its `options`, the correct
+`answer` as a letter, and an `explanation`. Check the file, then import it into one user's
+private area, locally and against Neon:
 
 ```bash
-uv run python -m app.seed
-DATABASE_URL="postgresql://..." uv run python -m app.seed               # macOS / Linux
-$env:DATABASE_URL="postgresql://..."; uv run python -m app.seed         # Windows PowerShell
+uv run python -m app.cli check content/my-passages.yaml
+uv run python -m app.cli import content/my-passages.yaml --owner <username>
+DATABASE_URL="postgresql://..." uv run python -m app.cli import content/my-passages.yaml --owner <username>
 ```
 
-Passages whose slug already exists are skipped, so the script can run any number of times.
-To change a passage that is already loaded, delete it from the database and run the seed
-again. Deleting a passage also deletes its attempts.
+`--common` instead of `--owner` imports passages that every user sees.
+
+A passage whose slug is already loaded is updated, so the import can run any number of
+times. Results of earlier attempts keep the version they were taken on.
 
 ## How it works
 
@@ -304,7 +313,7 @@ sessions
 
 passages
   id                int, primary key        used in URLs
-  slug              str(80), unique         e.g. "b1-media"; lets the seed skip loaded passages
+  slug              str(80), unique         e.g. "b1-media"; lets an import update a passage
   title             str
   level             str, default ""         e.g. "A2"; never NULL, the list groups by it
   text              text                    a blank line starts a new paragraph
@@ -367,7 +376,6 @@ qiraa/
 ├── app/
 │   ├── main.py            creates the app: static files, routes, error pages, /healthz
 │   ├── models.py          imports every model, for Alembic and the tests
-│   ├── seed.py            the passages and the script that loads them
 │   ├── core/              shared by every feature
 │   │   ├── base.py        Base (naming convention), utcnow(), unique_where()
 │   │   ├── config.py      settings from environment variables and .env, project paths
@@ -389,6 +397,7 @@ qiraa/
 │       ├── reader.js      tappable Arabic words and the translation popup
 │       ├── attempt.js     timer, pause and resume, autosave, the submit check
 │       └── forms.js       sends forms marked data-background without a page reload
+├── content/              example.yaml; other content files stay local (ignored by git)
 ├── docker/initdb/         SQL run on the first start of the Compose database
 ├── migrations/            Alembic environment and the initial schema
 ├── tests/                 conftest.py, factories.py and six test files
@@ -411,7 +420,6 @@ Templates are in `app/templates/<feature>/`.
   the console.
 - There is no password reset and no limit on login attempts, so sign-ups are best kept closed.
 - The word popup only links to Google Translate.
-- Changing a loaded passage means deleting and re-seeding it, which also deletes its attempts.
 - Interface text and error messages are written directly in Russian in the templates and code.
 - When you are logged out, submitting a form redirects to `/login` with that form's address
   in `next`. After logging in, the browser opens it with GET and gets `405`.
