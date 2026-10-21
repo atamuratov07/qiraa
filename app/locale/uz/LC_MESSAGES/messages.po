@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-15 13:30+0500\n"
+"POT-Creation-Date: 2026-10-21 20:06+0500\n"
 "PO-Revision-Date: 2026-10-15 13:30+0500\n"
 "Last-Translator: Damir\n"
 "Language: uz\n"
@@ -75,15 +75,108 @@ msgstr "Foydalanuvchi nomi yoki parol notoʻgʻri."
 msgid "Wrong password."
 msgstr "Parol notoʻgʻri."
 
+#: app/content/errors.py:6
+#, python-format
+msgid "This is not valid YAML: %(problem)s"
+msgstr "Bu yaroqli YAML emas: %(problem)s"
+
+#: app/content/errors.py:8
+#, python-format
+msgid "The invisible character %(code)s is not allowed. Delete it or retype the line."
+msgstr "Koʻrinmas %(code)s belgisiga ruxsat yoʻq. Uni oʻchiring yoki qatorni qayta yozing."
+
+#: app/content/errors.py:11
+msgid "Anchors and aliases (& and *) are not allowed. Write the value out in full."
+msgstr "Langar va havolalar (& va *) ishlatilmaydi. Qiymatni toʻliq yozing."
+
+#: app/content/errors.py:13
+msgid "The lists and blocks are nested too deeply."
+msgstr "Roʻyxatlar va bloklar bir-birining ichiga juda chuqur joylashgan."
+
+#: app/content/errors.py:14
+#, python-format
+msgid "%(key)s appears twice in the same block."
+msgstr "%(key)s kaliti bitta blokda ikki marta uchraydi."
+
+#: app/content/errors.py:15
+msgid "The file is empty."
+msgstr "Fayl boʻsh."
+
+#: app/content/errors.py:16 app/content/errors.py:17
+msgid "Expected a block of key: value lines."
+msgstr "Bu yerda «kalit: qiymat» koʻrinishidagi qatorlar bloki kerak."
+
+#: app/content/errors.py:18
+msgid "Expected a list of items starting with a dash (-)."
+msgstr "Bu yerda har bir bandi chiziqcha (-) bilan boshlanadigan roʻyxat kerak."
+
+#: app/content/errors.py:19
+#, python-format
+msgid "The field %(field)s is missing."
+msgstr "%(field)s maydoni yetishmayapti."
+
+#: app/content/errors.py:20
+#, python-format
+msgid "Unknown field %(field)s. Check the spelling."
+msgstr "Nomaʼlum maydon: %(field)s. Yozilishini tekshiring."
+
+#: app/content/errors.py:22
+msgid "Expected text. Quote a value that looks like a number, a date, yes or no."
+msgstr "Bu yerda matn kerak. Son, sana, yes yoki no ga oʻxshagan qiymatni qoʻshtirnoqqa oling."
+
+#: app/content/errors.py:24
+msgid "This can't be empty."
+msgstr "Bu boʻsh boʻlishi mumkin emas."
+
+#: app/content/errors.py:25
+#, python-format
+msgid "Too long: the limit is %(max_length)s characters."
+msgstr "Juda uzun: koʻpi bilan %(max_length)s ta belgi."
+
+#: app/content/errors.py:26
+#, python-format
+msgid "Too few items: at least %(min_length)s are needed."
+msgstr "Bandlar juda kam: kamida %(min_length)s ta kerak."
+
+#: app/content/errors.py:27
+#, python-format
+msgid "Too many items: the limit is %(max_length)s."
+msgstr "Bandlar juda koʻp: koʻpi bilan %(max_length)s ta."
+
+#: app/content/errors.py:28
+msgid "The answer must be a letter from A to F."
+msgstr "Javob A dan F gacha boʻlgan harf boʻlishi kerak."
+
+#: app/content/errors.py:29
+#, python-format
+msgid "The option %(option)s appears twice."
+msgstr "%(option)s varianti ikki marta uchraydi."
+
+#: app/content/errors.py:31
+#, python-format
+msgid "Answer %(answer)s is out of range: this question has %(count)s options."
+msgstr "%(answer)s javobi yoʻq: bu savolda bor-yoʻgʻi %(count)s ta variant."
+
+#: app/content/errors.py:34
+msgid "Use lowercase Latin letters, digits and single hyphens, like b1-media."
+msgstr ""
+"Kichik lotin harflari, raqamlar va yakka chiziqchalardan foydalaning, masalan "
+"b1-media."
+
+#: app/content/errors.py:36
+#, python-format
+msgid "The slug %(slug)s is used by more than one passage."
+msgstr "%(slug)s slugi bir nechta matnda koʻrsatilgan."
+
 #: app/passages/routes.py:35 app/passages/routes.py:56
 msgid "Passage not found"
 msgstr "Matn topilmadi"
 
-#: app/practice/routes.py:24 app/practice/routes.py:106
+#: app/practice/routes.py:24 app/practice/routes.py:107
 msgid "Attempt not found"
 msgstr "Urinish topilmadi"
 
-#: app/practice/routes.py:92
+#: app/practice/routes.py:93
 msgid "This attempt is already submitted."
 msgstr "Bu urinish allaqachon tekshirishga yuborilgan."
 
@@ -111,7 +204,7 @@ msgstr "Chiqish"
 msgid "show"
 msgstr "koʻrsatish"
 
-#: app/templates/base.html:74 app/templates/practice/attempt.html:37
+#: app/templates/base.html:74 app/templates/practice/attempt.html:38
 msgid "hide"
 msgstr "yashirish"
 
@@ -119,7 +212,7 @@ msgstr "yashirish"
 msgid "Show timer"
 msgstr "Taymerni koʻrsatish"
 
-#: app/templates/base.html:76 app/templates/practice/attempt.html:37
+#: app/templates/base.html:76 app/templates/practice/attempt.html:38
 msgid "Hide timer"
 msgstr "Taymerni yashirish"
 
@@ -271,7 +364,7 @@ msgstr "Yangi"
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr "Tugallanmagan · javob berildi %(answered)s/%(total)s · %(time)s"
 
-#: app/templates/passages/list.html:61 app/templates/practice/attempt.html:100
+#: app/templates/passages/list.html:61 app/templates/practice/attempt.html:101
 msgid "Continue"
 msgstr "Davom etish"
 
@@ -302,29 +395,29 @@ msgstr "Boshlash"
 msgid "The timer starts when you press “Start” and pauses if you leave the page."
 msgstr "Taymer «Boshlash» bosilgach ishga tushadi va sahifadan chiqsangiz toʻxtab turadi."
 
-#: app/templates/passages/start.html:55 app/templates/practice/attempt.html:107
-#: app/templates/practice/result.html:32
+#: app/templates/passages/start.html:55 app/templates/practice/attempt.html:108
+#: app/templates/practice/result.html:37
 msgid "All passages"
 msgstr "Barcha matnlar"
 
-#: app/templates/practice/attempt.html:53
+#: app/templates/practice/attempt.html:54
 msgid "Tap a word or select several to see the translation into Russian."
 msgstr "Rus tilidagi tarjimani koʻrish uchun soʻzni bosing yoki bir nechtasini belgilang."
 
-#: app/templates/practice/attempt.html:77
+#: app/templates/practice/attempt.html:78
 #, python-format
 msgid "Answered %(answered)s of %(total)s · saved"
 msgstr "Javob berildi: %(answered)s/%(total)s · saqlandi"
 
-#: app/templates/practice/attempt.html:80
+#: app/templates/practice/attempt.html:81
 msgid "Check answers"
 msgstr "Javoblarni tekshirish"
 
-#: app/templates/practice/attempt.html:90
+#: app/templates/practice/attempt.html:91
 msgid "Paused"
 msgstr "Pauza"
 
-#: app/templates/practice/attempt.html:93
+#: app/templates/practice/attempt.html:94
 #, python-format
 msgid ""
 "Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"
@@ -333,36 +426,36 @@ msgstr ""
 "Javob berildi: <span data-answered>%(answered)s</span>/%(total)s · oʻtgan vaqt <span "
 "data-pause-time>%(time)s</span>"
 
-#: app/templates/practice/attempt.html:103
+#: app/templates/practice/attempt.html:104
 msgid "Discard this attempt and its saved answers?"
 msgstr "Bu urinish va saqlangan javoblar bekor qilinsinmi?"
 
-#: app/templates/practice/attempt.html:105
+#: app/templates/practice/attempt.html:106
 msgid "Discard and start over"
 msgstr "Bekor qilib, qaytadan boshlash"
 
-#: app/templates/practice/result.html:15
+#: app/templates/practice/result.html:18
 msgid "Result"
 msgstr "Natija"
 
-#: app/templates/practice/result.html:26
+#: app/templates/practice/result.html:29
 #, python-format
 msgid "%(percent)s%% correct in %(time)s. Mistakes are marked below."
 msgstr "%(time)s ichida %(percent)s%% toʻgʻri. Xatolar quyida belgilangan."
 
-#: app/templates/practice/result.html:30
+#: app/templates/practice/result.html:34
 msgid "Try again"
 msgstr "Qayta urinish"
 
-#: app/templates/practice/result.html:56
+#: app/templates/practice/result.html:61
 msgid "your answer"
 msgstr "sizning javobingiz"
 
-#: app/templates/practice/result.html:60
+#: app/templates/practice/result.html:65
 msgid "No answer"
 msgstr "Javob yoʻq"
 
-#: app/templates/practice/result.html:77
+#: app/templates/practice/result.html:82
 msgid "Russian translation"
 msgstr "Rus tilidagi tarjima"
 
