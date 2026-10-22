@@ -51,7 +51,7 @@ def import_content(
     common = common and user.is_admin
 
     try:
-        if file is not None:
+        if file is not None and file.filename:
             text = decode(file.file.read(MAX_BYTES + 1))
         report = import_passages(db, parse(text).passages, owner=user, common=common)
 
