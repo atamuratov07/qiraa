@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-22 15:35+0500\n"
+"POT-Creation-Date: 2026-10-23 02:43+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -182,7 +182,7 @@ msgstr ""
 msgid "The file is not UTF-8 text. Save it as UTF-8 and try again."
 msgstr ""
 
-#: app/passages/routes.py:35 app/passages/routes.py:56
+#: app/passages/routes.py:43 app/passages/routes.py:64 app/passages/routes.py:82
 msgid "Passage not found"
 msgstr ""
 
@@ -335,14 +335,12 @@ msgid "Already have an account?"
 msgstr ""
 
 #: app/templates/content/import.html:17 app/templates/content/import.html:21
-#: app/templates/passages/list.html:31
+#: app/templates/passages/list.html:30
 msgid "Import passages"
 msgstr ""
 
 #: app/templates/content/import.html:22
-msgid ""
-"Paste a YAML file or choose one. A passage whose slug you have already imported is "
-"updated, and results of earlier attempts don't change."
+msgid "A passage whose slug was imported before is updated."
 msgstr ""
 
 #: app/templates/content/import.html:27
@@ -389,9 +387,7 @@ msgid "Prompt for a chatbot: turn any material into this format"
 msgstr ""
 
 #: app/templates/content/import.html:78
-msgid ""
-"Copy the prompt into a chatbot, then add your material: text, a photo or a PDF. Paste"
-" its answer above. Check every answer marked # check before importing."
+msgid "The chatbot marks answers it chose itself with # check. Check them before importing."
 msgstr ""
 
 #: app/templates/content/import.html:79
@@ -413,50 +409,46 @@ msgstr[1] ""
 msgid "Marhaba, %(name)s"
 msgstr ""
 
-#: app/templates/passages/list.html:30
-msgid "Pick a passage. Tap any Arabic word while reading to see its translation."
-msgstr ""
-
-#: app/templates/passages/list.html:39
+#: app/templates/passages/list.html:38
 msgid "Other"
 msgstr ""
 
-#: app/templates/passages/list.html:45 app/templates/passages/start.html:46
+#: app/templates/passages/list.html:44 app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
 msgid_plural "%(count)s questions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/passages/list.html:49
+#: app/templates/passages/list.html:48
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/passages/list.html:52
+#: app/templates/passages/list.html:51
 msgid "New"
 msgstr ""
 
-#: app/templates/passages/list.html:60
+#: app/templates/passages/list.html:59
 #, python-format
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr ""
 
-#: app/templates/passages/list.html:62 app/templates/practice/attempt.html:101
+#: app/templates/passages/list.html:61 app/templates/practice/attempt.html:100
 msgid "Continue"
 msgstr ""
 
-#: app/templates/passages/list.html:64
+#: app/templates/passages/list.html:63
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr ""
 
-#: app/templates/passages/list.html:66
+#: app/templates/passages/list.html:65
 msgid "Discard"
 msgstr ""
 
-#: app/templates/passages/list.html:75
+#: app/templates/passages/list.html:74
 msgid "No passages yet."
 msgstr ""
 
@@ -471,44 +463,36 @@ msgstr[1] ""
 msgid "Start"
 msgstr ""
 
-#: app/templates/passages/start.html:54
-msgid "The timer starts when you press “Start” and pauses if you leave the page."
-msgstr ""
-
-#: app/templates/passages/start.html:55 app/templates/practice/attempt.html:108
+#: app/templates/passages/start.html:54 app/templates/practice/attempt.html:107
 #: app/templates/practice/result.html:37
 msgid "All passages"
 msgstr ""
 
-#: app/templates/practice/attempt.html:54
-msgid "Tap a word or select several to see the translation into Russian."
-msgstr ""
-
-#: app/templates/practice/attempt.html:78
+#: app/templates/practice/attempt.html:77
 #, python-format
 msgid "Answered %(answered)s of %(total)s · saved"
 msgstr ""
 
-#: app/templates/practice/attempt.html:81
+#: app/templates/practice/attempt.html:80
 msgid "Check answers"
 msgstr ""
 
-#: app/templates/practice/attempt.html:91
+#: app/templates/practice/attempt.html:90
 msgid "Paused"
 msgstr ""
 
-#: app/templates/practice/attempt.html:94
+#: app/templates/practice/attempt.html:93
 #, python-format
 msgid ""
 "Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"
 "time>%(time)s</span> elapsed"
 msgstr ""
 
-#: app/templates/practice/attempt.html:104
+#: app/templates/practice/attempt.html:103
 msgid "Discard this attempt and its saved answers?"
 msgstr ""
 
-#: app/templates/practice/attempt.html:106
+#: app/templates/practice/attempt.html:105
 msgid "Discard and start over"
 msgstr ""
 
@@ -518,7 +502,7 @@ msgstr ""
 
 #: app/templates/practice/result.html:29
 #, python-format
-msgid "%(percent)s%% correct in %(time)s. Mistakes are marked below."
+msgid "%(percent)s%% correct in %(time)s"
 msgstr ""
 
 #: app/templates/practice/result.html:34

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-22 15:35+0500\n"
+"POT-Creation-Date: 2026-10-23 02:43+0500\n"
 "PO-Revision-Date: 2026-10-15 13:30+0500\n"
 "Last-Translator: Damir\n"
 "Language: uz\n"
@@ -181,7 +181,7 @@ msgstr "Fayl %(limit)s dan katta."
 msgid "The file is not UTF-8 text. Save it as UTF-8 and try again."
 msgstr "Fayl UTF-8 kodlashida emas. Uni UTF-8 da saqlang va qaytadan urinib koʻring."
 
-#: app/passages/routes.py:35 app/passages/routes.py:56
+#: app/passages/routes.py:43 app/passages/routes.py:64 app/passages/routes.py:82
 msgid "Passage not found"
 msgstr "Matn topilmadi"
 
@@ -334,17 +334,13 @@ msgid "Already have an account?"
 msgstr "Hisobingiz bormi?"
 
 #: app/templates/content/import.html:17 app/templates/content/import.html:21
-#: app/templates/passages/list.html:31
+#: app/templates/passages/list.html:30
 msgid "Import passages"
 msgstr "Matnlarni import qilish"
 
 #: app/templates/content/import.html:22
-msgid ""
-"Paste a YAML file or choose one. A passage whose slug you have already imported is "
-"updated, and results of earlier attempts don't change."
-msgstr ""
-"YAML matnini qoʻying yoki faylni tanlang. Slugi avval import qilingan matn "
-"yangilanadi, oldingi urinishlar natijalari esa oʻzgarmaydi."
+msgid "A passage whose slug was imported before is updated."
+msgstr "Slugi avval import qilingan matn yangilanadi."
 
 #: app/templates/content/import.html:27
 msgid "Nothing was imported. Fix these problems and try again:"
@@ -390,13 +386,10 @@ msgid "Prompt for a chatbot: turn any material into this format"
 msgstr "Chat-bot uchun prompt: istalgan materialni shu formatga oʻtkazish"
 
 #: app/templates/content/import.html:78
-msgid ""
-"Copy the prompt into a chatbot, then add your material: text, a photo or a PDF. Paste"
-" its answer above. Check every answer marked # check before importing."
+msgid "The chatbot marks answers it chose itself with # check. Check them before importing."
 msgstr ""
-"Promptni chat-botga nusxalang va materialingizni qoʻshing: matn, rasm yoki PDF. Uning"
-" javobini yuqoriga qoʻying. Import qilishdan oldin # check belgisi qoʻyilgan har bir "
-"javobni tekshiring."
+"Chat-bot oʻzi tanlagan javoblarni # check bilan belgilaydi. Import qilishdan oldin "
+"ularni tekshiring."
 
 #: app/templates/content/import.html:79
 msgid "Copy the prompt"
@@ -417,52 +410,46 @@ msgstr[1] "ketma-ket kun"
 msgid "Marhaba, %(name)s"
 msgstr "Marhaba, %(name)s"
 
-#: app/templates/passages/list.html:30
-msgid "Pick a passage. Tap any Arabic word while reading to see its translation."
-msgstr ""
-"Matnni tanlang. Oʻqish paytida tarjimasini koʻrish uchun istalgan arabcha soʻzni "
-"bosing."
-
-#: app/templates/passages/list.html:39
+#: app/templates/passages/list.html:38
 msgid "Other"
 msgstr "Boshqa"
 
-#: app/templates/passages/list.html:45 app/templates/passages/start.html:46
+#: app/templates/passages/list.html:44 app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
 msgid_plural "%(count)s questions"
 msgstr[0] "%(count)s ta savol"
 msgstr[1] "%(count)s ta savol"
 
-#: app/templates/passages/list.html:49
+#: app/templates/passages/list.html:48
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
 msgstr[0] "Eng yaxshi natija %(best)s%% · %(count)s ta urinish"
 msgstr[1] "Eng yaxshi natija %(best)s%% · %(count)s ta urinish"
 
-#: app/templates/passages/list.html:52
+#: app/templates/passages/list.html:51
 msgid "New"
 msgstr "Yangi"
 
-#: app/templates/passages/list.html:60
+#: app/templates/passages/list.html:59
 #, python-format
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr "Tugallanmagan · javob berildi %(answered)s/%(total)s · %(time)s"
 
-#: app/templates/passages/list.html:62 app/templates/practice/attempt.html:101
+#: app/templates/passages/list.html:61 app/templates/practice/attempt.html:100
 msgid "Continue"
 msgstr "Davom etish"
 
-#: app/templates/passages/list.html:64
+#: app/templates/passages/list.html:63
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr "Bu tugallanmagan urinish bekor qilinsinmi? Saqlangan javoblar oʻchiriladi."
 
-#: app/templates/passages/list.html:66
+#: app/templates/passages/list.html:65
 msgid "Discard"
 msgstr "Bekor qilish"
 
-#: app/templates/passages/list.html:75
+#: app/templates/passages/list.html:74
 msgid "No passages yet."
 msgstr "Hozircha matnlar yoʻq."
 
@@ -477,33 +464,25 @@ msgstr[1] "%(count)s ta urinishda eng yaxshi natija %(best)s%%"
 msgid "Start"
 msgstr "Boshlash"
 
-#: app/templates/passages/start.html:54
-msgid "The timer starts when you press “Start” and pauses if you leave the page."
-msgstr "Taymer «Boshlash» bosilgach ishga tushadi va sahifadan chiqsangiz toʻxtab turadi."
-
-#: app/templates/passages/start.html:55 app/templates/practice/attempt.html:108
+#: app/templates/passages/start.html:54 app/templates/practice/attempt.html:107
 #: app/templates/practice/result.html:37
 msgid "All passages"
 msgstr "Barcha matnlar"
 
-#: app/templates/practice/attempt.html:54
-msgid "Tap a word or select several to see the translation into Russian."
-msgstr "Rus tilidagi tarjimani koʻrish uchun soʻzni bosing yoki bir nechtasini belgilang."
-
-#: app/templates/practice/attempt.html:78
+#: app/templates/practice/attempt.html:77
 #, python-format
 msgid "Answered %(answered)s of %(total)s · saved"
 msgstr "Javob berildi: %(answered)s/%(total)s · saqlandi"
 
-#: app/templates/practice/attempt.html:81
+#: app/templates/practice/attempt.html:80
 msgid "Check answers"
 msgstr "Javoblarni tekshirish"
 
-#: app/templates/practice/attempt.html:91
+#: app/templates/practice/attempt.html:90
 msgid "Paused"
 msgstr "Pauza"
 
-#: app/templates/practice/attempt.html:94
+#: app/templates/practice/attempt.html:93
 #, python-format
 msgid ""
 "Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"
@@ -512,11 +491,11 @@ msgstr ""
 "Javob berildi: <span data-answered>%(answered)s</span>/%(total)s · oʻtgan vaqt <span "
 "data-pause-time>%(time)s</span>"
 
-#: app/templates/practice/attempt.html:104
+#: app/templates/practice/attempt.html:103
 msgid "Discard this attempt and its saved answers?"
 msgstr "Bu urinish va saqlangan javoblar bekor qilinsinmi?"
 
-#: app/templates/practice/attempt.html:106
+#: app/templates/practice/attempt.html:105
 msgid "Discard and start over"
 msgstr "Bekor qilib, qaytadan boshlash"
 
@@ -526,8 +505,8 @@ msgstr "Natija"
 
 #: app/templates/practice/result.html:29
 #, python-format
-msgid "%(percent)s%% correct in %(time)s. Mistakes are marked below."
-msgstr "%(time)s ichida %(percent)s%% toʻgʻri. Xatolar quyida belgilangan."
+msgid "%(percent)s%% correct in %(time)s"
+msgstr "%(time)s ichida %(percent)s%% toʻgʻri"
 
 #: app/templates/practice/result.html:34
 msgid "Try again"

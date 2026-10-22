@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-22 15:35+0500\n"
+"POT-Creation-Date: 2026-10-23 02:43+0500\n"
 "PO-Revision-Date: 2026-10-15 00:55+0500\n"
 "Last-Translator: Damir\n"
 "Language: ru\n"
@@ -180,7 +180,7 @@ msgstr "Файл больше %(limit)s."
 msgid "The file is not UTF-8 text. Save it as UTF-8 and try again."
 msgstr "Файл не в кодировке UTF-8. Сохраните его в UTF-8 и попробуйте снова."
 
-#: app/passages/routes.py:35 app/passages/routes.py:56
+#: app/passages/routes.py:43 app/passages/routes.py:64 app/passages/routes.py:82
 msgid "Passage not found"
 msgstr "Текст не найден"
 
@@ -333,17 +333,13 @@ msgid "Already have an account?"
 msgstr "Уже есть аккаунт?"
 
 #: app/templates/content/import.html:17 app/templates/content/import.html:21
-#: app/templates/passages/list.html:31
+#: app/templates/passages/list.html:30
 msgid "Import passages"
 msgstr "Импорт текстов"
 
 #: app/templates/content/import.html:22
-msgid ""
-"Paste a YAML file or choose one. A passage whose slug you have already imported is "
-"updated, and results of earlier attempts don't change."
-msgstr ""
-"Вставьте YAML или выберите файл. Текст, чей слаг вы уже импортировали, обновится, а "
-"результаты прошлых попыток не изменятся."
+msgid "A passage whose slug was imported before is updated."
+msgstr "Текст со слагом, который уже импортировали, обновится."
 
 #: app/templates/content/import.html:27
 msgid "Nothing was imported. Fix these problems and try again:"
@@ -391,12 +387,8 @@ msgid "Prompt for a chatbot: turn any material into this format"
 msgstr "Промпт для чат-бота: превратить любой материал в этот формат"
 
 #: app/templates/content/import.html:78
-msgid ""
-"Copy the prompt into a chatbot, then add your material: text, a photo or a PDF. Paste"
-" its answer above. Check every answer marked # check before importing."
-msgstr ""
-"Скопируйте промпт в чат-бот и добавьте свой материал: текст, фото или PDF. Вставьте "
-"его ответ выше. Перед импортом проверьте каждый ответ с пометкой # check."
+msgid "The chatbot marks answers it chose itself with # check. Check them before importing."
+msgstr "Ответы, которые чат-бот выбрал сам, помечены # check. Проверьте их перед импортом."
 
 #: app/templates/content/import.html:79
 msgid "Copy the prompt"
@@ -418,15 +410,11 @@ msgstr[2] "дней подряд"
 msgid "Marhaba, %(name)s"
 msgstr "Мархаба, %(name)s"
 
-#: app/templates/passages/list.html:30
-msgid "Pick a passage. Tap any Arabic word while reading to see its translation."
-msgstr "Выбери текст. Нажми на любое арабское слово во время чтения, чтобы увидеть перевод."
-
-#: app/templates/passages/list.html:39
+#: app/templates/passages/list.html:38
 msgid "Other"
 msgstr "Другое"
 
-#: app/templates/passages/list.html:45 app/templates/passages/start.html:46
+#: app/templates/passages/list.html:44 app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
 msgid_plural "%(count)s questions"
@@ -434,7 +422,7 @@ msgstr[0] "%(count)s вопрос"
 msgstr[1] "%(count)s вопроса"
 msgstr[2] "%(count)s вопросов"
 
-#: app/templates/passages/list.html:49
+#: app/templates/passages/list.html:48
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
@@ -442,28 +430,28 @@ msgstr[0] "Лучший результат %(best)s%% · %(count)s попытк�
 msgstr[1] "Лучший результат %(best)s%% · %(count)s попытки"
 msgstr[2] "Лучший результат %(best)s%% · %(count)s попыток"
 
-#: app/templates/passages/list.html:52
+#: app/templates/passages/list.html:51
 msgid "New"
 msgstr "Новый"
 
-#: app/templates/passages/list.html:60
+#: app/templates/passages/list.html:59
 #, python-format
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr "Не завершён · отвечено %(answered)s/%(total)s · %(time)s"
 
-#: app/templates/passages/list.html:62 app/templates/practice/attempt.html:101
+#: app/templates/passages/list.html:61 app/templates/practice/attempt.html:100
 msgid "Continue"
 msgstr "Продолжить"
 
-#: app/templates/passages/list.html:64
+#: app/templates/passages/list.html:63
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr "Сбросить эту незавершённую попытку? Сохранённые ответы будут удалены."
 
-#: app/templates/passages/list.html:66
+#: app/templates/passages/list.html:65
 msgid "Discard"
 msgstr "Сбросить"
 
-#: app/templates/passages/list.html:75
+#: app/templates/passages/list.html:74
 msgid "No passages yet."
 msgstr "Текстов пока нет."
 
@@ -479,35 +467,25 @@ msgstr[2] "лучший результат %(best)s%% за %(count)s попыт�
 msgid "Start"
 msgstr "Начать"
 
-#: app/templates/passages/start.html:54
-msgid "The timer starts when you press “Start” and pauses if you leave the page."
-msgstr ""
-"Таймер запустится после нажатия «Начать» и встанет на паузу, если вы уйдёте со "
-"страницы."
-
-#: app/templates/passages/start.html:55 app/templates/practice/attempt.html:108
+#: app/templates/passages/start.html:54 app/templates/practice/attempt.html:107
 #: app/templates/practice/result.html:37
 msgid "All passages"
 msgstr "Все тексты"
 
-#: app/templates/practice/attempt.html:54
-msgid "Tap a word or select several to see the translation into Russian."
-msgstr "Нажмите на слово или выделите несколько, чтобы увидеть перевод на русский."
-
-#: app/templates/practice/attempt.html:78
+#: app/templates/practice/attempt.html:77
 #, python-format
 msgid "Answered %(answered)s of %(total)s · saved"
 msgstr "Отвечено %(answered)s из %(total)s · сохранено"
 
-#: app/templates/practice/attempt.html:81
+#: app/templates/practice/attempt.html:80
 msgid "Check answers"
 msgstr "Проверить ответы"
 
-#: app/templates/practice/attempt.html:91
+#: app/templates/practice/attempt.html:90
 msgid "Paused"
 msgstr "Пауза"
 
-#: app/templates/practice/attempt.html:94
+#: app/templates/practice/attempt.html:93
 #, python-format
 msgid ""
 "Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"
@@ -516,11 +494,11 @@ msgstr ""
 "Отвечено <span data-answered>%(answered)s</span>/%(total)s · прошло <span data-pause-"
 "time>%(time)s</span>"
 
-#: app/templates/practice/attempt.html:104
+#: app/templates/practice/attempt.html:103
 msgid "Discard this attempt and its saved answers?"
 msgstr "Сбросить эту попытку и сохранённые ответы?"
 
-#: app/templates/practice/attempt.html:106
+#: app/templates/practice/attempt.html:105
 msgid "Discard and start over"
 msgstr "Сбросить и начать заново"
 
@@ -530,8 +508,8 @@ msgstr "Результат"
 
 #: app/templates/practice/result.html:29
 #, python-format
-msgid "%(percent)s%% correct in %(time)s. Mistakes are marked below."
-msgstr "%(percent)s%% верно за %(time)s. Ошибки отмечены ниже."
+msgid "%(percent)s%% correct in %(time)s"
+msgstr "%(percent)s%% верно за %(time)s"
 
 #: app/templates/practice/result.html:34
 msgid "Try again"
