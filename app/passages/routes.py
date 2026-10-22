@@ -6,10 +6,18 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from app.auth.deps import CurrentUser
 from app.core.db import DB
 from app.core.i18n import _
+from app.core.permissions import load_editable
 from app.core.templating import render
 from app.core.timeutils import local_day
-from app.passages.service import load_passage, passage_cards, passage_stats
-from app.passages.views import PassagesPage, PassageStartPage
+from app.passages.models import Passage
+from app.passages.service import (
+    delete_passage,
+    load_passage,
+    managed_passages,
+    passage_cards,
+    passage_stats,
+)
+from app.passages.views import ManagePage, PassagesPage, PassageStartPage
 from app.practice.service import open_attempt_for, start
 from app.profile.streaks import visible_streak
 
@@ -57,3 +65,22 @@ def start_attempt(pid: int, db: DB, user: CurrentUser) -> RedirectResponse:
 
     attempt = start(db, user, passage, now=datetime.now(UTC))
     return RedirectResponse(f"/attempts/{attempt.id}", status_code=303)
+
+
+@router.get("/manage/passages")
+def manage_page(request: Request, db: DB, user: CurrentUser) -> HTMLResponse:
+    ctx: ManagePage = {"user": user, "passages": managed_passages(db, user)}
+
+    return render(request, "passages/manage.html", ctx)
+
+
+@router.post("/manage/passages/{pid}/delete")
+def manage_delete(pid: int, db: DB, user: CurrentUser) -> RedirectResponse:
+    passage = load_editable(db, user, Passage, pid)
+
+    if passage is None:
+        raise HTTPException(404, _("Passage not found"))
+
+    delete_passage(db, passage)
+
+    return RedirectResponse("/manage/passages", status_code=303)

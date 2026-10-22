@@ -205,75 +205,79 @@ msgstr "Google Tarjimon"
 msgid "Passages"
 msgstr "Matnlar"
 
-#: app/templates/base.html:56 app/templates/profile/profile.html:26
+#: app/templates/base.html:56
+msgid "Manage"
+msgstr "Boshqarish"
+
+#: app/templates/base.html:57 app/templates/profile/profile.html:26
 msgid "Profile"
 msgstr "Profil"
 
-#: app/templates/base.html:58
+#: app/templates/base.html:59
 msgid "Log out"
 msgstr "Chiqish"
 
-#: app/templates/base.html:73
+#: app/templates/base.html:74
 msgid "show"
 msgstr "koʻrsatish"
 
-#: app/templates/base.html:74 app/templates/practice/attempt.html:38
+#: app/templates/base.html:75 app/templates/practice/attempt.html:38
 msgid "hide"
 msgstr "yashirish"
 
-#: app/templates/base.html:75
+#: app/templates/base.html:76
 msgid "Show timer"
 msgstr "Taymerni koʻrsatish"
 
-#: app/templates/base.html:76 app/templates/practice/attempt.html:38
+#: app/templates/base.html:77 app/templates/practice/attempt.html:38
 msgid "Hide timer"
 msgstr "Taymerni yashirish"
 
-#: app/templates/base.html:77
+#: app/templates/base.html:78
 #, python-brace-format
 msgid "Answered {answered} of {total} · {status}"
 msgstr "Javob berildi: {answered}/{total} · {status}"
 
-#: app/templates/base.html:78
+#: app/templates/base.html:79
 msgid "saving…"
 msgstr "saqlanmoqda…"
 
-#: app/templates/base.html:79
+#: app/templates/base.html:80
 msgid "saved"
 msgstr "saqlandi"
 
-#: app/templates/base.html:80
+#: app/templates/base.html:81
 #, python-brace-format
 msgid "not saved ({code}); the answer will be sent when you submit"
 msgstr "saqlanmadi ({code}); javob tekshirishda yuboriladi"
 
-#: app/templates/base.html:81
+#: app/templates/base.html:82
 msgid "no connection: not saved; the answer will be sent when you submit"
 msgstr "internet yoʻq: saqlanmadi; javob tekshirishda yuboriladi"
 
-#: app/templates/base.html:82
+#: app/templates/base.html:83
 #, python-brace-format
 msgid "Questions without an answer: {count}. Submit anyway?"
 msgstr "Javobsiz savollar: {count}. Baribir tekshirilsinmi?"
 
-#: app/templates/base.html:83
+#: app/templates/base.html:84
 msgid "Checking…"
 msgstr "Tekshirilmoqda…"
 
-#: app/templates/base.html:84
+#: app/templates/base.html:85
 msgid "Translation is not available yet."
 msgstr "Tarjima hozircha mavjud emas."
 
-#: app/templates/base.html:85
+#: app/templates/base.html:86
 #, python-brace-format
 msgid "Server error ({code})."
 msgstr "Server xatosi ({code})."
 
-#: app/templates/base.html:86
+#: app/templates/base.html:87
 msgid "Translation not found."
 msgstr "Tarjima topilmadi."
 
-#: app/templates/base.html:87
+#: app/templates/base.html:88
 msgid "Network error. Try the link below."
 msgstr "Tarmoq xatosi. Quyidagi havoladan foydalanib koʻring."
 
@@ -334,7 +338,6 @@ msgid "Already have an account?"
 msgstr "Hisobingiz bormi?"
 
 #: app/templates/content/import.html:17 app/templates/content/import.html:21
-#: app/templates/passages/list.html:30
 msgid "Import passages"
 msgstr "Matnlarni import qilish"
 
@@ -377,7 +380,7 @@ msgstr "Yoki fayl (1 MB gacha)"
 msgid "Common: every user sees these passages"
 msgstr "Umumiy: bu matnlarni barcha foydalanuvchilar koʻradi"
 
-#: app/templates/content/import.html:73
+#: app/templates/content/import.html:73 app/templates/passages/manage.html:20
 msgid "Import"
 msgstr "Import qilish"
 
@@ -410,48 +413,69 @@ msgstr[1] "ketma-ket kun"
 msgid "Marhaba, %(name)s"
 msgstr "Marhaba, %(name)s"
 
-#: app/templates/passages/list.html:38
+#: app/templates/passages/list.html:37
 msgid "Other"
 msgstr "Boshqa"
 
-#: app/templates/passages/list.html:44 app/templates/passages/start.html:46
+#: app/templates/passages/list.html:43 app/templates/passages/manage.html:31
+#: app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
 msgid_plural "%(count)s questions"
 msgstr[0] "%(count)s ta savol"
 msgstr[1] "%(count)s ta savol"
 
-#: app/templates/passages/list.html:48
+#: app/templates/passages/list.html:47
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
 msgstr[0] "Eng yaxshi natija %(best)s%% · %(count)s ta urinish"
 msgstr[1] "Eng yaxshi natija %(best)s%% · %(count)s ta urinish"
 
-#: app/templates/passages/list.html:51
+#: app/templates/passages/list.html:50
 msgid "New"
 msgstr "Yangi"
 
-#: app/templates/passages/list.html:59
+#: app/templates/passages/list.html:58
 #, python-format
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr "Tugallanmagan · javob berildi %(answered)s/%(total)s · %(time)s"
 
-#: app/templates/passages/list.html:61 app/templates/practice/attempt.html:100
+#: app/templates/passages/list.html:60 app/templates/practice/attempt.html:100
 msgid "Continue"
 msgstr "Davom etish"
 
-#: app/templates/passages/list.html:63
+#: app/templates/passages/list.html:62
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr "Bu tugallanmagan urinish bekor qilinsinmi? Saqlangan javoblar oʻchiriladi."
 
-#: app/templates/passages/list.html:65
+#: app/templates/passages/list.html:64
 msgid "Discard"
 msgstr "Bekor qilish"
 
-#: app/templates/passages/list.html:74
+#: app/templates/passages/list.html:73 app/templates/passages/manage.html:45
 msgid "No passages yet."
 msgstr "Hozircha matnlar yoʻq."
+
+#: app/templates/passages/manage.html:15 app/templates/passages/manage.html:19
+msgid "Manage passages"
+msgstr "Matnlarni boshqarish"
+
+#: app/templates/passages/manage.html:33
+msgid "Common"
+msgstr "Umumiy"
+
+#: app/templates/passages/manage.html:36
+msgid "Delete this passage for everyone? Results on it stay."
+msgstr "Matn hamma uchun oʻchirilsinmi? Undagi natijalar saqlanib qoladi."
+
+#: app/templates/passages/manage.html:36
+msgid "Delete this passage? Results on it stay."
+msgstr "Matn oʻchirilsinmi? Undagi natijalar saqlanib qoladi."
+
+#: app/templates/passages/manage.html:39
+msgid "Delete"
+msgstr "Oʻchirish"
 
 #: app/templates/passages/start.html:47
 #, python-format

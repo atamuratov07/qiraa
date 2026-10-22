@@ -204,75 +204,79 @@ msgstr "Google Переводчик"
 msgid "Passages"
 msgstr "Тексты"
 
-#: app/templates/base.html:56 app/templates/profile/profile.html:26
+#: app/templates/base.html:56
+msgid "Manage"
+msgstr "Управление"
+
+#: app/templates/base.html:57 app/templates/profile/profile.html:26
 msgid "Profile"
 msgstr "Профиль"
 
-#: app/templates/base.html:58
+#: app/templates/base.html:59
 msgid "Log out"
 msgstr "Выйти"
 
-#: app/templates/base.html:73
+#: app/templates/base.html:74
 msgid "show"
 msgstr "показать"
 
-#: app/templates/base.html:74 app/templates/practice/attempt.html:38
+#: app/templates/base.html:75 app/templates/practice/attempt.html:38
 msgid "hide"
 msgstr "скрыть"
 
-#: app/templates/base.html:75
+#: app/templates/base.html:76
 msgid "Show timer"
 msgstr "Показать таймер"
 
-#: app/templates/base.html:76 app/templates/practice/attempt.html:38
+#: app/templates/base.html:77 app/templates/practice/attempt.html:38
 msgid "Hide timer"
 msgstr "Скрыть таймер"
 
-#: app/templates/base.html:77
+#: app/templates/base.html:78
 #, python-brace-format
 msgid "Answered {answered} of {total} · {status}"
 msgstr "Отвечено {answered} из {total} · {status}"
 
-#: app/templates/base.html:78
+#: app/templates/base.html:79
 msgid "saving…"
 msgstr "сохранение…"
 
-#: app/templates/base.html:79
+#: app/templates/base.html:80
 msgid "saved"
 msgstr "сохранено"
 
-#: app/templates/base.html:80
+#: app/templates/base.html:81
 #, python-brace-format
 msgid "not saved ({code}); the answer will be sent when you submit"
 msgstr "не сохранено ({code}); ответ отправится при проверке"
 
-#: app/templates/base.html:81
+#: app/templates/base.html:82
 msgid "no connection: not saved; the answer will be sent when you submit"
 msgstr "нет сети: не сохранено; ответ отправится при проверке"
 
-#: app/templates/base.html:82
+#: app/templates/base.html:83
 #, python-brace-format
 msgid "Questions without an answer: {count}. Submit anyway?"
 msgstr "Вопросов без ответа: {count}. Всё равно проверить?"
 
-#: app/templates/base.html:83
+#: app/templates/base.html:84
 msgid "Checking…"
 msgstr "Проверяем…"
 
-#: app/templates/base.html:84
+#: app/templates/base.html:85
 msgid "Translation is not available yet."
 msgstr "Перевод пока недоступен."
 
-#: app/templates/base.html:85
+#: app/templates/base.html:86
 #, python-brace-format
 msgid "Server error ({code})."
 msgstr "Ошибка сервера ({code})."
 
-#: app/templates/base.html:86
+#: app/templates/base.html:87
 msgid "Translation not found."
 msgstr "Перевод не найден."
 
-#: app/templates/base.html:87
+#: app/templates/base.html:88
 msgid "Network error. Try the link below."
 msgstr "Ошибка сети. Попробуйте ссылку ниже."
 
@@ -333,7 +337,6 @@ msgid "Already have an account?"
 msgstr "Уже есть аккаунт?"
 
 #: app/templates/content/import.html:17 app/templates/content/import.html:21
-#: app/templates/passages/list.html:30
 msgid "Import passages"
 msgstr "Импорт текстов"
 
@@ -378,7 +381,7 @@ msgstr "Или файл (до 1 МБ)"
 msgid "Common: every user sees these passages"
 msgstr "Общие: эти тексты увидят все пользователи"
 
-#: app/templates/content/import.html:73
+#: app/templates/content/import.html:73 app/templates/passages/manage.html:20
 msgid "Import"
 msgstr "Импортировать"
 
@@ -410,11 +413,12 @@ msgstr[2] "дней подряд"
 msgid "Marhaba, %(name)s"
 msgstr "Мархаба, %(name)s"
 
-#: app/templates/passages/list.html:38
+#: app/templates/passages/list.html:37
 msgid "Other"
 msgstr "Другое"
 
-#: app/templates/passages/list.html:44 app/templates/passages/start.html:46
+#: app/templates/passages/list.html:43 app/templates/passages/manage.html:31
+#: app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
 msgid_plural "%(count)s questions"
@@ -422,7 +426,7 @@ msgstr[0] "%(count)s вопрос"
 msgstr[1] "%(count)s вопроса"
 msgstr[2] "%(count)s вопросов"
 
-#: app/templates/passages/list.html:48
+#: app/templates/passages/list.html:47
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
@@ -430,30 +434,50 @@ msgstr[0] "Лучший результат %(best)s%% · %(count)s попытк�
 msgstr[1] "Лучший результат %(best)s%% · %(count)s попытки"
 msgstr[2] "Лучший результат %(best)s%% · %(count)s попыток"
 
-#: app/templates/passages/list.html:51
+#: app/templates/passages/list.html:50
 msgid "New"
 msgstr "Новый"
 
-#: app/templates/passages/list.html:59
+#: app/templates/passages/list.html:58
 #, python-format
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr "Не завершён · отвечено %(answered)s/%(total)s · %(time)s"
 
-#: app/templates/passages/list.html:61 app/templates/practice/attempt.html:100
+#: app/templates/passages/list.html:60 app/templates/practice/attempt.html:100
 msgid "Continue"
 msgstr "Продолжить"
 
-#: app/templates/passages/list.html:63
+#: app/templates/passages/list.html:62
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr "Сбросить эту незавершённую попытку? Сохранённые ответы будут удалены."
 
-#: app/templates/passages/list.html:65
+#: app/templates/passages/list.html:64
 msgid "Discard"
 msgstr "Сбросить"
 
-#: app/templates/passages/list.html:74
+#: app/templates/passages/list.html:73 app/templates/passages/manage.html:45
 msgid "No passages yet."
 msgstr "Текстов пока нет."
+
+#: app/templates/passages/manage.html:15 app/templates/passages/manage.html:19
+msgid "Manage passages"
+msgstr "Управление текстами"
+
+#: app/templates/passages/manage.html:33
+msgid "Common"
+msgstr "Общий"
+
+#: app/templates/passages/manage.html:36
+msgid "Delete this passage for everyone? Results on it stay."
+msgstr "Удалить текст для всех? Результаты по нему сохранятся."
+
+#: app/templates/passages/manage.html:36
+msgid "Delete this passage? Results on it stay."
+msgstr "Удалить текст? Результаты по нему сохранятся."
+
+#: app/templates/passages/manage.html:39
+msgid "Delete"
+msgstr "Удалить"
 
 #: app/templates/passages/start.html:47
 #, python-format

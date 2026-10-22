@@ -50,3 +50,10 @@ class PassageStartPage(TypedDict):
     question_count: int
     best: int | None
     tries: int
+
+
+class ManagePage(TypedDict):
+    """passages/manage.html, GET /manage/passages"""
+
+    user: User
+    passages: list[ManagedPassage]
