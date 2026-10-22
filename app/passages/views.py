@@ -24,6 +24,16 @@ class PassageCard:
     unfinished: UnfinishedInfo | None
 
 
+@dataclass(frozen=True, slots=True)
+class ManagedPassage:
+    id: int
+    title: str
+    level: str
+    slug: str | None
+    is_common: bool
+    question_count: int
+
+
 class PassagesPage(TypedDict):
     """passages/list.html, GET /passages"""
 
