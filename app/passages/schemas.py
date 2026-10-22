@@ -16,9 +16,14 @@ def empty_to_none(value: str | None) -> str | None:
     return value or None
 
 
-NonEmpty = Annotated[str, StringConstraints(min_length=1)]
-Title = Annotated[str, StringConstraints(max_length=200)]
 LETTERS = "ABCDEF"
+MIN_OPTIONS = 2
+MAX_OPTIONS = len(LETTERS)
+MAX_TITLE = 200
+MAX_LEVEL = 16
+
+NonEmpty = Annotated[str, StringConstraints(min_length=1)]
+Title = Annotated[str, StringConstraints(max_length=MAX_TITLE)]
 
 
 class QuestionIn(BaseModel):
@@ -27,7 +32,9 @@ class QuestionIn(BaseModel):
     )
 
     prompt: NonEmpty
-    options: Annotated[list[NonEmpty], Field(min_length=2, max_length=6)]
+    options: Annotated[
+        list[NonEmpty], Field(min_length=MIN_OPTIONS, max_length=MAX_OPTIONS)
+    ]
     answer: Literal["A", "B", "C", "D", "E", "F"]
     explanation: Annotated[str | None, AfterValidator(empty_to_none)] = None
 
@@ -77,7 +84,7 @@ class PassageIn(BaseModel):
     )
 
     title: Annotated[Title | None, AfterValidator(empty_to_none)] = None
-    level: Annotated[str, StringConstraints(max_length=16)] = ""
+    level: Annotated[str, StringConstraints(max_length=MAX_LEVEL)] = ""
     text: NonEmpty
     translation_ru: Annotated[str | None, AfterValidator(empty_to_none)] = None
     glossary: dict[NonEmpty, NonEmpty] = Field(default_factory=dict)

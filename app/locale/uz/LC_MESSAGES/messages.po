@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-22 01:11+0500\n"
+"POT-Creation-Date: 2026-10-22 15:35+0500\n"
 "PO-Revision-Date: 2026-10-15 13:30+0500\n"
 "Last-Translator: Damir\n"
 "Language: uz\n"
@@ -14,31 +14,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:55
+#: app/main.py:57
 msgid "Bad Request"
 msgstr "Notoʻgʻri soʻrov"
 
-#: app/main.py:56
+#: app/main.py:58
 msgid "Unauthorized"
 msgstr "Kirish talab qilinadi"
 
-#: app/main.py:57
+#: app/main.py:59
 msgid "Forbidden"
 msgstr "Ruxsat yoʻq"
 
-#: app/main.py:58 app/main.py:89
+#: app/main.py:60 app/main.py:91
 msgid "Not Found"
 msgstr "Sahifa topilmadi"
 
-#: app/main.py:59
+#: app/main.py:61
 msgid "Method Not Allowed"
 msgstr "Bu usulga ruxsat berilmagan"
 
-#: app/main.py:60
+#: app/main.py:62
 msgid "Conflict"
 msgstr "Ziddiyat"
 
-#: app/main.py:61
+#: app/main.py:63
 msgid "Internal Server Error"
 msgstr "Serverda ichki xatolik"
 
@@ -171,6 +171,15 @@ msgstr "%(slug)s slugi bir nechta matnda koʻrsatilgan."
 #: app/content/errors.py:38
 msgid "Someone imported the same passage at the same moment. Import the file again."
 msgstr "Kimdir aynan shu matnni xuddi shu paytda import qildi. Faylni qayta import qiling."
+
+#: app/content/errors.py:40
+#, python-format
+msgid "The file is larger than %(limit)s."
+msgstr "Fayl %(limit)s dan katta."
+
+#: app/content/errors.py:41
+msgid "The file is not UTF-8 text. Save it as UTF-8 and try again."
+msgstr "Fayl UTF-8 kodlashida emas. Uni UTF-8 da saqlang va qaytadan urinib koʻring."
 
 #: app/passages/routes.py:35 app/passages/routes.py:56
 msgid "Passage not found"
@@ -324,6 +333,79 @@ msgstr "Hisob yaratish"
 msgid "Already have an account?"
 msgstr "Hisobingiz bormi?"
 
+#: app/templates/content/import.html:17 app/templates/content/import.html:21
+#: app/templates/passages/list.html:31
+msgid "Import passages"
+msgstr "Matnlarni import qilish"
+
+#: app/templates/content/import.html:22
+msgid ""
+"Paste a YAML file or choose one. A passage whose slug you have already imported is "
+"updated, and results of earlier attempts don't change."
+msgstr ""
+"YAML matnini qoʻying yoki faylni tanlang. Slugi avval import qilingan matn "
+"yangilanadi, oldingi urinishlar natijalari esa oʻzgarmaydi."
+
+#: app/templates/content/import.html:27
+msgid "Nothing was imported. Fix these problems and try again:"
+msgstr "Hech narsa import qilinmadi. Quyidagi xatolarni tuzatib, qaytadan urinib koʻring:"
+
+#: app/templates/content/import.html:31
+#, python-format
+msgid "Line %(line)s"
+msgstr "%(line)s-qator"
+
+#: app/templates/content/import.html:43
+#, python-format
+msgid "Added %(num)d passage"
+msgid_plural "Added %(num)d passages"
+msgstr[0] "%(num)d ta matn qoʻshildi"
+msgstr[1] "%(num)d ta matn qoʻshildi"
+
+#: app/templates/content/import.html:44
+#, python-format
+msgid "Updated %(num)d passage"
+msgid_plural "Updated %(num)d passages"
+msgstr[0] "%(num)d ta matn yangilandi"
+msgstr[1] "%(num)d ta matn yangilandi"
+
+#: app/templates/content/import.html:58
+msgid "YAML"
+msgstr "YAML"
+
+#: app/templates/content/import.html:63
+msgid "Or a file (up to 1 MB)"
+msgstr "Yoki fayl (1 MB gacha)"
+
+#: app/templates/content/import.html:70
+msgid "Common: every user sees these passages"
+msgstr "Umumiy: bu matnlarni barcha foydalanuvchilar koʻradi"
+
+#: app/templates/content/import.html:73
+msgid "Import"
+msgstr "Import qilish"
+
+#: app/templates/content/import.html:77
+msgid "Prompt for a chatbot: turn any material into this format"
+msgstr "Chat-bot uchun prompt: istalgan materialni shu formatga oʻtkazish"
+
+#: app/templates/content/import.html:78
+msgid ""
+"Copy the prompt into a chatbot, then add your material: text, a photo or a PDF. Paste"
+" its answer above. Check every answer marked # check before importing."
+msgstr ""
+"Promptni chat-botga nusxalang va materialingizni qoʻshing: matn, rasm yoki PDF. Uning"
+" javobini yuqoriga qoʻying. Import qilishdan oldin # check belgisi qoʻyilgan har bir "
+"javobni tekshiring."
+
+#: app/templates/content/import.html:79
+msgid "Copy the prompt"
+msgstr "Promptni nusxalash"
+
+#: app/templates/content/import.html:88
+msgid "Copied"
+msgstr "Nusxalandi"
+
 #: app/templates/passages/list.html:26
 msgid "day in a row"
 msgid_plural "days in a row"
@@ -341,46 +423,46 @@ msgstr ""
 "Matnni tanlang. Oʻqish paytida tarjimasini koʻrish uchun istalgan arabcha soʻzni "
 "bosing."
 
-#: app/templates/passages/list.html:38
+#: app/templates/passages/list.html:39
 msgid "Other"
 msgstr "Boshqa"
 
-#: app/templates/passages/list.html:44 app/templates/passages/start.html:46
+#: app/templates/passages/list.html:45 app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
 msgid_plural "%(count)s questions"
 msgstr[0] "%(count)s ta savol"
 msgstr[1] "%(count)s ta savol"
 
-#: app/templates/passages/list.html:48
+#: app/templates/passages/list.html:49
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
 msgstr[0] "Eng yaxshi natija %(best)s%% · %(count)s ta urinish"
 msgstr[1] "Eng yaxshi natija %(best)s%% · %(count)s ta urinish"
 
-#: app/templates/passages/list.html:51
+#: app/templates/passages/list.html:52
 msgid "New"
 msgstr "Yangi"
 
-#: app/templates/passages/list.html:59
+#: app/templates/passages/list.html:60
 #, python-format
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr "Tugallanmagan · javob berildi %(answered)s/%(total)s · %(time)s"
 
-#: app/templates/passages/list.html:61 app/templates/practice/attempt.html:101
+#: app/templates/passages/list.html:62 app/templates/practice/attempt.html:101
 msgid "Continue"
 msgstr "Davom etish"
 
-#: app/templates/passages/list.html:63
+#: app/templates/passages/list.html:64
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr "Bu tugallanmagan urinish bekor qilinsinmi? Saqlangan javoblar oʻchiriladi."
 
-#: app/templates/passages/list.html:65
+#: app/templates/passages/list.html:66
 msgid "Discard"
 msgstr "Bekor qilish"
 
-#: app/templates/passages/list.html:74
+#: app/templates/passages/list.html:75
 msgid "No passages yet."
 msgstr "Hozircha matnlar yoʻq."
 

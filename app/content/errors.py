@@ -37,6 +37,8 @@ MESSAGES: dict[str, str] = {
     "import_conflict": N_(
         "Someone imported the same passage at the same moment. Import the file again."
     ),
+    "file_too_large": N_("The file is larger than %(limit)s."),
+    "not_utf8": N_("The file is not UTF-8 text. Save it as UTF-8 and try again."),
 }
 
 type Loc = tuple[int | str, ...]

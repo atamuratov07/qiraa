@@ -14,6 +14,7 @@ from pydantic_core import PydanticCustomError
 from app.passages.schemas import PassageIn
 
 SLUG = re.compile(r"[a-z0-9]+(-[a-z0-9]+)*")
+MAX_SLUG = 80
 
 
 def slug_is_simple(slug: str) -> str:
@@ -26,7 +27,9 @@ def slug_is_simple(slug: str) -> str:
     return slug
 
 
-Slug = Annotated[str, StringConstraints(max_length=80), AfterValidator(slug_is_simple)]
+Slug = Annotated[
+    str, StringConstraints(max_length=MAX_SLUG), AfterValidator(slug_is_simple)
+]
 
 
 class PassageEntry(PassageIn):

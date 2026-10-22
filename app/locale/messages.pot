@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-22 01:11+0500\n"
+"POT-Creation-Date: 2026-10-22 15:35+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,31 +17,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:55
+#: app/main.py:57
 msgid "Bad Request"
 msgstr ""
 
-#: app/main.py:56
+#: app/main.py:58
 msgid "Unauthorized"
 msgstr ""
 
-#: app/main.py:57
+#: app/main.py:59
 msgid "Forbidden"
 msgstr ""
 
-#: app/main.py:58 app/main.py:89
+#: app/main.py:60 app/main.py:91
 msgid "Not Found"
 msgstr ""
 
-#: app/main.py:59
+#: app/main.py:61
 msgid "Method Not Allowed"
 msgstr ""
 
-#: app/main.py:60
+#: app/main.py:62
 msgid "Conflict"
 msgstr ""
 
-#: app/main.py:61
+#: app/main.py:63
 msgid "Internal Server Error"
 msgstr ""
 
@@ -171,6 +171,15 @@ msgstr ""
 
 #: app/content/errors.py:38
 msgid "Someone imported the same passage at the same moment. Import the file again."
+msgstr ""
+
+#: app/content/errors.py:40
+#, python-format
+msgid "The file is larger than %(limit)s."
+msgstr ""
+
+#: app/content/errors.py:41
+msgid "The file is not UTF-8 text. Save it as UTF-8 and try again."
 msgstr ""
 
 #: app/passages/routes.py:35 app/passages/routes.py:56
@@ -325,6 +334,74 @@ msgstr ""
 msgid "Already have an account?"
 msgstr ""
 
+#: app/templates/content/import.html:17 app/templates/content/import.html:21
+#: app/templates/passages/list.html:31
+msgid "Import passages"
+msgstr ""
+
+#: app/templates/content/import.html:22
+msgid ""
+"Paste a YAML file or choose one. A passage whose slug you have already imported is "
+"updated, and results of earlier attempts don't change."
+msgstr ""
+
+#: app/templates/content/import.html:27
+msgid "Nothing was imported. Fix these problems and try again:"
+msgstr ""
+
+#: app/templates/content/import.html:31
+#, python-format
+msgid "Line %(line)s"
+msgstr ""
+
+#: app/templates/content/import.html:43
+#, python-format
+msgid "Added %(num)d passage"
+msgid_plural "Added %(num)d passages"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/content/import.html:44
+#, python-format
+msgid "Updated %(num)d passage"
+msgid_plural "Updated %(num)d passages"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/content/import.html:58
+msgid "YAML"
+msgstr ""
+
+#: app/templates/content/import.html:63
+msgid "Or a file (up to 1 MB)"
+msgstr ""
+
+#: app/templates/content/import.html:70
+msgid "Common: every user sees these passages"
+msgstr ""
+
+#: app/templates/content/import.html:73
+msgid "Import"
+msgstr ""
+
+#: app/templates/content/import.html:77
+msgid "Prompt for a chatbot: turn any material into this format"
+msgstr ""
+
+#: app/templates/content/import.html:78
+msgid ""
+"Copy the prompt into a chatbot, then add your material: text, a photo or a PDF. Paste"
+" its answer above. Check every answer marked # check before importing."
+msgstr ""
+
+#: app/templates/content/import.html:79
+msgid "Copy the prompt"
+msgstr ""
+
+#: app/templates/content/import.html:88
+msgid "Copied"
+msgstr ""
+
 #: app/templates/passages/list.html:26
 msgid "day in a row"
 msgid_plural "days in a row"
@@ -340,46 +417,46 @@ msgstr ""
 msgid "Pick a passage. Tap any Arabic word while reading to see its translation."
 msgstr ""
 
-#: app/templates/passages/list.html:38
+#: app/templates/passages/list.html:39
 msgid "Other"
 msgstr ""
 
-#: app/templates/passages/list.html:44 app/templates/passages/start.html:46
+#: app/templates/passages/list.html:45 app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
 msgid_plural "%(count)s questions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/passages/list.html:48
+#: app/templates/passages/list.html:49
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/passages/list.html:51
+#: app/templates/passages/list.html:52
 msgid "New"
 msgstr ""
 
-#: app/templates/passages/list.html:59
+#: app/templates/passages/list.html:60
 #, python-format
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr ""
 
-#: app/templates/passages/list.html:61 app/templates/practice/attempt.html:101
+#: app/templates/passages/list.html:62 app/templates/practice/attempt.html:101
 msgid "Continue"
 msgstr ""
 
-#: app/templates/passages/list.html:63
+#: app/templates/passages/list.html:64
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr ""
 
-#: app/templates/passages/list.html:65
+#: app/templates/passages/list.html:66
 msgid "Discard"
 msgstr ""
 
-#: app/templates/passages/list.html:74
+#: app/templates/passages/list.html:75
 msgid "No passages yet."
 msgstr ""
 

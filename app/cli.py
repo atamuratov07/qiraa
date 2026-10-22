@@ -106,8 +106,8 @@ def run(db: Session, args: Args) -> int:
 
 def read(path: Path) -> ContentFile | None:
     try:
-        return loader.parse(path.read_text(encoding="utf-8-sig"))
-    except (OSError, UnicodeDecodeError) as e:
+        return loader.parse(loader.decode(path.read_bytes()))
+    except OSError as e:
         print(f"{path}: {e}", file=sys.stderr)
     except ContentError as e:
         print_errors(path, e.errors)
