@@ -83,9 +83,14 @@
 {% endblock %}
 {% block scripts %}
 <script>
-  document.getElementById("copy-prompt").addEventListener("click", async (event) => {
+  const copyButton = document.getElementById("copy-prompt");
+  const copyLabel = copyButton.textContent;
+  let resetTimer;
+  copyButton.addEventListener("click", async () => {
     await navigator.clipboard.writeText(document.getElementById("chatbot-prompt").textContent);
-    event.target.textContent = {{ _("Copied") | tojson }};
+    copyButton.textContent = {{ _("Copied") | tojson }};
+    clearTimeout(resetTimer); // a second click restarts the 2 seconds
+    resetTimer = setTimeout(() => (copyButton.textContent = copyLabel), 2000);
   });
 </script>
 {% endblock %}
