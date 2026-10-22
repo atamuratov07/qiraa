@@ -55,7 +55,13 @@ commands for running the site (`make-admin`, `import`, `check`). `app/locale/` h
   `display_title()` · `views.py` `ErrorPage`.
 - `auth/`: `User`, `UserSession` · `deps.py` `CurrentUser`, `MaybeUser`, `LoginRequired` ·
   `security.py` password hashing, session tokens.
-- `passages/`: `Passage` · passage list statistics, start card.
+- `passages/`: `Passage` · `schemas.py` `PassageIn`, `QuestionIn` and their limits (shared
+  by YAML and the editor) · `apply_passage()`, passage list statistics, start card.
+- `content/`: content files, no models · `schemas.py` `PassageEntry`, `ContentFile` ·
+  `loader.py` `parse()`, `decode()` · `yaml_tree.py` line numbers (see
+  [CONTENT-LOADER.md](CONTENT-LOADER.md)) · `errors.py` `LineError`, `ContentError`,
+  `describe()` · `service.py` `import_passages()` · `prompt.py` the chatbot prompt ·
+  the import page.
 - `practice/`: `Question`, `Option`, `Attempt`, `AttemptAnswer`, and the copy an attempt
   keeps (`AttemptContent`, `QuestionCopy`, `OptionCopy`) · attempt service (`copy_passage()`,
   `has_option()`, `grade()`) · pages, `api.py` and `schemas.py` for the JSON endpoints.
@@ -127,6 +133,14 @@ at the top.
     (`has_option()`). Editing or deleting content never changes a result: a deleted passage
     only sets `passage_id` to NULL.
 
+16. **Content files.** Every passage in a file has a slug written by hand. An import looks
+    it up among common passages, or among the importer's private ones (a partial unique
+    index for each), updates what it finds and replaces its questions: clear, flush, then
+    insert, because one flush runs inserts before deletes. Errors are `LineError`s with a
+    type (Pydantic's or ours) and the line from the YAML node tree, translated where they
+    are shown (`describe()`), so the CLI prints English. Limits are constants in the
+    schemas, and the chatbot prompt reads them.
+
 ## Tests
 
 - Three levels: pure rules (no DB), services (real DB per test), routes (`TestClient`).
@@ -140,6 +154,7 @@ at the top.
   `pyproject.toml`).
 - `tests/conftest.py` pins the settings tests depend on, so a local `.env` can't change them.
   The test client sends the `ru` language cookie, so page tests check the Russian text.
+- `tests/test_content_files.py` parses every `content/*.yaml`, so a broken file fails CI.
 - `tests/test_i18n.py` fails when a catalog misses a message from the code, or has a fuzzy,
   stale or untranslated entry, or a broken placeholder.
 
