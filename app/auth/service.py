@@ -70,22 +70,28 @@ def register(
     return user
 
 
+def find_user(db: Session, username: str) -> User | None:
+    return db.scalar(select(User).where(User.username == normalize_username(username)))
+
+
 def authenticate(db: Session, username: str, password: str) -> User:
-    user = db.scalar(select(User).where(User.username == normalize_username(username)))
+    user = find_user(db, username)
     if user is None:
         waste_equal_time(password)
         raise AuthError(_("Wrong username or password."))
+
     if not verify_password(user.password_hash, password):
         raise AuthError(_("Wrong username or password."))
+
     if needs_rehash(user.password_hash):
         user.password_hash = hash_password(password)
         db.commit()
+
     return user
 
 
 def set_admin(db: Session, username: str) -> User | None:
-    """Returns None when there's no such user."""
-    user = db.scalar(select(User).where(User.username == normalize_username(username)))
+    user = find_user(db, username)
     if user is None:
         return None
 

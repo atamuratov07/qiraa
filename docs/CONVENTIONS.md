@@ -23,7 +23,8 @@ CDN · plain JavaScript (`reader.js`, `attempt.js`, `forms.js`), no build step.
 docker compose up -d --wait db
 uv sync
 uv run alembic upgrade head
-uv run python -m app.seed                 # loads the 4 real passages; skips existing slugs
+uv run python -m app.cli import content/<file>.yaml --owner <username>   # adds or updates by slug
+uv run python -m app.cli check content/<file>.yaml                       # no database needed
 uv run python -m app.cli make-admin <username>   # prefix DATABASE_URL=... for Neon
 uv run fastapi dev app/main.py
 uv run pytest                             # on qiraa_test; tables recreated per test
@@ -40,8 +41,9 @@ throwaway database: every test drops all tables.
 ## Code layout
 
 Organised by feature. `app/main.py` creates the app, includes every router and handles errors.
-`app/models.py` imports every model. `app/seed.py` loads the real passages (until step 6).
-`app/cli.py` holds commands for running the site (`make-admin`). `app/locale/` holds the
+`app/models.py` imports every model. `content/` holds YAML content files; only
+`example.yaml` is in git, so real passages stay private and local. `app/cli.py` holds
+commands for running the site (`make-admin`, `import`, `check`). `app/locale/` holds the
 `.po` catalogs, read at startup (no compiled `.mo` files).
 
 - `core/`: `base.py` `Base`, `utcnow()`, `unique_where()`, `Owned`, `common_or_owned()` ·
@@ -53,7 +55,13 @@ Organised by feature. `app/main.py` creates the app, includes every router and h
   `display_title()` · `views.py` `ErrorPage`.
 - `auth/`: `User`, `UserSession` · `deps.py` `CurrentUser`, `MaybeUser`, `LoginRequired` ·
   `security.py` password hashing, session tokens.
-- `passages/`: `Passage` · passage list statistics, start card.
+- `passages/`: `Passage` · `schemas.py` `PassageIn`, `QuestionIn` and their limits (shared
+  by YAML and the editor) · `apply_passage()`, passage list statistics, start card.
+- `content/`: content files, no models · `schemas.py` `PassageEntry`, `ContentFile` ·
+  `loader.py` `parse()`, `decode()` · `yaml_tree.py` line numbers (see
+  [CONTENT-LOADER.md](CONTENT-LOADER.md)) · `errors.py` `LineError`, `ContentError`,
+  `describe()` · `service.py` `import_passages()` · `prompt.py` the chatbot prompt ·
+  the import page.
 - `practice/`: `Question`, `Option`, `Attempt`, `AttemptAnswer`, and the copy an attempt
   keeps (`AttemptContent`, `QuestionCopy`, `OptionCopy`) · attempt service (`copy_passage()`,
   `has_option()`, `grade()`) · pages, `api.py` and `schemas.py` for the JSON endpoints.
@@ -108,8 +116,8 @@ at the top.
     with `from __future__ import annotations` and import other features' models only under
     `if TYPE_CHECKING:`; SQLAlchemy finds relationship targets by class name. Services, views
     and routes may import any feature's models and services; only `main.py` imports routes,
-    so a route can import from anywhere without a cycle. Entry points (`main.py`, `seed.py`,
-    `cli.py`, `migrations/env.py`, `tests/conftest.py`) import `app.models`, so every model is
+    so a route can import from anywhere without a cycle. Entry points (`main.py`, `cli.py`,
+    `migrations/env.py`, `tests/conftest.py`) import `app.models`, so every model is
     registered before the first query. `__init__.py` files stay empty. Paths
     come from `BASE_DIR` / `APP_DIR` in `core/config.py`, never from `__file__` elsewhere.
 14. **Translations.** Messages are English. Python calls `_()` and `ngettext()`, templates
@@ -125,6 +133,14 @@ at the top.
     (`has_option()`). Editing or deleting content never changes a result: a deleted passage
     only sets `passage_id` to NULL.
 
+16. **Content files.** Every passage in a file has a slug written by hand. An import looks
+    it up among common passages, or among the importer's private ones (a partial unique
+    index for each), updates what it finds and replaces its questions: clear, flush, then
+    insert, because one flush runs inserts before deletes. Errors are `LineError`s with a
+    type (Pydantic's or ours) and the line from the YAML node tree, translated where they
+    are shown (`describe()`), so the CLI prints English. Limits are constants in the
+    schemas, and the chatbot prompt reads them.
+
 ## Tests
 
 - Three levels: pure rules (no DB), services (real DB per test), routes (`TestClient`).
@@ -138,6 +154,7 @@ at the top.
   `pyproject.toml`).
 - `tests/conftest.py` pins the settings tests depend on, so a local `.env` can't change them.
   The test client sends the `ru` language cookie, so page tests check the Russian text.
+- `tests/test_content_files.py` parses every `content/*.yaml`, so a broken file fails CI.
 - `tests/test_i18n.py` fails when a catalog misses a message from the code, or has a fuzzy,
   stale or untranslated entry, or a broken placeholder.
 

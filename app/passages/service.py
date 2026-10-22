@@ -4,8 +4,9 @@ from sqlalchemy.orm import Session, selectinload
 from app.auth.models import User
 from app.core.permissions import load_visible, visible
 from app.passages.models import Passage
+from app.passages.schemas import PassageIn, QuestionIn
 from app.passages.views import PassageCard, UnfinishedInfo
-from app.practice.models import Attempt, Question
+from app.practice.models import Attempt, Option, Question
 
 
 def load_passage(db: Session, user: User, passage_id: int) -> Passage | None:
@@ -16,6 +17,41 @@ def load_passage(db: Session, user: User, passage_id: int) -> Passage | None:
         passage_id,
         selectinload(Passage.questions).selectinload(Question.options),
     )
+
+
+def build_questions(items: list[QuestionIn]) -> list[Question]:
+    questions: list[Question] = []
+
+    for position, q in enumerate(items, start=1):
+        options = [
+            Option(position=i, text=text, is_correct=(i - 1 == q.correct_index))
+            for i, text in enumerate(q.options, start=1)
+        ]
+
+        questions.append(
+            Question(
+                position=position,
+                prompt=q.prompt,
+                explanation=q.explanation,
+                options=options,
+            )
+        )
+
+    return questions
+
+
+def apply_passage(db: Session, passage: Passage, data: PassageIn) -> None:
+    passage.title = data.title
+    passage.level = data.level
+    passage.text = data.text
+    passage.translation_ru = data.translation_ru
+    passage.glossary = data.glossary
+
+    if passage.questions:
+        passage.questions.clear()
+        db.flush()
+
+    passage.questions.extend(build_questions(data.questions))
 
 
 def _best_and_tries_query(user: User) -> Select[int | None, int, int]:

@@ -1,6 +1,6 @@
 """Imports every model, so Base.metadata knows every table (Alembic, create_all).
 
-Entry points (main, seed, migrations, tests) import this module. Feature code imports
+Entry points (main, cli, migrations, tests) import this module. Feature code imports
 models from their feature
 """
 

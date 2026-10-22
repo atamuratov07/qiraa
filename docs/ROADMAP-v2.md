@@ -32,14 +32,14 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 | Attempts              | one `attempts` table for passages and grammar sessions; each attempt keeps a copy of what it shows (`content`: title, text, translation, questions with their options in shuffled order and the correct one marked)                             |
 | Editing content       | allowed at any time, also after attempts; a result shows the copy its attempt was taken on and keeps its score (no regrading); answers point into the copy, so editing or deleting content never removes a result                               |
 | Passage title         | optional; when missing, show the start of the text                                                                                                                                                                                              |
-| Slug                  | only for common passages loaded from YAML (keeps re-imports from duplicating), generated automatically, unique among common passages                                                                                                            |
+| Slug                  | required in content files and written by hand (never generated, so fixing a title can't make the next import add a duplicate); unique among common passages and among each owner's private passages; passages made in the editor have none      |
 | Author and visibility | two separate columns on every content table: `owner_id` is the author, `is_common` is who can see it. A row is never private and authorless (CHECK constraint)                                                                                  |
 | Ownership rule        | Visible: common or mine. Editable: mine, or common if I am an admin. Admins don't see other users' private content                                                                                                                              |
 | Account deletion      | private content is deleted with the account; common content stays with `owner_id` set to NULL (`ON DELETE SET NULL`), so other users keep their results on it                                                                                   |
 | Publishing            | only admins set `is_common`                                                                                                                                                                                                                     |
 | Admin                 | `users.is_admin`, set from the command line only                                                                                                                                                                                                |
 | Sign-ups              | closed to the public: the form asks for one shared invite code (`SIGNUP_CODE`); `ALLOW_SIGNUP=false` still closes sign-up completely                                                                                                            |
-| Bulk loading          | YAML in the app (into my area, or common for admins) and `python -m app.cli import file.yaml --owner <username>` / `--common` from the command line                                                                                             |
+| Bulk loading          | YAML at `/manage/import` (into my area, or common for admins) and `python -m app.cli import file.yaml --owner <username>` / `--common`; importing again updates by slug; real passages stay out of git                                          |
 | Frontend              | stay server-rendered; add Alpine.js (one script tag) for the passage editor and the navigator; no React, no switch to Django                                                                                                                    |
 | Passage editor        | Alpine keeps the passage as JSON and posts it; the same Pydantic schema validates the form and YAML                                                                                                                                             |
 | Grammar session       | `/grammar` is a start form only (no page that lists the whole bank): pool "common + mine" or "only mine", any size, both remembered in the browser; the size is capped at the number of questions in the pool                                   |
@@ -50,6 +50,7 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 | Dates                 | Babel's date formatting replaces the hand-written Russian month names                                                                                                                                                                           |
 | Local database        | Postgres in Docker Compose for development and tests; the app itself runs on the machine, not in a container; SQLite support removed                                                                                                            |
 | Code layout           | organise by feature (see step 2)                                                                                                                                                                                                                |
+| Concurrency           | synchronous: `def` routes with a blocking `Session` run in FastAPI's thread pool; no `async` until a feature waits on many outside calls at once                                                                                                |
 
 ## Open decisions (likely choice first)
 
@@ -68,7 +69,8 @@ passages          + owner_id        → users.id, nullable, ON DELETE SET NULL
                   + is_common       bool, default false
                   CHECK: is_common OR owner_id IS NOT NULL
                     title           now nullable
-                    slug            now nullable; unique WHERE is_common
+                    slug            now nullable; unique WHERE is_common, and
+                                    (owner_id, slug) unique WHERE NOT is_common
                     glossary        used by word translation
 
 questions           passage_id      now nullable (NULL = grammar question)
@@ -192,13 +194,15 @@ Templates stay in `app/templates/<feature>/`.
 
 ### 6. Content format and import
 
-- [ ] Pydantic schemas for passages, grammar questions and speaking sets (shared by editor,
-      YAML and CLI).
-- [ ] `python -m app.cli import file.yaml --owner <username> | --common`; `check` command.
-- [ ] Move the four real passages from `seed.py` to `content/*.yaml`; drop `skills` column.
-- [ ] Import page: paste or upload YAML, see errors per line, save to my area (or common for
-      admins).
-- [ ] Re-importing a passage replaces its questions; results keep their copy.
+- [x] Pydantic schemas for passages, shared by the editor, YAML and the CLI (grammar and
+      speaking schemas come with steps 8 and 10). Errors carry a type and a line number and
+      are translated where they are shown.
+- [x] `python -m app.cli import file.yaml --owner <username> | --common`; `check` command.
+- [x] Move the four real passages from `seed.py` to a YAML file kept out of git
+      (`content/example.yaml` shows the format); `skill` dropped.
+- [x] Import page: paste or upload YAML, see errors per line, save to my area (or common for
+      admins); a prompt that tells a chatbot how to turn any material into the format.
+- [x] Re-importing a passage replaces its questions; results keep their copy.
       Done when: re-importing a common file updates it instead of duplicating.
 
 ### 7. Passage editor and "Manage" pages
@@ -219,7 +223,9 @@ Templates stay in `app/templates/<feature>/`.
 - [ ] Sessions use the attempt page without the passage column; results, profile and streak
       include them.
 - [ ] `/manage/grammar`: list of my questions (and common ones for admins) with new, edit,
-      delete, and YAML import.
+      delete.
+- [ ] Grammar questions in the content format (a `grammar:` list), imported by the CLI and
+      the import page; the chatbot prompt covers them.
       Done when: a 10-question session can be started, autosaved, submitted and reviewed, and asking
       for 50 questions from a pool of 40 gives 40.
 
@@ -239,6 +245,7 @@ Templates stay in `app/templates/<feature>/`.
       preparation countdown, then speaking countdown, then a "done" state. Before starting,
       both durations can be changed (defaults from the set, remembered in the browser per set).
 - [ ] `/manage/speaking` editor (one question per line, default durations).
+- [ ] Speaking sets in the content format (a `speaking:` list), imported like passages.
 - [ ] If open decision 1 is yes: `speaking_sessions` table, `POST /speaking/{id}/finish`
       calls `record_activity()`, and the profile calendar reads both tables.
       Done when: a set can be created and run with both countdowns (and, if decided, counted for the
@@ -256,6 +263,9 @@ Templates stay in `app/templates/<feature>/`.
 - [ ] Take a fresh Neon snapshot; rehearse `alembic upgrade head` on a Neon branch. While the
       migrations run, the 1.x instance may still serve for a few seconds and fail.
 - [ ] Set `SIGNUP_CODE` on Render.
+- [ ] If the four 1.0 passages are on Neon, make them private to their author
+      (`is_common = false`, `owner_id` set) before anyone else signs up. Content imports run
+      from the machine with `DATABASE_URL`: `content/` is not in the Docker image.
 - [ ] Update README (settings table: `SIGNUP_CODE`, `MYMEMORY_EMAIL`; the data model, where
       attempts now keep a copy instead of `option_order`), CHANGELOG; merge `v2`
       into `main`; tag `v2.0.0`; GitHub release.

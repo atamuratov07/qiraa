@@ -11,6 +11,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app import models  # noqa: F401  registers every model before the first query
 from app.auth.deps import LoginRequired
 from app.auth.routes import router as auth_router
+from app.content.routes import router as content_router
 from app.core.config import APP_DIR
 from app.core.i18n import N_, LocaleMiddleware, _
 from app.core.redirects import return_path
@@ -31,6 +32,7 @@ for router in (
     practice_router,
     api_router,
     profile_router,
+    content_router,
 ):
     app.include_router(router)
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-15 13:30+0500\n"
+"POT-Creation-Date: 2026-10-22 15:35+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,31 +17,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:55
+#: app/main.py:57
 msgid "Bad Request"
 msgstr ""
 
-#: app/main.py:56
+#: app/main.py:58
 msgid "Unauthorized"
 msgstr ""
 
-#: app/main.py:57
+#: app/main.py:59
 msgid "Forbidden"
 msgstr ""
 
-#: app/main.py:58 app/main.py:89
+#: app/main.py:60 app/main.py:91
 msgid "Not Found"
 msgstr ""
 
-#: app/main.py:59
+#: app/main.py:61
 msgid "Method Not Allowed"
 msgstr ""
 
-#: app/main.py:60
+#: app/main.py:62
 msgid "Conflict"
 msgstr ""
 
-#: app/main.py:61
+#: app/main.py:63
 msgid "Internal Server Error"
 msgstr ""
 
@@ -70,23 +70,127 @@ msgstr ""
 msgid "This username is already taken."
 msgstr ""
 
-#: app/auth/service.py:77 app/auth/service.py:79
+#: app/auth/service.py:81 app/auth/service.py:84
 msgid "Wrong username or password."
 msgstr ""
 
-#: app/auth/service.py:144
+#: app/auth/service.py:150
 msgid "Wrong password."
+msgstr ""
+
+#: app/content/errors.py:6
+#, python-format
+msgid "This is not valid YAML: %(problem)s"
+msgstr ""
+
+#: app/content/errors.py:8
+#, python-format
+msgid "The invisible character %(code)s is not allowed. Delete it or retype the line."
+msgstr ""
+
+#: app/content/errors.py:11
+msgid "Anchors and aliases (& and *) are not allowed. Write the value out in full."
+msgstr ""
+
+#: app/content/errors.py:13
+msgid "The lists and blocks are nested too deeply."
+msgstr ""
+
+#: app/content/errors.py:14
+#, python-format
+msgid "%(key)s appears twice in the same block."
+msgstr ""
+
+#: app/content/errors.py:15
+msgid "The file is empty."
+msgstr ""
+
+#: app/content/errors.py:16 app/content/errors.py:17
+msgid "Expected a block of key: value lines."
+msgstr ""
+
+#: app/content/errors.py:18
+msgid "Expected a list of items starting with a dash (-)."
+msgstr ""
+
+#: app/content/errors.py:19
+#, python-format
+msgid "The field %(field)s is missing."
+msgstr ""
+
+#: app/content/errors.py:20
+#, python-format
+msgid "Unknown field %(field)s. Check the spelling."
+msgstr ""
+
+#: app/content/errors.py:22
+msgid "Expected text. Quote a value that looks like a number, a date, yes or no."
+msgstr ""
+
+#: app/content/errors.py:24
+msgid "This can't be empty."
+msgstr ""
+
+#: app/content/errors.py:25
+#, python-format
+msgid "Too long: the limit is %(max_length)s characters."
+msgstr ""
+
+#: app/content/errors.py:26
+#, python-format
+msgid "Too few items: at least %(min_length)s are needed."
+msgstr ""
+
+#: app/content/errors.py:27
+#, python-format
+msgid "Too many items: the limit is %(max_length)s."
+msgstr ""
+
+#: app/content/errors.py:28
+msgid "The answer must be a letter from A to F."
+msgstr ""
+
+#: app/content/errors.py:29
+#, python-format
+msgid "The option %(option)s appears twice."
+msgstr ""
+
+#: app/content/errors.py:31
+#, python-format
+msgid "Answer %(answer)s is out of range: this question has %(count)s options."
+msgstr ""
+
+#: app/content/errors.py:34
+msgid "Use lowercase Latin letters, digits and single hyphens, like b1-media."
+msgstr ""
+
+#: app/content/errors.py:36
+#, python-format
+msgid "The slug %(slug)s is used by more than one passage."
+msgstr ""
+
+#: app/content/errors.py:38
+msgid "Someone imported the same passage at the same moment. Import the file again."
+msgstr ""
+
+#: app/content/errors.py:40
+#, python-format
+msgid "The file is larger than %(limit)s."
+msgstr ""
+
+#: app/content/errors.py:41
+msgid "The file is not UTF-8 text. Save it as UTF-8 and try again."
 msgstr ""
 
 #: app/passages/routes.py:35 app/passages/routes.py:56
 msgid "Passage not found"
 msgstr ""
 
-#: app/practice/routes.py:24 app/practice/routes.py:106
+#: app/practice/routes.py:24 app/practice/routes.py:107
 msgid "Attempt not found"
 msgstr ""
 
-#: app/practice/routes.py:92
+#: app/practice/routes.py:93
 msgid "This attempt is already submitted."
 msgstr ""
 
@@ -114,7 +218,7 @@ msgstr ""
 msgid "show"
 msgstr ""
 
-#: app/templates/base.html:74 app/templates/practice/attempt.html:37
+#: app/templates/base.html:74 app/templates/practice/attempt.html:38
 msgid "hide"
 msgstr ""
 
@@ -122,7 +226,7 @@ msgstr ""
 msgid "Show timer"
 msgstr ""
 
-#: app/templates/base.html:76 app/templates/practice/attempt.html:37
+#: app/templates/base.html:76 app/templates/practice/attempt.html:38
 msgid "Hide timer"
 msgstr ""
 
@@ -230,6 +334,74 @@ msgstr ""
 msgid "Already have an account?"
 msgstr ""
 
+#: app/templates/content/import.html:17 app/templates/content/import.html:21
+#: app/templates/passages/list.html:31
+msgid "Import passages"
+msgstr ""
+
+#: app/templates/content/import.html:22
+msgid ""
+"Paste a YAML file or choose one. A passage whose slug you have already imported is "
+"updated, and results of earlier attempts don't change."
+msgstr ""
+
+#: app/templates/content/import.html:27
+msgid "Nothing was imported. Fix these problems and try again:"
+msgstr ""
+
+#: app/templates/content/import.html:31
+#, python-format
+msgid "Line %(line)s"
+msgstr ""
+
+#: app/templates/content/import.html:43
+#, python-format
+msgid "Added %(num)d passage"
+msgid_plural "Added %(num)d passages"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/content/import.html:44
+#, python-format
+msgid "Updated %(num)d passage"
+msgid_plural "Updated %(num)d passages"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/content/import.html:58
+msgid "YAML"
+msgstr ""
+
+#: app/templates/content/import.html:63
+msgid "Or a file (up to 1 MB)"
+msgstr ""
+
+#: app/templates/content/import.html:70
+msgid "Common: every user sees these passages"
+msgstr ""
+
+#: app/templates/content/import.html:73
+msgid "Import"
+msgstr ""
+
+#: app/templates/content/import.html:77
+msgid "Prompt for a chatbot: turn any material into this format"
+msgstr ""
+
+#: app/templates/content/import.html:78
+msgid ""
+"Copy the prompt into a chatbot, then add your material: text, a photo or a PDF. Paste"
+" its answer above. Check every answer marked # check before importing."
+msgstr ""
+
+#: app/templates/content/import.html:79
+msgid "Copy the prompt"
+msgstr ""
+
+#: app/templates/content/import.html:88
+msgid "Copied"
+msgstr ""
+
 #: app/templates/passages/list.html:26
 msgid "day in a row"
 msgid_plural "days in a row"
@@ -245,46 +417,46 @@ msgstr ""
 msgid "Pick a passage. Tap any Arabic word while reading to see its translation."
 msgstr ""
 
-#: app/templates/passages/list.html:38
+#: app/templates/passages/list.html:39
 msgid "Other"
 msgstr ""
 
-#: app/templates/passages/list.html:44 app/templates/passages/start.html:46
+#: app/templates/passages/list.html:45 app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
 msgid_plural "%(count)s questions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/passages/list.html:48
+#: app/templates/passages/list.html:49
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/passages/list.html:51
+#: app/templates/passages/list.html:52
 msgid "New"
 msgstr ""
 
-#: app/templates/passages/list.html:59
+#: app/templates/passages/list.html:60
 #, python-format
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr ""
 
-#: app/templates/passages/list.html:61 app/templates/practice/attempt.html:100
+#: app/templates/passages/list.html:62 app/templates/practice/attempt.html:101
 msgid "Continue"
 msgstr ""
 
-#: app/templates/passages/list.html:63
+#: app/templates/passages/list.html:64
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr ""
 
-#: app/templates/passages/list.html:65
+#: app/templates/passages/list.html:66
 msgid "Discard"
 msgstr ""
 
-#: app/templates/passages/list.html:74
+#: app/templates/passages/list.html:75
 msgid "No passages yet."
 msgstr ""
 
@@ -303,65 +475,65 @@ msgstr ""
 msgid "The timer starts when you press “Start” and pauses if you leave the page."
 msgstr ""
 
-#: app/templates/passages/start.html:55 app/templates/practice/attempt.html:107
-#: app/templates/practice/result.html:32
+#: app/templates/passages/start.html:55 app/templates/practice/attempt.html:108
+#: app/templates/practice/result.html:37
 msgid "All passages"
 msgstr ""
 
-#: app/templates/practice/attempt.html:53
+#: app/templates/practice/attempt.html:54
 msgid "Tap a word or select several to see the translation into Russian."
 msgstr ""
 
-#: app/templates/practice/attempt.html:77
+#: app/templates/practice/attempt.html:78
 #, python-format
 msgid "Answered %(answered)s of %(total)s · saved"
 msgstr ""
 
-#: app/templates/practice/attempt.html:80
+#: app/templates/practice/attempt.html:81
 msgid "Check answers"
 msgstr ""
 
-#: app/templates/practice/attempt.html:90
+#: app/templates/practice/attempt.html:91
 msgid "Paused"
 msgstr ""
 
-#: app/templates/practice/attempt.html:93
+#: app/templates/practice/attempt.html:94
 #, python-format
 msgid ""
 "Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"
 "time>%(time)s</span> elapsed"
 msgstr ""
 
-#: app/templates/practice/attempt.html:103
+#: app/templates/practice/attempt.html:104
 msgid "Discard this attempt and its saved answers?"
 msgstr ""
 
-#: app/templates/practice/attempt.html:105
+#: app/templates/practice/attempt.html:106
 msgid "Discard and start over"
 msgstr ""
 
-#: app/templates/practice/result.html:15
+#: app/templates/practice/result.html:18
 msgid "Result"
 msgstr ""
 
-#: app/templates/practice/result.html:26
+#: app/templates/practice/result.html:29
 #, python-format
 msgid "%(percent)s%% correct in %(time)s. Mistakes are marked below."
 msgstr ""
 
-#: app/templates/practice/result.html:30
+#: app/templates/practice/result.html:34
 msgid "Try again"
 msgstr ""
 
-#: app/templates/practice/result.html:56
+#: app/templates/practice/result.html:61
 msgid "your answer"
 msgstr ""
 
-#: app/templates/practice/result.html:60
+#: app/templates/practice/result.html:65
 msgid "No answer"
 msgstr ""
 
-#: app/templates/practice/result.html:77
+#: app/templates/practice/result.html:82
 msgid "Russian translation"
 msgstr ""
 

@@ -1,0 +1,42 @@
+# An example content file. Other .yaml files in this folder are ignored by git, so real
+# passages stay on this machine. Import a file into one user's private area:
+#
+#   uv run python -m app.cli check content/example.yaml
+#   uv run python -m app.cli import content/example.yaml --owner <username>
+#
+# Importing again updates each passage by its slug. `answer` is the letter of the correct
+# option; the app shuffles options per attempt. In `text`, a blank line starts a new
+# paragraph. Quote a value that YAML would read as a number, a date, yes or no.
+
+passages:
+  - slug: example-market
+    title: فِي السُّوقِ
+    level: A2
+    text: |
+      ذَهَبَ أَحْمَدُ إِلَى السُّوقِ يَوْمَ الْجُمُعَةِ مَعَ أُمِّهِ. اشْتَرَى خُبْزًا وَتُفَّاحًا وَحَلِيبًا.
+
+      كَانَ السُّوقُ مُزْدَحِمًا، فَرَجَعَا إِلَى الْبَيْتِ قَبْلَ الظُّهْرِ.
+    translation_ru: |
+      В пятницу Ахмад пошёл на рынок с мамой. Он купил хлеб, яблоки и молоко.
+
+      На рынке было много людей, поэтому они вернулись домой до полудня.
+    glossary:
+      سوق: рынок
+      مزدحم: многолюдный
+    questions:
+      - prompt: مَتَى ذَهَبَ أَحْمَدُ إِلَى السُّوقِ؟
+        options:
+          - يَوْمَ السَّبْتِ
+          - يَوْمَ الْجُمُعَةِ
+          - يَوْمَ الْأَحَدِ
+        answer: B
+        explanation: |
+          В тексте сказано «يَوْمَ الْجُمُعَةِ», то есть в пятницу.
+      - prompt: لِمَاذَا رَجَعَا إِلَى الْبَيْتِ قَبْلَ الظُّهْرِ؟
+        options:
+          - لِأَنَّ الْخُبْزَ انْتَهَى
+          - لِأَنَّ الْمَطَرَ نَزَلَ
+          - لِأَنَّ السُّوقَ كَانَ مُزْدَحِمًا
+        answer: C
+        explanation: |
+          «كَانَ السُّوقُ مُزْدَحِمًا، فَرَجَعَا»: на рынке было много людей, поэтому они вернулись.
