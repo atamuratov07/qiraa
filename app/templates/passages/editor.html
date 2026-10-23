@@ -1,0 +1,136 @@
+{#
+  passages/editor.html: a new passage, or one I may edit.
+  Routes: GET/POST /manage/passages/new, GET/POST /manage/passages/{passage_id}/edit
+
+  Context:
+    user        logged-in user; .is_admin shows the "Common" checkbox
+    passage_id  int, or None for a new passage
+    slug        str or None; shown, never edited
+    common      bool, refills the checkbox
+    data        the passage in PassageIn's JSON shape (answer as a letter): the saved one,
+                what was posted after errors, or None for an empty form
+    errors      {path: message}. "questions[0].options[1]" is a field, "" the whole form.
+    limits      EditorLimits, a dict: title, level, min_options, max_options
+
+  Alpine (static/editor.js) holds the passage and writes it into the hidden field
+  "passage" as JSON on submit. POST fields: passage, common (admins only; an unticked
+  checkbox sends nothing). The radios, named by key (k1, k2...), are sent too and ignored.
+#}
+{% extends "base.html" %}
+{% set heading = _("Edit passage") if passage_id else _("New passage") %}
+{% set field = "block w-full rounded-lg border border-line bg-paper px-3 text-ink focus:outline-2 focus:outline-accent" %}
+{% set input = field ~ " mt-1 py-2" %}
+{% set arabic = input ~ " font-arabic text-xl leading-loose" %}
+{% set row_input = field ~ " py-1" %}
+{% set row_arabic = row_input ~ " font-arabic text-xl leading-loose" %}
+{% set remove = "grid size-8 shrink-0 cursor-pointer place-items-center rounded-full text-xl leading-none text-muted hover:bg-bad-soft hover:text-bad disabled:invisible" %}
+{% set add = "cursor-pointer text-sm font-semibold text-accent hover:underline" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-6">
+  <div>
+    <a href="/manage/passages" class="text-sm text-accent hover:underline">← {{ _("Manage passages") }}</a>
+    <h1 class="mt-1 text-2xl font-bold">{{ heading }}</h1>
+    {% if slug %}
+    <p class="mt-1 text-sm text-muted">{% trans slug=slug %}Imported as <code>{{ slug }}</code>. Importing the file again overwrites changes made here.{% endtrans %}</p>
+    {% endif %}
+  </div>
+
+  {% if errors %}
+  <div class="rounded-2xl bg-bad-soft p-4 text-sm text-bad">
+    <p class="font-semibold">{{ _("The passage was not saved. Fix the marked fields.") }}</p>
+    {% if "" in errors %}<p class="mt-1">{{ errors[""] }}</p>{% endif %}
+  </div>
+  {% endif %}
+
+  <form method="post" action="{{ '/manage/passages/%d/edit' % passage_id if passage_id else '/manage/passages/new' }}"
+        x-data="passageEditor" @submit="save" class="space-y-6">
+    <input type="hidden" name="passage" x-ref="passage">
+
+    <section class="space-y-4 rounded-2xl border border-line bg-white p-6">
+      <div class="grid gap-4 sm:grid-cols-[1fr_8rem]">
+        <label class="block text-sm text-muted">{{ _("Title") }}
+          <input x-model="title" maxlength="{{ limits.title }}" dir="rtl" lang="ar" class="{{ arabic }}">
+          <span x-show="error('title')" x-text="error('title')" class="mt-1 block text-bad"></span>
+        </label>
+        <label class="block text-sm text-muted">{{ _("Level") }}
+          <input x-model="level" maxlength="{{ limits.level }}" placeholder="A2" class="{{ input }}">
+          <span x-show="error('level')" x-text="error('level')" class="mt-1 block text-bad"></span>
+        </label>
+      </div>
+      <label class="block text-sm text-muted">{{ _("Text") }}
+        <textarea x-model="text" rows="10" required dir="rtl" lang="ar" class="{{ arabic }}"></textarea>
+        <span x-show="error('text')" x-text="error('text')" class="mt-1 block text-bad"></span>
+      </label>
+      <label class="block text-sm text-muted">{{ _("Translation into Russian") }}
+        <textarea x-model="translation" rows="5" class="{{ input }}"></textarea>
+        <span x-show="error('translation_ru')" x-text="error('translation_ru')" class="mt-1 block text-bad"></span>
+      </label>
+    </section>
+
+    <template x-for="(q, qi) in questions" :key="q.key">
+      <section class="space-y-4 rounded-2xl border border-line bg-white p-6">
+        <div class="flex items-center justify-between">
+          <h2 class="font-semibold" x-text="questionLabel(qi)"></h2>
+          <button type="button" @click="removeQuestion(qi)" :disabled="questions.length === 1"
+                  title="{{ _("Remove question") }}" aria-label="{{ _("Remove question") }}" class="{{ remove }}">×</button>
+        </div>
+        <textarea x-model="q.prompt" rows="2" required dir="rtl" lang="ar" aria-label="{{ _("Question") }}" class="{{ arabic }}"></textarea>
+        <span x-show="error(`questions[${qi}].prompt`)" x-text="error(`questions[${qi}].prompt`)" class="block text-sm text-bad"></span>
+
+        <div class="space-y-2">
+          <template x-for="(o, oi) in q.options" :key="o.key">
+            <div>
+              <div class="flex items-center gap-3">
+                <input type="radio" :name="q.key" :value="o.key" x-model="q.correct"
+                       title="{{ _("Correct option") }}" aria-label="{{ _("Correct option") }}" class="size-5 shrink-0 accent-accent">
+                <input x-model="o.text" required dir="rtl" lang="ar" class="{{ row_arabic }}">
+                <button type="button" @click="removeOption(q, oi)" :disabled="q.options.length <= limits.min_options"
+                        title="{{ _("Remove option") }}" aria-label="{{ _("Remove option") }}" class="{{ remove }}">×</button>
+              </div>
+              <span x-show="error(`questions[${qi}].options[${oi}]`)" x-text="error(`questions[${qi}].options[${oi}]`)" class="ms-8 block text-sm text-bad"></span>
+            </div>
+          </template>
+          <span x-show="error(`questions[${qi}].options`)" x-text="error(`questions[${qi}].options`)" class="block text-sm text-bad"></span>
+          <span x-show="error(`questions[${qi}].answer`)" x-text="error(`questions[${qi}].answer`)" class="block text-sm text-bad"></span>
+          <button type="button" @click="addOption(q)" x-show="q.options.length < limits.max_options" class="{{ add }}">+ {{ _("Add option") }}</button>
+        </div>
+
+        <label class="block text-sm text-muted">{{ _("Explanation") }}
+          <textarea x-model="q.explanation" rows="2" class="{{ input }}"></textarea>
+        </label>
+      </section>
+    </template>
+    <span x-show="error('questions')" x-text="error('questions')" class="block text-sm text-bad"></span>
+    <button type="button" @click="addQuestion" class="{{ add }}">+ {{ _("Add question") }}</button>
+
+    <section class="space-y-3 rounded-2xl border border-line bg-white p-6">
+      <h2 class="font-semibold">{{ _("Glossary") }}</h2>
+      <template x-for="(row, wi) in glossary" :key="row.key">
+        <div class="flex items-center gap-3">
+          <input x-model="row.word" placeholder="{{ _("Word") }}" dir="rtl" lang="ar" class="{{ row_arabic }}">
+          <input x-model="row.meaning" placeholder="{{ _("Meaning") }}" class="{{ row_input }}">
+          <button type="button" @click="removeWord(wi)" title="{{ _("Remove word") }}" aria-label="{{ _("Remove word") }}" class="{{ remove }}">×</button>
+        </div>
+      </template>
+      <span x-show="glossaryError()" x-text="glossaryError()" class="block text-sm text-bad"></span>
+      <button type="button" @click="addWord" class="{{ add }}">+ {{ _("Add word") }}</button>
+    </section>
+
+    <div class="flex flex-wrap items-center gap-4">
+      <button class="cursor-pointer rounded-xl bg-accent px-5 py-2.5 font-semibold text-white hover:brightness-110">{{ _("Save") }}</button>
+      {% if user.is_admin %}
+      <label class="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="common" {{ "checked" if common }} class="accent-accent">
+        {{ _("Common: every user sees this passage") }}
+      </label>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="application/json" id="editor-data">{{ {"data": data, "errors": errors, "limits": limits} | tojson }}</script>
+<script src="/static/editor.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.17.4/dist/cdn.min.js" defer></script>
+{% endblock %}

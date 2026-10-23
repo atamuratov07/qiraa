@@ -6,7 +6,7 @@
     user
     title       the passage title, or the start of its text
     passage_id  for "Try again" and the word translation lookup; None once the passage
-                is deleted (no "Try again" then)
+                is deleted or no longer visible to me (no "Try again" then)
     content     the copy taken when the attempt started: .text, .translation_ru, and
                 .questions in display order, each with .id .prompt .explanation and
                 .options in the attempt's shuffled order, each with .id .text .is_correct
@@ -26,7 +26,7 @@
   </div>
   <div>
     <h1 class="w-fit font-arabic text-2xl font-bold" lang="ar" dir="rtl">{{ title }}</h1>
-    <p class="text-muted">{% trans time=mmss(attempt.elapsed_seconds) %}{{ percent }}% correct in {{ time }}. Mistakes are marked below.{% endtrans %}</p>
+    <p class="text-muted">{% trans time=mmss(attempt.elapsed_seconds) %}{{ percent }}% correct in {{ time }}{% endtrans %}</p>
     <div class="mt-3 flex flex-wrap gap-2">
       {# a new attempt is created on the server, so this is a POST form, not a link #}
       {% if passage_id %}

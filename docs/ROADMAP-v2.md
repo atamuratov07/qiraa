@@ -36,12 +36,12 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 | Author and visibility | two separate columns on every content table: `owner_id` is the author, `is_common` is who can see it. A row is never private and authorless (CHECK constraint)                                                                                  |
 | Ownership rule        | Visible: common or mine. Editable: mine, or common if I am an admin. Admins don't see other users' private content                                                                                                                              |
 | Account deletion      | private content is deleted with the account; common content stays with `owner_id` set to NULL (`ON DELETE SET NULL`), so other users keep their results on it                                                                                   |
-| Publishing            | only admins set `is_common`                                                                                                                                                                                                                     |
+| Publishing            | only admins set `is_common`; unpublishing returns a passage to its author, or to the admin when it has none                                                                                                                                     |
 | Admin                 | `users.is_admin`, set from the command line only                                                                                                                                                                                                |
 | Sign-ups              | closed to the public: the form asks for one shared invite code (`SIGNUP_CODE`); `ALLOW_SIGNUP=false` still closes sign-up completely                                                                                                            |
 | Bulk loading          | YAML at `/manage/import` (into my area, or common for admins) and `python -m app.cli import file.yaml --owner <username>` / `--common`; importing again updates by slug; real passages stay out of git                                          |
 | Frontend              | stay server-rendered; add Alpine.js (one script tag) for the passage editor and the navigator; no React, no switch to Django                                                                                                                    |
-| Passage editor        | Alpine keeps the passage as JSON and posts it; the same Pydantic schema validates the form and YAML                                                                                                                                             |
+| Passage editor        | Alpine keeps the passage and posts it as JSON in one form field; `PassageIn` validates it as it does YAML, and errors show under their fields                                                                                                   |
 | Grammar session       | `/grammar` is a start form only (no page that lists the whole bank): pool "common + mine" or "only mine", any size, both remembered in the browser; the size is capped at the number of questions in the pool                                   |
 | Speaking timer        | one timer for the whole list: a preparation countdown, then a speaking countdown. Each set stores default `prepare_seconds` and `speak_seconds`; the session page lets me change both before starting and remembers them in the browser per set |
 | Word translation      | passage glossary, then MyMemory; no cache table in 2.0                                                                                                                                                                                          |
@@ -207,9 +207,10 @@ Templates stay in `app/templates/<feature>/`.
 
 ### 7. Passage editor and "Manage" pages
 
-- [ ] `/manage/passages`: list, new, edit, delete; Alpine editor with dynamic questions and
-      2–6 options, correct option as a radio, explanation, optional title and translation.
-- [ ] Admins get a "Common" checkbox.
+- [x] `/manage/passages`: list, new, edit, delete; Alpine editor with dynamic questions and
+      2–6 options, correct option as a radio, explanation, optional title, translation and
+      glossary.
+- [x] Admins get a "Common" checkbox.
       Done when: a passage created in the editor can be practised; validation errors show on the form.
 
 ### 8. Grammar practice

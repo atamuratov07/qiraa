@@ -24,6 +24,22 @@ passages:
 """
 
 
+MULTIPART = {"content-type": "multipart/form-data; boundary=B"}
+
+
+def browser_body(text: str) -> bytes:
+    """The form as a browser sends it with no file chosen: an empty part named file.
+
+    httpx can't build this part: given files={"file": ("", b"")}, it drops the empty
+    filename.
+    """
+    return (
+        f'--B\r\nContent-Disposition: form-data; name="text"\r\n\r\n{text}\r\n'
+        '--B\r\nContent-Disposition: form-data; name="file"; filename=""\r\n'
+        "Content-Type: application/octet-stream\r\n\r\n\r\n--B--\r\n"
+    ).encode()
+
+
 def stored(db: Session) -> list[tuple[str | None, int | None, bool]]:
     db.expire_all()
     query = select(Passage.slug, Passage.owner_id, Passage.is_common)
@@ -69,6 +85,15 @@ def test_an_admin_imports_common_passages(
     client.post(URL, data={"text": PASSAGE.format(answer="B"), "common": "on"})
 
     assert stored(db) == [("b1-media", admin.id, True)]
+
+
+def test_a_paste_from_the_browser_ignores_the_empty_file_input(
+    logged_in: TestClient, db: Session
+) -> None:
+    body = browser_body(PASSAGE.format(answer="B"))
+    response = logged_in.post(URL, content=body, headers=MULTIPART)
+
+    assert response.status_code == 200 and len(stored(db)) == 1
 
 
 def test_errors_show_their_line_and_keep_the_text(

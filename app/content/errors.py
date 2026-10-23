@@ -1,4 +1,8 @@
+from collections.abc import Mapping
 from dataclasses import dataclass
+
+from pydantic import ValidationError
+from pydantic_core import ErrorDetails
 
 from app.core.i18n import N_, _
 
@@ -71,7 +75,32 @@ def format_path(loc: Loc) -> str:
     return path
 
 
+def to_line_error(error: ErrorDetails, line: int | None) -> LineError:
+    loc = error["loc"]
+    ctx: dict[str, object] = dict(error.get("ctx", {}))
+    if error["type"] in ("missing", "extra_forbidden") and loc:
+        ctx["field"] = loc[-1]
+    return LineError(line, format_path(loc), error["type"], error["msg"], ctx)
+
+
 def describe(error: LineError) -> str:
     if error.type not in MESSAGES:
         return error.message
     return _(MESSAGES[error.type], **error.ctx)
+
+
+def messages_by_path(
+    exc: ValidationError, overrides: Mapping[str, str] | None = None
+) -> dict[str, str]:
+    """The first message for each path; `overrides` replaces a type's wording."""
+    messages: dict[str, str] = {}
+
+    for detail in exc.errors():
+        e = to_line_error(detail, None)
+        if overrides and e.type in overrides:
+            message = _(overrides[e.type], **e.ctx)
+        else:
+            message = describe(e)
+        messages.setdefault(e.path, message)
+
+    return messages

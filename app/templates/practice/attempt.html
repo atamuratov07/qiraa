@@ -6,7 +6,7 @@
     user
     title       the passage title, or the start of its text
     passage_id  for the word translation lookup and the "Discard" link; None once the
-                passage is deleted
+                passage is deleted or no longer visible to me
     content     the copy taken when the attempt started: .text, .level, and .questions
                 in display order, each with .id .prompt and .options in this attempt's
                 shuffled order, each with .id .text
@@ -51,7 +51,6 @@
       <p class="mb-4">{{ para }}</p>
       {% endfor %}
     </div>
-    <p class="text-xs text-muted">{{ _("Tap a word or select several to see the translation into Russian.") }}</p>
   </article>
 
   <form id="answers-form" method="post" action="/attempts/{{ attempt.id }}/submit"
