@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, Literal, TypedDict
 
 from sqlalchemy import (
     JSON,
+    CheckConstraint,
     DateTime,
     ForeignKey,
     Index,
+    String,
     UniqueConstraint,
+    and_,
     column,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -18,6 +21,8 @@ from app.core.text import display_title
 
 if TYPE_CHECKING:
     from app.auth.models import User
+
+AttemptKind = Literal["passage", "grammar"]
 
 
 class OptionCopy(TypedDict):
@@ -43,12 +48,21 @@ class AttemptContent(TypedDict):
 
 class Attempt(Base):
     __tablename__: str = "attempts"
-    __table_args__: tuple[Index, ...] = (
+    __table_args__: tuple[Index | CheckConstraint, ...] = (
         unique_where(
             "uq_attempts_one_open",
             "user_id",
             "passage_id",
             where=column("submitted_at").is_(None),
+        ),
+        unique_where(
+            "uq_attempts_one_open_grammar",
+            "user_id",
+            where=and_(column("submitted_at").is_(None), column("kind") == "grammar"),
+        ),
+        CheckConstraint("kind IN ('passage', 'grammar')", name="known_kind"),
+        CheckConstraint(
+            "kind = 'passage' OR passage_id IS NULL", name="grammar_has_no_passage"
         ),
     )
 
@@ -59,6 +73,7 @@ class Attempt(Base):
     passage_id: Mapped[int | None] = mapped_column(
         ForeignKey("passages.id", ondelete="SET NULL"), index=True
     )
+    kind: Mapped[AttemptKind] = mapped_column(String(16))
     content: Mapped[AttemptContent] = mapped_column(JSON)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

@@ -3,7 +3,9 @@
 from datetime import timedelta
 
 import pytest
+from psycopg.errors import UniqueViolation
 from sqlalchemy import Engine, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.auth.models import User
@@ -11,7 +13,7 @@ from app.core import timeutils
 from app.passages.models import Passage
 from app.passages.service import passage_cards, passage_stats
 from app.practice import service
-from app.practice.models import Attempt, AttemptAnswer
+from app.practice.models import Attempt, AttemptAnswer, AttemptContent
 from tests.factories import T0
 
 
@@ -83,6 +85,7 @@ def test_double_click_race_returns_the_winning_attempt(
     must return the other request's attempt instead of failing.
     """
     winner = Attempt(
+        kind="passage",
         user_id=user.id,
         passage_id=passage.id,
         content=service.copy_passage(passage),
@@ -108,6 +111,36 @@ def test_double_click_race_returns_the_winning_attempt(
     assert result.id == winner.id
     assert calls == 2
     assert len(db.scalars(select(Attempt)).all()) == 1
+
+
+def test_one_open_grammar_session_per_user(db: Session, user: User) -> None:
+    def session() -> Attempt:
+        content: AttemptContent = {
+            "title": None,
+            "level": "",
+            "text": "",
+            "translation_ru": None,
+            "questions": [],
+        }
+        return Attempt(
+            kind="grammar",
+            user_id=user.id,
+            content=content,
+            started_at=T0,
+            last_seen_at=T0,
+        )
+
+    first = session()
+    db.add_all([first, session()])
+    with pytest.raises(IntegrityError) as error:
+        db.commit()
+    db.rollback()
+    assert isinstance(error.value.orig, UniqueViolation)
+
+    first = session()
+    first.submitted_at = T0
+    db.add_all([first, session()])
+    db.commit()  # a submitted session doesn't count
 
 
 # ---------------------------------------------------------------------------

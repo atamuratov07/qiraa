@@ -26,6 +26,7 @@ def submitted(
     user: User, passage: Passage, score: int, total: int, at: datetime
 ) -> Attempt:
     return Attempt(
+        kind="passage",
         user_id=user.id,
         passage_id=passage.id,
         content=copy_passage(passage),
@@ -66,6 +67,7 @@ def test_profile_numbers_and_calendar(
             submitted(user, passage, 5, 5, datetime(2026, 10, 6, 10, tzinfo=UTC)),
             submitted(user, passage2, 2, 4, datetime(2026, 9, 1, 10, tzinfo=UTC)),
             Attempt(  # still open: counted nowhere
+                kind="passage",
                 user_id=user.id,
                 passage_id=passage2.id,
                 content=copy_passage(passage2),

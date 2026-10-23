@@ -130,6 +130,7 @@ def start(db: Session, user: User, passage: Passage, now: datetime) -> Attempt:
         return existing
 
     attempt = Attempt(
+        kind="passage",
         user_id=user.id,
         passage_id=passage.id,
         content=copy_passage(passage),

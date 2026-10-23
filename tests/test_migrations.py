@@ -10,6 +10,7 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from sqlalchemy import CheckConstraint, Engine, create_engine, inspect, text
+from sqlalchemy.exc import IntegrityError
 
 from app.core.config import BASE_DIR, get_settings
 from app.models import Base
@@ -113,6 +114,31 @@ def test_migrations_create_every_check_and_partial_index(empty_db: Engine) -> No
     assert actual == expected
 
 
+def test_existing_attempts_become_passage_attempts(empty_db: Engine) -> None:
+    upgrade("2ad70ffd8c9c")
+    insert_attempt = text(
+        "INSERT INTO attempts (user_id, passage_id, content, started_at, "
+        "last_seen_at, elapsed_seconds) VALUES (1, NULL, '{}', now(), now(), 0)"
+    )
+    with empty_db.begin() as conn:
+        conn.execute(
+            text(
+                "INSERT INTO users (id, username, password_hash, created_at) "
+                "VALUES (1, 'peter', 'x', now())"
+            )
+        )
+        conn.execute(insert_attempt)
+
+    upgrade("head")
+
+    with empty_db.begin() as conn:
+        assert conn.scalar(text("SELECT kind FROM attempts")) == "passage"
+    with pytest.raises(IntegrityError), empty_db.begin() as conn:
+        conn.execute(
+            insert_attempt
+        )  # no default any more: a new attempt names its kind
+
+
 def test_existing_attempts_get_a_copy_of_their_passage(empty_db: Engine) -> None:
     upgrade("350b8310a972")
     with empty_db.begin() as conn:
@@ -186,10 +212,10 @@ def test_downgrading_drops_what_the_old_schema_cannot_hold(empty_db: Engine) -> 
         )
         conn.execute(
             text(
-                "INSERT INTO attempts (id, user_id, passage_id, content, started_at, "
-                "last_seen_at, elapsed_seconds) "
-                "VALUES (1, 1, 1, :copy, now(), now(), 0), "
-                "(2, 1, NULL, :copy, now(), now(), 0)"  # its passage was deleted
+                "INSERT INTO attempts (id, user_id, passage_id, kind, content, "
+                "started_at, last_seen_at, elapsed_seconds) "
+                "VALUES (1, 1, 1, 'passage', :copy, now(), now(), 0), "
+                "(2, 1, NULL, 'passage', :copy, now(), now(), 0)"  # passage deleted
             ),
             {"copy": copy},
         )
