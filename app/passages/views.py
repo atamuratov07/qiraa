@@ -2,8 +2,9 @@ from dataclasses import dataclass
 from typing import TypedDict
 
 from app.auth.models import User
+from app.content.schemas import MAX_OPTIONS, MIN_OPTIONS
 from app.passages.models import Passage
-from app.passages.schemas import MAX_LEVEL, MAX_OPTIONS, MAX_TITLE, MIN_OPTIONS
+from app.passages.schemas import MAX_LEVEL, MAX_TITLE
 
 
 @dataclass(frozen=True, slots=True)

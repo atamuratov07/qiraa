@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-23 04:36+0500\n"
+"POT-Creation-Date: 2026-10-23 18:50+0500\n"
 "PO-Revision-Date: 2026-10-15 00:55+0500\n"
 "Last-Translator: Damir\n"
 "Language: ru\n"
@@ -47,32 +47,32 @@ msgstr "Внутренняя ошибка сервера"
 msgid "Sign-up is closed."
 msgstr "Регистрация закрыта."
 
-#: app/auth/service.py:45
+#: app/auth/service.py:46
 msgid "Wrong invite code."
 msgstr "Неверный код приглашения."
 
-#: app/auth/service.py:49
+#: app/auth/service.py:50
 msgid "Username: 3–32 characters, Latin letters, digits or _."
 msgstr "Имя пользователя: 3–32 символа, латинские буквы, цифры или _."
 
-#: app/auth/service.py:53
+#: app/auth/service.py:54
 #, python-format
 msgid "The password must be %(min)d–%(max)d characters long."
 msgstr "Пароль должен содержать %(min)d–%(max)d символов."
 
-#: app/auth/service.py:59
+#: app/auth/service.py:60
 msgid "The passwords don't match."
 msgstr "Пароли не совпадают."
 
-#: app/auth/service.py:61
+#: app/auth/service.py:62
 msgid "This username is already taken."
 msgstr "Это имя пользователя уже занято."
 
-#: app/auth/service.py:81 app/auth/service.py:84
+#: app/auth/service.py:82 app/auth/service.py:85
 msgid "Wrong username or password."
 msgstr "Неверное имя пользователя или пароль."
 
-#: app/auth/service.py:150
+#: app/auth/service.py:151
 msgid "Wrong password."
 msgstr "Неверный пароль."
 
@@ -164,12 +164,12 @@ msgstr "Используйте строчные латинские буквы, �
 
 #: app/content/errors.py:40
 #, python-format
-msgid "The slug %(slug)s is used by more than one passage."
-msgstr "Слаг %(slug)s указан у нескольких текстов."
+msgid "The slug %(slug)s is used twice in this file."
+msgstr "Слаг %(slug)s встречается в файле дважды."
 
 #: app/content/errors.py:42
-msgid "Someone imported the same passage at the same moment. Import the file again."
-msgstr "Кто-то импортировал тот же текст в ту же секунду. Импортируйте файл ещё раз."
+msgid "Someone imported the same content at the same moment. Import the file again."
+msgstr "Кто-то импортировал то же самое в ту же секунду. Импортируйте файл ещё раз."
 
 #: app/content/errors.py:44
 #, python-format
@@ -180,25 +180,25 @@ msgstr "Файл больше %(limit)s."
 msgid "The file is not UTF-8 text. Save it as UTF-8 and try again."
 msgstr "Файл не в кодировке UTF-8. Сохраните его в UTF-8 и попробуйте снова."
 
-#: app/passages/routes.py:42
+#: app/passages/routes.py:41
 msgid "Choose the correct option."
 msgstr "Выберите правильный вариант."
 
-#: app/passages/routes.py:87 app/passages/routes.py:111 app/passages/routes.py:132
-#: app/passages/routes.py:150
+#: app/passages/routes.py:86 app/passages/routes.py:110 app/passages/routes.py:131
+#: app/passages/routes.py:149
 msgid "Passage not found"
 msgstr "Текст не найден"
 
-#: app/passages/routes.py:213
+#: app/passages/routes.py:212
 #, python-format
 msgid "Another passage already uses the slug %(slug)s."
 msgstr "Слаг %(slug)s уже занят другим текстом."
 
-#: app/practice/routes.py:24 app/practice/routes.py:107
+#: app/practice/routes.py:24 app/practice/routes.py:108
 msgid "Attempt not found"
 msgstr "Попытка не найдена"
 
-#: app/practice/routes.py:93
+#: app/practice/routes.py:94
 msgid "This attempt is already submitted."
 msgstr "Эта попытка уже отправлена на проверку."
 
@@ -351,24 +351,48 @@ msgstr "Создать аккаунт"
 msgid "Already have an account?"
 msgstr "Уже есть аккаунт?"
 
-#: app/templates/content/import.html:17 app/templates/content/import.html:21
+#: app/templates/content/import.html:19
+msgid "Import grammar questions"
+msgstr "Импорт вопросов по грамматике"
+
+#: app/templates/content/import.html:19
 msgid "Import passages"
 msgstr "Импорт текстов"
 
-#: app/templates/content/import.html:22
+#: app/templates/content/import.html:25
+msgid "A question whose slug was imported before is updated."
+msgstr "Вопрос со слагом, который уже импортировали, обновится."
+
+#: app/templates/content/import.html:25
 msgid "A passage whose slug was imported before is updated."
 msgstr "Текст со слагом, который уже импортировали, обновится."
 
-#: app/templates/content/import.html:27
+#: app/templates/content/import.html:30
 msgid "Nothing was imported. Fix these problems and try again:"
 msgstr "Ничего не импортировано. Исправьте ошибки и попробуйте снова:"
 
-#: app/templates/content/import.html:31
+#: app/templates/content/import.html:34
 #, python-format
 msgid "Line %(line)s"
 msgstr "Строка %(line)s"
 
-#: app/templates/content/import.html:43
+#: app/templates/content/import.html:47
+#, python-format
+msgid "Added %(num)d question"
+msgid_plural "Added %(num)d questions"
+msgstr[0] "Добавлен %(num)d вопрос"
+msgstr[1] "Добавлено %(num)d вопроса"
+msgstr[2] "Добавлено %(num)d вопросов"
+
+#: app/templates/content/import.html:48
+#, python-format
+msgid "Updated %(num)d question"
+msgid_plural "Updated %(num)d questions"
+msgstr[0] "Обновлён %(num)d вопрос"
+msgstr[1] "Обновлено %(num)d вопроса"
+msgstr[2] "Обновлено %(num)d вопросов"
+
+#: app/templates/content/import.html:52
 #, python-format
 msgid "Added %(num)d passage"
 msgid_plural "Added %(num)d passages"
@@ -376,7 +400,7 @@ msgstr[0] "Добавлен %(num)d текст"
 msgstr[1] "Добавлено %(num)d текста"
 msgstr[2] "Добавлено %(num)d текстов"
 
-#: app/templates/content/import.html:44
+#: app/templates/content/import.html:53
 #, python-format
 msgid "Updated %(num)d passage"
 msgid_plural "Updated %(num)d passages"
@@ -384,35 +408,39 @@ msgstr[0] "Обновлён %(num)d текст"
 msgstr[1] "Обновлено %(num)d текста"
 msgstr[2] "Обновлено %(num)d текстов"
 
-#: app/templates/content/import.html:58
+#: app/templates/content/import.html:71
 msgid "YAML"
 msgstr "YAML"
 
-#: app/templates/content/import.html:63
+#: app/templates/content/import.html:76
 msgid "Or a file (up to 1 MB)"
 msgstr "Или файл (до 1 МБ)"
 
-#: app/templates/content/import.html:70
+#: app/templates/content/import.html:83
+msgid "Common: every user sees these questions"
+msgstr "Общие: эти вопросы увидят все пользователи"
+
+#: app/templates/content/import.html:83
 msgid "Common: every user sees these passages"
 msgstr "Общие: эти тексты увидят все пользователи"
 
-#: app/templates/content/import.html:73 app/templates/passages/manage.html:23
+#: app/templates/content/import.html:86 app/templates/passages/manage.html:23
 msgid "Import"
 msgstr "Импортировать"
 
-#: app/templates/content/import.html:77
+#: app/templates/content/import.html:90
 msgid "Prompt for a chatbot: turn any material into this format"
 msgstr "Промпт для чат-бота: превратить любой материал в этот формат"
 
-#: app/templates/content/import.html:78
+#: app/templates/content/import.html:91
 msgid "The chatbot marks answers it chose itself with # check. Check them before importing."
 msgstr "Ответы, которые чат-бот выбрал сам, помечены # check. Проверьте их перед импортом."
 
-#: app/templates/content/import.html:79
+#: app/templates/content/import.html:92
 msgid "Copy the prompt"
 msgstr "Скопировать промпт"
 
-#: app/templates/content/import.html:91
+#: app/templates/content/import.html:104
 msgid "Copied"
 msgstr "Скопировано"
 

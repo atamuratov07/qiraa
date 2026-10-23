@@ -8,10 +8,15 @@ from sqlalchemy.orm import Session
 from app.auth.models import User
 from app.auth.service import SESSION_COOKIE, create_session
 from app.content.loader import MAX_BYTES, parse
-from app.content.prompt import EXAMPLE
+from app.grammar.models import GrammarQuestion
+from app.grammar.prompt import EXAMPLE as GRAMMAR_EXAMPLE
+from app.grammar.schemas import GrammarFile
 from app.passages.models import Passage
+from app.passages.prompt import EXAMPLE
+from app.passages.schemas import PassageFile
 
-URL = "/manage/import"
+URL = "/manage/passages/import"
+GRAMMAR_URL = "/manage/grammar/import"
 PASSAGE = """\
 passages:
   - slug: b1-media
@@ -48,7 +53,7 @@ def stored(db: Session) -> list[tuple[str | None, int | None, bool]]:
 
 def test_logged_out_goes_to_login(client: TestClient) -> None:
     response = client.get(URL)
-    assert response.headers["location"] == "/login?next=/manage/import"
+    assert response.headers["location"] == "/login?next=/manage/passages/import"
 
 
 def test_the_common_checkbox_is_for_admins_only(
@@ -134,7 +139,22 @@ def test_an_uploaded_file(
 
 
 def test_the_page_shows_a_prompt_whose_example_is_valid(logged_in: TestClient) -> None:
-    assert parse(EXAMPLE).passages[0].slug == "a2-market"
+    assert parse(EXAMPLE, PassageFile).passages[0].slug == "a2-market"
     page = logged_in.get(URL).text
     assert "Convert the material I give you" in page
     assert "2 to 6 different options" in page
+
+
+def test_grammar_questions_are_imported_on_their_own_page(
+    logged_in: TestClient, db: Session, user: User
+) -> None:
+    assert parse(GRAMMAR_EXAMPLE, GrammarFile).grammar[0].slug == "verb-prepositions-01"
+    page = logged_in.get(GRAMMAR_URL).text
+    assert "Arabic grammar practice app" in page
+
+    response = logged_in.post(GRAMMAR_URL, data={"text": GRAMMAR_EXAMPLE})
+
+    assert response.status_code == 200
+    assert "Добавлено 2 вопроса" in response.text
+    owners = db.scalars(select(GrammarQuestion.owner_id)).all()
+    assert owners == [user.id, user.id]

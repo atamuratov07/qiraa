@@ -1,7 +1,7 @@
 """
 uv run python -m app.cli make-admin <username>
 uv run python -m app.cli import content/passages.yaml --common
-uv run python -m app.cli import my.yaml --owner <username>
+uv run python -m app.cli import my.yaml --owner <username>   # passages or grammar
 uv run python -m app.cli check content/passages.yaml   # needs no database
 DATABASE_URL="postgresql://..." uv run python -m app.cli ...   # Neon
 """
@@ -17,9 +17,12 @@ from app import models  # noqa: F401  registers every model before the first que
 from app.auth.service import find_user, set_admin
 from app.content import loader
 from app.content.errors import ContentError, LineError, describe
-from app.content.schemas import ContentFile
-from app.content.service import ImportedPassage, import_passages
+from app.content.service import ImportedItem
 from app.core.db import SessionLocal
+from app.grammar.schemas import GrammarFile
+from app.grammar.service import import_grammar
+from app.passages.schemas import PassageFile
+from app.passages.service import import_passages
 
 
 class Args(argparse.Namespace):
@@ -40,7 +43,8 @@ def build_parser() -> argparse.ArgumentParser:
     make_admin.add_argument("username")
 
     import_ = commands.add_parser(
-        "import", help="add the passages of a file, or update them by slug"
+        "import",
+        help="add the passages or grammar questions of a file, or update them by slug",
     )
     import_.add_argument("file", type=Path)
     scope = import_.add_mutually_exclusive_group(required=True)
@@ -79,9 +83,15 @@ def run(db: Session, args: Args) -> int:
                     return 1
 
             try:
-                report = import_passages(
-                    db, content.passages, owner=owner, common=args.common
-                )
+                match content:
+                    case PassageFile(passages=entries):
+                        report = import_passages(
+                            db, entries, owner=owner, common=args.common
+                        )
+                    case GrammarFile(grammar=entries):
+                        report = import_grammar(
+                            db, entries, owner=owner, common=args.common
+                        )
             except ContentError as e:
                 print_errors(args.file, e.errors)
                 return 1
@@ -94,9 +104,12 @@ def run(db: Session, args: Args) -> int:
             if content is None:
                 return 1
 
-            count = len(content.passages)
-            noun = "passage" if count == 1 else "passages"
-            print(f"{args.file}: {count} {noun}, no errors")
+            match content:
+                case PassageFile(passages=entries):
+                    count, noun = len(entries), "passage"
+                case GrammarFile(grammar=entries):
+                    count, noun = len(entries), "grammar question"
+            print(f"{args.file}: {count} {noun}{'' if count == 1 else 's'}, no errors")
 
         case _:
             raise AssertionError(f"unhandled command {args.command!r}")
@@ -104,9 +117,9 @@ def run(db: Session, args: Args) -> int:
     return 0
 
 
-def read(path: Path) -> ContentFile | None:
+def read(path: Path) -> PassageFile | GrammarFile | None:
     try:
-        return loader.parse(loader.decode(path.read_bytes()))
+        return loader.parse_file(loader.decode(path.read_bytes()))
     except OSError as e:
         print(f"{path}: {e}", file=sys.stderr)
     except ContentError as e:
@@ -124,8 +137,8 @@ def print_errors(path: Path, errors: list[LineError]) -> None:
         print(": ".join(parts), file=sys.stderr)
 
 
-def summary(label: str, passages: list[ImportedPassage]) -> str:
-    return f"{label} {len(passages)}: {', '.join(p.slug for p in passages) or '-'}"
+def summary(label: str, items: list[ImportedItem]) -> str:
+    return f"{label} {len(items)}: {', '.join(i.slug for i in items) or '-'}"
 
 
 def main(argv: Sequence[str] | None = None) -> int:

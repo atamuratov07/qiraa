@@ -4,9 +4,17 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.auth.models import User
+from app.content.schemas import LETTERS, QuestionIn
+from app.content.service import (
+    ImportedItem,
+    ImportReport,
+    check_importer,
+    commit_import,
+    slug_scope,
+)
 from app.core.permissions import editable, load_visible, visible
 from app.passages.models import Passage, PassageOption, PassageQuestion
-from app.passages.schemas import LETTERS, PassageIn, QuestionIn
+from app.passages.schemas import PassageEntry, PassageIn
 from app.passages.views import ManagedPassage, PassageCard, UnfinishedInfo
 from app.practice.models import Attempt
 
@@ -125,6 +133,47 @@ def update_passage(
 def delete_passage(db: Session, passage: Passage) -> None:
     db.delete(passage)
     db.commit()
+
+
+def import_passages(
+    db: Session, entries: list[PassageEntry], *, owner: User | None, common: bool
+) -> ImportReport:
+    check_importer(owner, common)
+
+    existing = {
+        p.slug: p
+        for p in db.scalars(
+            select(Passage)
+            .where(
+                slug_scope(Passage, owner, common),
+                Passage.slug.in_([entry.slug for entry in entries]),
+            )
+            .options(selectinload(Passage.questions))
+        )
+    }
+
+    added: list[Passage] = []
+    updated: list[Passage] = []
+    for entry in entries:
+        passage = existing.get(entry.slug)
+        if passage is not None:
+            apply_passage(db, passage, entry)
+            updated.append(passage)
+        else:
+            passage = Passage(
+                slug=entry.slug, owner_id=owner.id if owner else None, is_common=common
+            )
+            apply_passage(db, passage, entry)
+            db.add(passage)
+            added.append(passage)
+
+    commit_import(db)
+
+    return ImportReport(imported(added), imported(updated))
+
+
+def imported(passages: list[Passage]) -> list[ImportedItem]:
+    return [ImportedItem(p.id, p.slug or "", p.display_title) for p in passages]
 
 
 def managed_passages(db: Session, user: User) -> list[ManagedPassage]:

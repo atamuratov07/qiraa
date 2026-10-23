@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-23 04:36+0500\n"
+"POT-Creation-Date: 2026-10-23 18:50+0500\n"
 "PO-Revision-Date: 2026-10-15 13:30+0500\n"
 "Last-Translator: Damir\n"
 "Language: uz\n"
@@ -46,32 +46,32 @@ msgstr "Serverda ichki xatolik"
 msgid "Sign-up is closed."
 msgstr "Roʻyxatdan oʻtish yopiq."
 
-#: app/auth/service.py:45
+#: app/auth/service.py:46
 msgid "Wrong invite code."
 msgstr "Taklif kodi notoʻgʻri."
 
-#: app/auth/service.py:49
+#: app/auth/service.py:50
 msgid "Username: 3–32 characters, Latin letters, digits or _."
 msgstr "Foydalanuvchi nomi: 3–32 ta belgi, lotin harflari, raqamlar yoki _."
 
-#: app/auth/service.py:53
+#: app/auth/service.py:54
 #, python-format
 msgid "The password must be %(min)d–%(max)d characters long."
 msgstr "Parol %(min)d–%(max)d ta belgidan iborat boʻlishi kerak."
 
-#: app/auth/service.py:59
+#: app/auth/service.py:60
 msgid "The passwords don't match."
 msgstr "Parollar mos kelmadi."
 
-#: app/auth/service.py:61
+#: app/auth/service.py:62
 msgid "This username is already taken."
 msgstr "Bu foydalanuvchi nomi band."
 
-#: app/auth/service.py:81 app/auth/service.py:84
+#: app/auth/service.py:82 app/auth/service.py:85
 msgid "Wrong username or password."
 msgstr "Foydalanuvchi nomi yoki parol notoʻgʻri."
 
-#: app/auth/service.py:150
+#: app/auth/service.py:151
 msgid "Wrong password."
 msgstr "Parol notoʻgʻri."
 
@@ -165,12 +165,12 @@ msgstr ""
 
 #: app/content/errors.py:40
 #, python-format
-msgid "The slug %(slug)s is used by more than one passage."
-msgstr "%(slug)s slugi bir nechta matnda koʻrsatilgan."
+msgid "The slug %(slug)s is used twice in this file."
+msgstr "%(slug)s slugi faylda ikki marta uchraydi."
 
 #: app/content/errors.py:42
-msgid "Someone imported the same passage at the same moment. Import the file again."
-msgstr "Kimdir aynan shu matnni xuddi shu paytda import qildi. Faylni qayta import qiling."
+msgid "Someone imported the same content at the same moment. Import the file again."
+msgstr "Kimdir aynan shu kontentni xuddi shu paytda import qildi. Faylni qayta import qiling."
 
 #: app/content/errors.py:44
 #, python-format
@@ -181,25 +181,25 @@ msgstr "Fayl %(limit)s dan katta."
 msgid "The file is not UTF-8 text. Save it as UTF-8 and try again."
 msgstr "Fayl UTF-8 kodlashida emas. Uni UTF-8 da saqlang va qaytadan urinib koʻring."
 
-#: app/passages/routes.py:42
+#: app/passages/routes.py:41
 msgid "Choose the correct option."
 msgstr "Toʻgʻri variantni tanlang."
 
-#: app/passages/routes.py:87 app/passages/routes.py:111 app/passages/routes.py:132
-#: app/passages/routes.py:150
+#: app/passages/routes.py:86 app/passages/routes.py:110 app/passages/routes.py:131
+#: app/passages/routes.py:149
 msgid "Passage not found"
 msgstr "Matn topilmadi"
 
-#: app/passages/routes.py:213
+#: app/passages/routes.py:212
 #, python-format
 msgid "Another passage already uses the slug %(slug)s."
 msgstr "%(slug)s slugi boshqa matnda band."
 
-#: app/practice/routes.py:24 app/practice/routes.py:107
+#: app/practice/routes.py:24 app/practice/routes.py:108
 msgid "Attempt not found"
 msgstr "Urinish topilmadi"
 
-#: app/practice/routes.py:93
+#: app/practice/routes.py:94
 msgid "This attempt is already submitted."
 msgstr "Bu urinish allaqachon tekshirishga yuborilgan."
 
@@ -352,68 +352,94 @@ msgstr "Hisob yaratish"
 msgid "Already have an account?"
 msgstr "Hisobingiz bormi?"
 
-#: app/templates/content/import.html:17 app/templates/content/import.html:21
+#: app/templates/content/import.html:19
+msgid "Import grammar questions"
+msgstr "Grammatika savollarini import qilish"
+
+#: app/templates/content/import.html:19
 msgid "Import passages"
 msgstr "Matnlarni import qilish"
 
-#: app/templates/content/import.html:22
+#: app/templates/content/import.html:25
+msgid "A question whose slug was imported before is updated."
+msgstr "Slugi avval import qilingan savol yangilanadi."
+
+#: app/templates/content/import.html:25
 msgid "A passage whose slug was imported before is updated."
 msgstr "Slugi avval import qilingan matn yangilanadi."
 
-#: app/templates/content/import.html:27
+#: app/templates/content/import.html:30
 msgid "Nothing was imported. Fix these problems and try again:"
 msgstr "Hech narsa import qilinmadi. Quyidagi xatolarni tuzatib, qaytadan urinib koʻring:"
 
-#: app/templates/content/import.html:31
+#: app/templates/content/import.html:34
 #, python-format
 msgid "Line %(line)s"
 msgstr "%(line)s-qator"
 
-#: app/templates/content/import.html:43
+#: app/templates/content/import.html:47
+#, python-format
+msgid "Added %(num)d question"
+msgid_plural "Added %(num)d questions"
+msgstr[0] "%(num)d ta savol qoʻshildi"
+msgstr[1] "%(num)d ta savol qoʻshildi"
+
+#: app/templates/content/import.html:48
+#, python-format
+msgid "Updated %(num)d question"
+msgid_plural "Updated %(num)d questions"
+msgstr[0] "%(num)d ta savol yangilandi"
+msgstr[1] "%(num)d ta savol yangilandi"
+
+#: app/templates/content/import.html:52
 #, python-format
 msgid "Added %(num)d passage"
 msgid_plural "Added %(num)d passages"
 msgstr[0] "%(num)d ta matn qoʻshildi"
 msgstr[1] "%(num)d ta matn qoʻshildi"
 
-#: app/templates/content/import.html:44
+#: app/templates/content/import.html:53
 #, python-format
 msgid "Updated %(num)d passage"
 msgid_plural "Updated %(num)d passages"
 msgstr[0] "%(num)d ta matn yangilandi"
 msgstr[1] "%(num)d ta matn yangilandi"
 
-#: app/templates/content/import.html:58
+#: app/templates/content/import.html:71
 msgid "YAML"
 msgstr "YAML"
 
-#: app/templates/content/import.html:63
+#: app/templates/content/import.html:76
 msgid "Or a file (up to 1 MB)"
 msgstr "Yoki fayl (1 MB gacha)"
 
-#: app/templates/content/import.html:70
+#: app/templates/content/import.html:83
+msgid "Common: every user sees these questions"
+msgstr "Umumiy: bu savollarni barcha foydalanuvchilar koʻradi"
+
+#: app/templates/content/import.html:83
 msgid "Common: every user sees these passages"
 msgstr "Umumiy: bu matnlarni barcha foydalanuvchilar koʻradi"
 
-#: app/templates/content/import.html:73 app/templates/passages/manage.html:23
+#: app/templates/content/import.html:86 app/templates/passages/manage.html:23
 msgid "Import"
 msgstr "Import qilish"
 
-#: app/templates/content/import.html:77
+#: app/templates/content/import.html:90
 msgid "Prompt for a chatbot: turn any material into this format"
 msgstr "Chat-bot uchun prompt: istalgan materialni shu formatga oʻtkazish"
 
-#: app/templates/content/import.html:78
+#: app/templates/content/import.html:91
 msgid "The chatbot marks answers it chose itself with # check. Check them before importing."
 msgstr ""
 "Chat-bot oʻzi tanlagan javoblarni # check bilan belgilaydi. Import qilishdan oldin "
 "ularni tekshiring."
 
-#: app/templates/content/import.html:79
+#: app/templates/content/import.html:92
 msgid "Copy the prompt"
 msgstr "Promptni nusxalash"
 
-#: app/templates/content/import.html:91
+#: app/templates/content/import.html:104
 msgid "Copied"
 msgstr "Nusxalandi"
 

@@ -6,9 +6,13 @@ from sqlalchemy.orm import Session
 
 from app.auth.models import User
 from app.content.loader import parse
-from app.content.schemas import PassageEntry
-from app.content.service import NotAllowed, import_passages
+from app.content.service import NotAllowed
+from app.grammar.models import GrammarQuestion
+from app.grammar.schemas import GrammarEntry, GrammarFile
+from app.grammar.service import import_grammar
 from app.passages.models import Passage, PassageOption, PassageQuestion
+from app.passages.schemas import PassageEntry, PassageFile
+from app.passages.service import import_passages
 from app.practice import service
 from app.practice.models import Attempt
 from tests.factories import T0
@@ -38,7 +42,7 @@ passages:
 
 
 def entries(text: str) -> list[PassageEntry]:
-    return parse(text).passages
+    return parse(text, PassageFile).passages
 
 
 def count(db: Session, model: type[Passage | PassageQuestion | PassageOption]) -> int:
@@ -116,3 +120,31 @@ def test_only_admins_import_common_content(
 
     with Session(engine) as fresh:
         assert count(fresh, Passage) == 0
+
+
+def test_reimporting_grammar_updates_by_slug_within_each_area(
+    db: Session, user: User, other_user: User
+) -> None:
+    def grammar(answer: str, *options: str) -> list[GrammarEntry]:
+        text = f"""\
+grammar:
+  - slug: case-01
+    prompt: جملة ___.
+    options: [{", ".join(options)}]
+    answer: {answer}
+"""
+        return parse(text, GrammarFile).grammar
+
+    first = import_grammar(db, grammar("A", "أ", "ب"), owner=user, common=False)
+    theirs = import_grammar(db, grammar("A", "أ", "ب"), owner=other_user, common=False)
+    again = import_grammar(db, grammar("C", "ج", "د", "ه"), owner=user, common=False)
+
+    assert [i.id for i in again.updated] == [first.added[0].id]
+    assert again.added == [] and theirs.added[0].id != first.added[0].id
+    db.expire_all()
+    mine = db.get_one(GrammarQuestion, first.added[0].id)
+    assert [(o.text, o.is_correct) for o in mine.options] == [
+        ("ج", False),
+        ("د", False),
+        ("ه", True),
+    ]

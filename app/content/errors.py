@@ -37,9 +37,9 @@ MESSAGES: dict[str, str] = {
     "bad_slug": N_(
         "Use lowercase Latin letters, digits and single hyphens, like b1-media."
     ),
-    "duplicate_slug": N_("The slug %(slug)s is used by more than one passage."),
+    "duplicate_slug": N_("The slug %(slug)s is used twice in this file."),
     "import_conflict": N_(
-        "Someone imported the same passage at the same moment. Import the file again."
+        "Someone imported the same content at the same moment. Import the file again."
     ),
     "file_too_large": N_("The file is larger than %(limit)s."),
     "not_utf8": N_("The file is not UTF-8 text. Save it as UTF-8 and try again."),
