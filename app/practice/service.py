@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.auth.models import User
+from app.core.permissions import visible
 from app.core.timeutils import as_utc, local_day
 from app.passages.models import Passage
 from app.practice.models import (
@@ -110,6 +111,17 @@ def load_attempt(db: Session, user: User, attempt_id: int) -> Attempt | None:
         return None
 
     return attempt
+
+
+def visible_passage_id(db: Session, user: User, attempt: Attempt) -> int | None:
+    if attempt.passage_id is None:
+        return None
+
+    return db.scalar(
+        select(Passage.id).where(
+            Passage.id == attempt.passage_id, visible(Passage, user)
+        )
+    )
 
 
 def start(db: Session, user: User, passage: Passage, now: datetime) -> Attempt:

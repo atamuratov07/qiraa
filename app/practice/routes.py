@@ -43,12 +43,13 @@ def _answers_from_form(fields: dict[str, str]) -> dict[int, int]:
 def attempt_page(request: Request, aid: int, db: DB, user: CurrentUser) -> HTMLResponse:
     attempt = _own_attempt(db, user, aid)
     answers = service.saved_answers(attempt)
+    passage_id = service.visible_passage_id(db, user, attempt)
 
     if attempt.submitted_at is not None:
         result_ctx: ResultPage = {
             "user": user,
             "title": attempt.display_title,
-            "passage_id": attempt.passage_id,
+            "passage_id": passage_id,
             "content": attempt.content,
             "attempt": attempt,
             "answers": answers,
@@ -58,7 +59,7 @@ def attempt_page(request: Request, aid: int, db: DB, user: CurrentUser) -> HTMLR
     ctx: AttemptPage = {
         "user": user,
         "title": attempt.display_title,
-        "passage_id": attempt.passage_id,
+        "passage_id": passage_id,
         "content": attempt.content,
         "attempt": attempt,
         "answers": answers,
