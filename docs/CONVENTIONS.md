@@ -8,7 +8,8 @@ is in [ROADMAP-v2.md](ROADMAP-v2.md); the user-facing description is in
 
 Python 3.13 · FastAPI with Jinja2 server-rendered pages · SQLAlchemy 2.1 · Alembic · Babel ·
 Pydantic v2 + pydantic-settings · argon2-cffi · uv · pytest · Tailwind v4 browser build from a
-CDN · plain JavaScript (`reader.js`, `attempt.js`, `forms.js`), no build step.
+CDN · plain JavaScript (`reader.js`, `attempt.js`, `forms.js`) and Alpine.js from a CDN
+(`editor.js`), no build step.
 
 - Production: Docker image on Render (free web service, Frankfurt), Postgres on Neon (free,
   Frankfurt). Every push to `main` deploys. The container runs `alembic upgrade head` on start.
@@ -56,7 +57,8 @@ commands for running the site (`make-admin`, `import`, `check`). `app/locale/` h
 - `auth/`: `User`, `UserSession` · `deps.py` `CurrentUser`, `MaybeUser`, `LoginRequired` ·
   `security.py` password hashing, session tokens.
 - `passages/`: `Passage` · `schemas.py` `PassageIn`, `QuestionIn` and their limits (shared
-  by YAML and the editor) · `apply_passage()`, passage list statistics, start card.
+  by YAML and the editor) · `apply_passage()`, passage list statistics, start card ·
+  `create_passage()`, `update_passage()`, `passage_in()`, the manage list and the editor.
 - `content/`: content files, no models · `schemas.py` `PassageEntry`, `ContentFile` ·
   `loader.py` `parse()`, `decode()` · `yaml_tree.py` line numbers (see
   [CONTENT-LOADER.md](CONTENT-LOADER.md)) · `errors.py` `LineError`, `ContentError`,
@@ -131,7 +133,8 @@ at the top.
     page read that copy, never the live passage; `Attempt` has no `passage` relationship.
     Answers store ids from the copy with no foreign keys, so the service checks them
     (`has_option()`). Editing or deleting content never changes a result: a deleted passage
-    only sets `passage_id` to NULL.
+    only sets `passage_id` to NULL. The pages link to the passage only while I can see it
+    (`visible_passage_id()`).
 
 16. **Content files.** Every passage in a file has a slug written by hand. An import looks
     it up among common passages, or among the importer's private ones (a partial unique
@@ -140,6 +143,11 @@ at the top.
     type (Pydantic's or ours) and the line from the YAML node tree, translated where they
     are shown (`describe()`), so the CLI prints English. Limits are constants in the
     schemas, and the chatbot prompt reads them.
+
+17. **The passage editor** posts the passage as JSON in one form field. The route validates
+    it with `PassageIn.model_validate_json()` in its body, since a failed check in the
+    signature shows the 404 page. `messages_by_path()` keys the errors by path, such as
+    `questions[0].options[1]`, for the field that shows them.
 
 ## Tests
 
