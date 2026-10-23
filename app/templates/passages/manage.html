@@ -8,8 +8,9 @@
                  .id .title .level .slug (None for editor-made passages) .is_common
                  .question_count
 
-  "Delete" submits POST /manage/passages/{id}/delete (no fields) after a confirm dialog,
-  in the background (data-background, see forms.js).
+  "Edit" opens /manage/passages/{id}/edit. "Delete" submits POST
+  /manage/passages/{id}/delete (no fields) after a confirm dialog, in the background
+  (data-background, see forms.js).
 #}
 {% extends "base.html" %}
 {% block title %}{{ _("Manage passages") }}{% endblock %}
@@ -17,7 +18,10 @@
 <div class="mx-auto max-w-3xl space-y-6">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <h1 class="text-2xl font-bold">{{ _("Manage passages") }}</h1>
-    <a href="/manage/import" class="rounded-xl border border-accent px-4 py-2 text-sm font-semibold text-accent hover:bg-accent-soft">{{ _("Import") }}</a>
+    <div class="flex gap-2">
+      <a href="/manage/passages/new" class="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white hover:brightness-110">{{ _("New passage") }}</a>
+      <a href="/manage/import" class="rounded-xl border border-accent px-4 py-2 text-sm font-semibold text-accent hover:bg-accent-soft">{{ _("Import") }}</a>
+    </div>
   </div>
 
   {% if passages %}
@@ -34,6 +38,7 @@
         </p>
       </div>
       {% set question = _("Delete this passage for everyone? Results on it stay.") if p.is_common else _("Delete this passage? Results on it stay.") %}
+      <a href="/manage/passages/{{ p.id }}/edit" class="text-sm font-semibold text-accent hover:underline">{{ _("Edit") }}</a>
       <form method="post" action="/manage/passages/{{ p.id }}/delete"
             onsubmit='return confirm({{ question | tojson }})' data-background>
         <button class="cursor-pointer text-sm text-muted hover:text-bad">{{ _("Delete") }}</button>

@@ -1,15 +1,39 @@
 """Level 3: /manage/passages (users: peter 1, sarah 2, admin 3)."""
 
+import json
+
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.auth.models import User
 from app.auth.service import SESSION_COOKIE, create_session
 from app.passages.models import Passage
-from tests.factories import make_passage
+from tests.factories import make_passage, make_question
 
 URL = "/manage/passages"
+
+
+def editor_form(*answers: str | None, prompt: str = "سؤال؟") -> dict[str, str]:
+    """The editor's fields as a browser posts them, radios included."""
+    passage = {
+        "title": "",
+        "level": "A2",
+        "text": "الفقرة.",
+        "translation_ru": "",
+        "glossary": {},
+        "questions": [
+            {
+                "prompt": prompt,
+                "options": ["أ", "ب", "ج"],
+                "answer": a,
+                "explanation": "",
+            }
+            for a in answers
+        ],
+    }
+    return {"passage": json.dumps(passage, ensure_ascii=False), "k1": "k3"}
 
 
 @pytest.fixture
@@ -71,3 +95,87 @@ def test_deleting_what_i_may_not_edit_is_a_404(
 
     assert client.post(f"{URL}/{passage_id}/delete").status_code == 404
     assert db.get(Passage, passage_id) is not None
+
+
+def test_a_new_passage_is_saved_and_can_be_practised(
+    logged_in: TestClient, db: Session, user: User
+) -> None:
+    response = logged_in.post(f"{URL}/new", data=editor_form("B", "C"))
+
+    assert (response.status_code, response.headers["location"]) == (303, URL)
+    passage = db.scalars(select(Passage)).one()
+    assert (passage.owner_id, passage.is_common, passage.title) == (
+        user.id,
+        False,
+        None,
+    )
+    assert logged_in.post(f"/passages/{passage.id}/attempts").status_code == 303
+
+
+def test_errors_show_under_their_fields_and_keep_the_input(
+    logged_in: TestClient, db: Session
+) -> None:
+    form = editor_form(None, prompt="سؤال فريد؟")
+    form["passage"] = form["passage"].replace('"ب"', '" "')
+    response = logged_in.post(f"{URL}/new", data=form)
+
+    assert response.status_code == 400
+    assert '"questions[0].answer": "Выберите правильный вариант."' in response.text
+    assert (
+        '"questions[0].options[1]": "Значение не может быть пустым."' in response.text
+    )
+    assert "سؤال فريد؟" in response.text  # the editor is refilled
+    assert db.scalars(select(Passage)).all() == []
+
+
+def test_a_payload_that_is_not_json_is_refused(logged_in: TestClient) -> None:
+    response = logged_in.post(f"{URL}/new", data={"passage": "{not json"})
+    assert response.status_code == 400 and '"data": null' in response.text
+
+
+def test_editing_replaces_the_questions(
+    logged_in: TestClient, db: Session, user: User
+) -> None:
+    db.add(
+        make_passage(
+            10, [make_question(1, correct=1), make_question(2, correct=2)], owner=user
+        )
+    )
+    db.commit()
+
+    page = logged_in.get(f"{URL}/10/edit").text
+    assert 'action="/manage/passages/10/edit"' in page and "سؤال 2؟" in page
+
+    response = logged_in.post(f"{URL}/10/edit", data=editor_form("C"))
+
+    assert response.status_code == 303
+    db.expire_all()
+    [question] = db.get_one(Passage, 10).questions
+    assert [o.is_correct for o in question.options] == [False, False, True]
+
+
+@pytest.mark.usefixtures("owned")
+def test_editing_what_i_may_not_edit_is_a_404(logged_in: TestClient) -> None:
+    for pid in (11, 13):  # sarah's private, common
+        assert logged_in.get(f"{URL}/{pid}/edit").status_code == 404
+        response = logged_in.post(f"{URL}/{pid}/edit", data=editor_form("A"))
+        assert response.status_code == 404
+
+
+def test_publishing_into_a_taken_slug_shows_the_error(
+    client: TestClient, db: Session, admin: User
+) -> None:
+    common = make_passage(5, [])
+    mine = make_passage(6, [make_question(1, correct=1)], owner=admin, is_common=False)
+    common.slug = mine.slug = "b1-media"
+    db.add_all([common, mine])
+    db.commit()
+    client.cookies.set(SESSION_COOKIE, create_session(db, admin))
+
+    form = editor_form("A") | {"common": "on"}
+    response = client.post(f"{URL}/6/edit", data=form)
+
+    assert response.status_code == 400
+    assert "Слаг b1-media уже занят другим текстом." in response.text
+    db.expire_all()
+    assert not db.get_one(Passage, 6).is_common

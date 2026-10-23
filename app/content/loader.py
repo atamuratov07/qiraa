@@ -2,7 +2,7 @@ from pydantic import ValidationError
 from pydantic_core import ErrorDetails
 from yaml.nodes import Node
 
-from app.content.errors import ContentError, LineError, format_path
+from app.content.errors import ContentError, LineError, to_line_error
 from app.content.schemas import ContentFile
 from app.content.yaml_tree import line_of, read_yaml
 
@@ -39,10 +39,4 @@ def parse(text: str) -> ContentFile:
 
 
 def from_pydantic(root: Node, error: ErrorDetails) -> LineError:
-    loc = error["loc"]
-    ctx: dict[str, object] = dict(error.get("ctx", {}))
-    if error["type"] in ("missing", "extra_forbidden") and loc:
-        ctx["field"] = loc[-1]
-    return LineError(
-        line_of(root, loc), format_path(loc), error["type"], error["msg"], ctx
-    )
+    return to_line_error(error, line_of(root, error["loc"]))
