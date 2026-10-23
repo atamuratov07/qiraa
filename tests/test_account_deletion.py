@@ -12,9 +12,9 @@ from sqlalchemy.orm import Session
 from app.auth.models import User
 from app.auth.security import hash_password
 from app.auth.service import delete_account
-from app.passages.models import Passage
+from app.passages.models import Passage, PassageOption, PassageQuestion
 from app.practice import service
-from app.practice.models import Attempt, AttemptAnswer, Option, Question
+from app.practice.models import Attempt, AttemptAnswer
 from tests.factories import T0, make_passage, make_question
 
 PASSWORD = "correct-horse"
@@ -48,8 +48,8 @@ def test_deleting_an_account_removes_private_content_and_keeps_common(
 
     assert count(db, User, User.id == 1) == 0
     assert count(db, Passage, Passage.id == 5) == 0
-    assert count(db, Question, Question.id == 1) == 0
-    assert count(db, Option, Option.question_id == 1) == 0
+    assert count(db, PassageQuestion, PassageQuestion.id == 1) == 0
+    assert count(db, PassageOption, PassageOption.question_id == 1) == 0
     assert count(db, Attempt, Attempt.user_id == 1) == 0
     assert count(db, AttemptAnswer, AttemptAnswer.question_id == 1) == 0
 

@@ -39,11 +39,17 @@ def empty_db(database_url: str, monkeypatch: pytest.MonkeyPatch) -> Iterator[Eng
     get_settings.cache_clear()
 
     engine = create_engine(database_url)
+    reset_schema(engine)
+    yield engine
+    # A test can end at an old revision, whose table names drop_all() doesn't know.
+    reset_schema(engine)
+    engine.dispose()
+
+
+def reset_schema(engine: Engine) -> None:
     with engine.begin() as conn:
         conn.execute(text("DROP SCHEMA public CASCADE"))
         conn.execute(text("CREATE SCHEMA public"))
-    yield engine
-    engine.dispose()
 
 
 def test_existing_passages_become_common(empty_db: Engine) -> None:
@@ -172,10 +178,10 @@ def test_downgrading_drops_what_the_old_schema_cannot_hold(empty_db: Engine) -> 
                 "VALUES (1, 'peter', 'x', now());"
                 "INSERT INTO passages (id, title, level, text, glossary, is_common) "
                 "VALUES (1, 'نص', 'A2', 'الفقرة.', '{}', true);"
-                "INSERT INTO questions (id, passage_id, position, prompt) "
+                "INSERT INTO passage_questions (id, passage_id, position, prompt) "
                 "VALUES (1, 1, 1, 'سؤال؟');"
-                "INSERT INTO options (id, question_id, position, text, is_correct) "
-                "VALUES (11, 1, 1, 'أ', false), (12, 1, 2, 'ب', true)"
+                "INSERT INTO passage_options (id, question_id, position, text, "
+                "is_correct) VALUES (11, 1, 1, 'أ', false), (12, 1, 2, 'ب', true)"
             )
         )
         conn.execute(

@@ -5,10 +5,10 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.auth.models import User
 from app.core.permissions import editable, load_visible, visible
-from app.passages.models import Passage
+from app.passages.models import Passage, PassageOption, PassageQuestion
 from app.passages.schemas import LETTERS, PassageIn, QuestionIn
 from app.passages.views import ManagedPassage, PassageCard, UnfinishedInfo
-from app.practice.models import Attempt, Option, Question
+from app.practice.models import Attempt
 
 
 class SlugTaken(Exception):
@@ -25,7 +25,7 @@ def load_passage(db: Session, user: User, passage_id: int) -> Passage | None:
         user,
         Passage,
         passage_id,
-        selectinload(Passage.questions).selectinload(Question.options),
+        selectinload(Passage.questions).selectinload(PassageQuestion.options),
     )
 
 
@@ -50,17 +50,17 @@ def passage_in(passage: Passage) -> PassageIn:
     )
 
 
-def build_questions(items: list[QuestionIn]) -> list[Question]:
-    questions: list[Question] = []
+def build_questions(items: list[QuestionIn]) -> list[PassageQuestion]:
+    questions: list[PassageQuestion] = []
 
     for position, q in enumerate(items, start=1):
         options = [
-            Option(position=i, text=text, is_correct=(i - 1 == q.correct_index))
+            PassageOption(position=i, text=text, is_correct=(i - 1 == q.correct_index))
             for i, text in enumerate(q.options, start=1)
         ]
 
         questions.append(
-            Question(
+            PassageQuestion(
                 position=position,
                 prompt=q.prompt,
                 explanation=q.explanation,
@@ -129,7 +129,7 @@ def delete_passage(db: Session, passage: Passage) -> None:
 
 def managed_passages(db: Session, user: User) -> list[ManagedPassage]:
     rows = db.execute(
-        select(Passage, func.count(Question.id))
+        select(Passage, func.count(PassageQuestion.id))
         .outerjoin(Passage.questions)
         .where(editable(Passage, user))
         .group_by(Passage.id)

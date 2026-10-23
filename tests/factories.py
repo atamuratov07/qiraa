@@ -8,20 +8,21 @@ Id scheme, so tests can be read without looking anything up:
 from datetime import UTC, datetime
 
 from app.auth.models import User
-from app.passages.models import Passage
-from app.practice.models import Option, Question
+from app.passages.models import Passage, PassageOption, PassageQuestion
 
 T0 = datetime(2026, 10, 7, 10, 0, 0, tzinfo=UTC)
 
 
-def make_question(question_id: int, *, correct: int, position: int = 1) -> Question:
-    return Question(
+def make_question(
+    question_id: int, *, correct: int, position: int = 1
+) -> PassageQuestion:
+    return PassageQuestion(
         id=question_id,
         position=position,
         prompt=f"سؤال {question_id}؟",
         explanation=f"Explanation for question {question_id}",
         options=[
-            Option(
+            PassageOption(
                 id=question_id * 10 + k,
                 position=k,
                 text=f"خيار {k}",
@@ -34,7 +35,7 @@ def make_question(question_id: int, *, correct: int, position: int = 1) -> Quest
 
 def make_passage(
     passage_id: int,
-    questions: list[Question],
+    questions: list[PassageQuestion],
     *,
     level: str = "A2",
     owner: User | None = None,

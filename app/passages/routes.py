@@ -15,7 +15,7 @@ from app.core.i18n import N_, _
 from app.core.permissions import load_editable
 from app.core.templating import render
 from app.core.timeutils import local_day
-from app.passages.models import Passage
+from app.passages.models import Passage, PassageQuestion
 from app.passages.schemas import PassageIn
 from app.passages.service import (
     SlugTaken,
@@ -35,7 +35,6 @@ from app.passages.views import (
     PassagesPage,
     PassageStartPage,
 )
-from app.practice.models import Question
 from app.practice.service import open_attempt_for, start
 from app.profile.streaks import visible_streak
 
@@ -81,7 +80,7 @@ def load_for_editing(db: DB, user: User, pid: int) -> Passage:
         user,
         Passage,
         pid,
-        selectinload(Passage.questions).selectinload(Question.options),
+        selectinload(Passage.questions).selectinload(PassageQuestion.options),
     )
     if passage is None:
         raise HTTPException(404, _("Passage not found"))

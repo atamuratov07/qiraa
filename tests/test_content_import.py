@@ -8,9 +8,9 @@ from app.auth.models import User
 from app.content.loader import parse
 from app.content.schemas import PassageEntry
 from app.content.service import NotAllowed, import_passages
-from app.passages.models import Passage
+from app.passages.models import Passage, PassageOption, PassageQuestion
 from app.practice import service
-from app.practice.models import Attempt, Option, Question
+from app.practice.models import Attempt
 from tests.factories import T0
 
 TWO_QUESTIONS = """\
@@ -41,7 +41,7 @@ def entries(text: str) -> list[PassageEntry]:
     return parse(text).passages
 
 
-def count(db: Session, model: type[Passage | Question | Option]) -> int:
+def count(db: Session, model: type[Passage | PassageQuestion | PassageOption]) -> int:
     return db.scalar(select(func.count()).select_from(model)) or 0
 
 
@@ -65,7 +65,11 @@ def test_reimporting_updates_the_passage_and_keeps_results(
     second = import_passages(db, entries(ONE_QUESTION), owner=None, common=True)
 
     assert (second.added, [p.id for p in second.updated]) == ([], [passage.id])
-    assert (count(db, Passage), count(db, Question), count(db, Option)) == (1, 1, 2)
+    assert (
+        count(db, Passage),
+        count(db, PassageQuestion),
+        count(db, PassageOption),
+    ) == (1, 1, 2)
     db.expire_all()
     assert [q.prompt for q in db.get_one(Passage, passage.id).questions] == ["جديد؟"]
     kept = db.get_one(Attempt, attempt.id)
@@ -83,7 +87,7 @@ def test_one_slug_in_each_scope_is_a_separate_passage(
 
     assert (len(again.added), len(again.updated)) == (0, 1)
     owners = db.execute(
-        select(Passage.owner_id, Passage.is_common, func.count(Question.id))
+        select(Passage.owner_id, Passage.is_common, func.count(PassageQuestion.id))
         .join(Passage.questions)
         .group_by(Passage.id)
         .order_by(Passage.id)

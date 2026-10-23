@@ -8,7 +8,6 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
-    Text,
     UniqueConstraint,
     column,
 )
@@ -19,53 +18,6 @@ from app.core.text import display_title
 
 if TYPE_CHECKING:
     from app.auth.models import User
-    from app.passages.models import Passage
-
-
-class Question(Base):
-    __tablename__: str = "questions"
-    __table_args__: tuple[UniqueConstraint, ...] = (
-        UniqueConstraint("passage_id", "position"),
-    )
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    passage_id: Mapped[int] = mapped_column(
-        ForeignKey("passages.id", ondelete="CASCADE")
-    )
-    position: Mapped[int] = mapped_column()
-    prompt: Mapped[str] = mapped_column(Text)
-    explanation: Mapped[str | None] = mapped_column(Text)
-
-    passage: Mapped[Passage] = relationship(back_populates="questions")
-
-    options: Mapped[list[Option]] = relationship(
-        back_populates="question",
-        cascade="all, delete-orphan",
-        order_by="Option.position",
-        passive_deletes=True,
-    )
-
-
-class Option(Base):
-    __tablename__: str = "options"
-    __table_args__: tuple[UniqueConstraint, Index] = (
-        UniqueConstraint("question_id", "position"),
-        unique_where(
-            "uq_options_one_correct",
-            "question_id",
-            where=column("is_correct"),
-        ),
-    )
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    question_id: Mapped[int] = mapped_column(
-        ForeignKey("questions.id", ondelete="CASCADE")
-    )
-    position: Mapped[int] = mapped_column()
-    text: Mapped[str] = mapped_column(Text)
-    is_correct: Mapped[bool] = mapped_column(default=False)
-
-    question: Mapped[Question] = relationship(back_populates="options")
 
 
 class OptionCopy(TypedDict):

@@ -56,17 +56,18 @@ commands for running the site (`make-admin`, `import`, `check`). `app/locale/` h
   `display_title()` · `views.py` `ErrorPage`.
 - `auth/`: `User`, `UserSession` · `deps.py` `CurrentUser`, `MaybeUser`, `LoginRequired` ·
   `security.py` password hashing, session tokens.
-- `passages/`: `Passage` · `schemas.py` `PassageIn`, `QuestionIn` and their limits (shared
-  by YAML and the editor) · `apply_passage()`, passage list statistics, start card ·
-  `create_passage()`, `update_passage()`, `passage_in()`, the manage list and the editor.
+- `passages/`: `Passage`, `PassageQuestion`, `PassageOption` · `schemas.py` `PassageIn`,
+  `QuestionIn` and their limits (shared by YAML and the editor) · `apply_passage()`, passage
+  list statistics, start card · `create_passage()`, `update_passage()`, `passage_in()`, the
+  manage list and the editor.
 - `content/`: content files, no models · `schemas.py` `PassageEntry`, `ContentFile` ·
   `loader.py` `parse()`, `decode()` · `yaml_tree.py` line numbers (see
   [CONTENT-LOADER.md](CONTENT-LOADER.md)) · `errors.py` `LineError`, `ContentError`,
   `describe()` · `service.py` `import_passages()` · `prompt.py` the chatbot prompt ·
   the import page.
-- `practice/`: `Question`, `Option`, `Attempt`, `AttemptAnswer`, and the copy an attempt
-  keeps (`AttemptContent`, `QuestionCopy`, `OptionCopy`) · attempt service (`copy_passage()`,
-  `has_option()`, `grade()`) · pages, `api.py` and `schemas.py` for the JSON endpoints.
+- `practice/`: `Attempt`, `AttemptAnswer`, and the copy an attempt keeps (`AttemptContent`,
+  `QuestionCopy`, `OptionCopy`) · attempt service (`copy_passage()`, `has_option()`,
+  `grade()`) · pages, `api.py` and `schemas.py` for the JSON endpoints.
 - `profile/`: `streaks.py` · profile statistics and page.
 
 A feature has `models.py`, `service.py`, `routes.py` and `views.py` (dataclasses and one

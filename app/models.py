@@ -6,16 +6,16 @@ models from their feature
 
 from app.auth.models import User, UserSession
 from app.core.base import Base
-from app.passages.models import Passage
-from app.practice.models import Attempt, AttemptAnswer, Option, Question
+from app.passages.models import Passage, PassageOption, PassageQuestion
+from app.practice.models import Attempt, AttemptAnswer
 
 __all__ = [
     "Attempt",
     "AttemptAnswer",
     "Base",
-    "Option",
     "Passage",
-    "Question",
+    "PassageOption",
+    "PassageQuestion",
     "User",
     "UserSession",
 ]
