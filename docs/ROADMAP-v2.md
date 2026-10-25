@@ -45,7 +45,7 @@ Speaking practice is postponed until after the 2.0 release (see "Later").
 | Passage editor        | Alpine keeps the passage and posts it as JSON in one form field; `PassageIn` validates it as it does YAML, and errors show under their fields                                                                                                                                                                                    |
 | Content language      | Arabic or English: content takes its direction from its own text (`dir="auto"`) and Latin letters are set in Inter; no language field, since word translation looks up Arabic words only                                                                                                                                         |
 | Grammar session       | `/grammar` is a start form only (no page that lists the whole bank): pool "common + mine" or "only mine", any size, both remembered in the browser; the size is capped at the number of questions in the pool; one open session per user, which the start page offers to continue or discard                                     |
-| Word translation      | MyMemory only, into the language picked in the popup (Uzbek, Russian or English; the interface's by default, remembered in the browser); Arabic text only; a cache in memory, no cache table in 2.0; the unused `passages.glossary` column is dropped                                                                            |
+| Word translation      | the popup asks MyMemory from the browser (no server endpoint, so each user has their own anonymous quota), into the language picked in the popup (Uzbek, Russian or English; the interface's by default, remembered in the browser); Arabic text only; the unused `passages.glossary` column is dropped                          |
 | Translations          | gettext with Babel and Jinja's i18n extension; English msgids, so English needs no catalog; catalogs for `ru` and `uz`                                                                                                                                                                                                           |
 | Language choice       | the `qiraa_lang` cookie (set from `users.locale` at login), then `Accept-Language`, then English                                                                                                                                                                                                                                 |
 | Dates                 | Babel's date formatting replaces the hand-written Russian month names                                                                                                                                                                                                                                                            |
@@ -240,12 +240,13 @@ Templates stay in `app/templates/<feature>/`.
 
 ### 10. Word translation
 
-- [ ] Drop `passages.glossary` (never used): the column, the schema field, the editor's
+- [x] Drop `passages.glossary` (never used): the column, the schema field, the editor's
       rows and the prompt line.
-- [ ] `GET /api/translate?q=…&to=…` for logged-in users: Arabic text only (400 otherwise),
-      into `uz`, `ru` or `en` through MyMemory (`MYMEMORY_EMAIL` raises the free quota
-      from 5,000 to 50,000 characters a day), cached in memory.
-- [ ] The popup: ru · uz · en buttons, the interface language by default, the choice kept
+- [x] The popup asks MyMemory itself (`fetch` from `reader.js`; MyMemory allows it with
+      `Access-Control-Allow-Origin: *`): Arabic text only, up to 500 characters
+      (MyMemory's limit; longer selections get a message), the answers kept for the
+      browser session, errors shown with the Google Translate link.
+- [x] The popup: uz · ru · en buttons, the interface language by default, the choice kept
       in the browser; the Google Translate link follows it.
       Done when: tapping a word and selecting a phrase each return a translation in the
       language picked.
@@ -258,7 +259,7 @@ Templates stay in `app/templates/<feature>/`.
 - [ ] If the four 1.0 passages are on Neon, make them private to their author
       (`is_common = false`, `owner_id` set) before anyone else signs up. Content imports run
       from the machine with `DATABASE_URL`: `content/` is not in the Docker image.
-- [ ] Update README (settings table: `SIGNUP_CODE`, `MYMEMORY_EMAIL`; the data model, where
+- [ ] Update README (settings table: `SIGNUP_CODE`; the data model, where
       attempts now keep a copy instead of `option_order`), CHANGELOG; merge `v2`
       into `main`; tag `v2.0.0`; GitHub release.
 - [ ] Check production: log in, old results, each practice type, each language, sign-up with
@@ -271,7 +272,6 @@ Templates stay in `app/templates/<feature>/`.
 | Grammar  | `GET /grammar` (start form), `POST /grammar/sessions` → the session's attempt page |
 | Manage   | `/manage/{passages,grammar}` with `new`, `{id}/edit`, `{id}/delete`, `import`      |
 | Settings | `POST /settings/language`                                                          |
-| API      | `GET /api/translate?q=…&to=…`                                                      |
 
 ## Later (after 2.0)
 
@@ -291,7 +291,9 @@ Templates stay in `app/templates/<feature>/`.
     calendar reads `attempts.submitted_at`, so that needs a `speaking_sessions` table (user,
     set, finished_at) and `POST /speaking/{id}/finish` calling `record_activity()`.
 
-- Translation cache table, if lookups feel slow or reach MyMemory's daily limit.
+- A translation endpoint on the server, if a provider with a key is needed (meanings in
+  context from a language model, a dictionary API, more quota than MyMemory's free one).
+  Keys can't be sent to the browser, so the popup would then ask our server.
 - A passage glossary (meanings chosen for this passage, in each interface language), if
   MyMemory's word-by-word meanings fall short. The 1.0 `glossary` column was dropped in
   step 10 without ever being used.

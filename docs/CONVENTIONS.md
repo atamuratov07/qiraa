@@ -15,6 +15,9 @@ CDN · plain JavaScript (`reader.js`, `attempt.js`, `forms.js`) and Alpine.js fr
   Frankfurt). Every push to `main` deploys. The container runs `alembic upgrade head` on start.
 - Local: Postgres 18 from `docker-compose.yml`, with `qiraa` for the app and `qiraa_test` for
   tests. The app runs on the machine. Settings come from the environment, then `.env`.
+- Word translation: `reader.js` asks MyMemory (`api.mymemory.translated.net`) from the
+  browser, with no key; the server has no translation endpoint. A Content-Security-Policy
+  would have to allow it in `connect-src`.
 - CI: `.github/workflows/tests.yml` on every push: `alembic upgrade head`, `alembic check`,
   `alembic downgrade base`, then the tests, all on Postgres 18.
 

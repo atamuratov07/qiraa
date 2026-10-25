@@ -8,8 +8,9 @@ the data in a way that needs a migration of existing records, or changes how con
 ## [Unreleased]
 
 Work towards 2.0, planned in [docs/ROADMAP-v2.md](docs/ROADMAP-v2.md): personal and common
-content, in-app editors, grammar practice, a question navigator, sign-up with an invite
-code, and the interface in Uzbek, Russian and English. Speaking practice comes after 2.0.
+content, in-app editors, grammar practice, a question navigator, word translation in
+Uzbek, Russian or English, sign-up with an invite code, and the interface in the same three
+languages. Speaking practice comes after 2.0.
 
 ### Added
 
@@ -26,6 +27,8 @@ code, and the interface in Uzbek, Russian and English. Speaking practice comes a
 ### Removed
 
 - SQLite support. Development, tests and production all use Postgres.
+- `passages.glossary`, which nothing used. Content files with a `glossary` key no longer
+  load.
 
 ### Fixed
 
