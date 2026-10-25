@@ -1,3 +1,7 @@
+import random
+from collections.abc import Callable
+from datetime import datetime
+
 from psycopg.errors import UniqueViolation
 from sqlalchemy import Select, func, select
 from sqlalchemy.exc import IntegrityError
@@ -15,8 +19,9 @@ from app.content.service import (
 from app.core.permissions import editable, load_visible, visible
 from app.passages.models import Passage, PassageOption, PassageQuestion
 from app.passages.schemas import PassageEntry, PassageIn
-from app.passages.views import ManagedPassage, PassageCard, UnfinishedInfo
-from app.practice.models import Attempt
+from app.passages.views import ManagedPassage, PassageCard
+from app.practice.models import Attempt, AttemptContent, OptionCopy, QuestionCopy
+from app.practice.views import UnfinishedInfo
 
 
 class SlugTaken(Exception):
@@ -198,6 +203,82 @@ def managed_passages(db: Session, user: User) -> list[ManagedPassage]:
     ]
 
 
+def copy_passage(
+    passage: Passage, shuffle: Callable[[list[OptionCopy]], None] = random.shuffle
+) -> AttemptContent:
+    questions: list[QuestionCopy] = []
+    for q in passage.questions:
+        options: list[OptionCopy] = [
+            {"id": o.id, "text": o.text, "is_correct": o.is_correct} for o in q.options
+        ]
+        shuffle(options)
+        questions.append(
+            {
+                "id": q.id,
+                "prompt": q.prompt,
+                "explanation": q.explanation,
+                "options": options,
+            }
+        )
+
+    return {
+        "title": passage.title,
+        "level": passage.level,
+        "text": passage.text,
+        "translation_ru": passage.translation_ru,
+        "questions": questions,
+    }
+
+
+def open_attempt_for(db: Session, user: User, passage: Passage) -> Attempt | None:
+    return db.scalar(
+        select(Attempt).where(
+            Attempt.user_id == user.id,
+            Attempt.passage_id == passage.id,
+            Attempt.submitted_at.is_(None),
+        )
+    )
+
+
+def visible_passage_id(db: Session, user: User, attempt: Attempt) -> int | None:
+    if attempt.passage_id is None:
+        return None
+
+    return db.scalar(
+        select(Passage.id).where(
+            Passage.id == attempt.passage_id, visible(Passage, user)
+        )
+    )
+
+
+def start_attempt(db: Session, user: User, passage: Passage, now: datetime) -> Attempt:
+    existing = open_attempt_for(db, user, passage)
+    if existing is not None:
+        return existing
+
+    attempt = Attempt(
+        kind="passage",
+        user_id=user.id,
+        passage_id=passage.id,
+        content=copy_passage(passage),
+        started_at=now,
+        last_seen_at=now,
+        elapsed_seconds=0,
+    )
+    db.add(attempt)
+
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        winner = open_attempt_for(db, user, passage)
+        if winner is None:
+            raise
+        return winner
+
+    return attempt
+
+
 def _best_and_tries_query(user: User) -> Select[int | None, int, int]:
     return (
         select(
@@ -242,7 +323,11 @@ def passage_cards(db: Session, user: User) -> list[PassageCard]:
 
     open_attempts = db.scalars(
         select(Attempt)
-        .where(Attempt.user_id == user.id, Attempt.submitted_at.is_(None))
+        .where(
+            Attempt.kind == "passage",
+            Attempt.user_id == user.id,
+            Attempt.submitted_at.is_(None),
+        )
         .options(selectinload(Attempt.answers))
     ).all()
     unfinished = {

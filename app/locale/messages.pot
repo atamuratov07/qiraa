@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-23 18:50+0500\n"
+"POT-Creation-Date: 2026-10-25 10:41+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,31 +17,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:57
+#: app/main.py:59
 msgid "Bad Request"
 msgstr ""
 
-#: app/main.py:58
+#: app/main.py:60
 msgid "Unauthorized"
 msgstr ""
 
-#: app/main.py:59
+#: app/main.py:61
 msgid "Forbidden"
 msgstr ""
 
-#: app/main.py:60 app/main.py:91
+#: app/main.py:62 app/main.py:93
 msgid "Not Found"
 msgstr ""
 
-#: app/main.py:61
+#: app/main.py:63
 msgid "Method Not Allowed"
 msgstr ""
 
-#: app/main.py:62
+#: app/main.py:64
 msgid "Conflict"
 msgstr ""
 
-#: app/main.py:63
+#: app/main.py:65
 msgid "Internal Server Error"
 msgstr ""
 
@@ -182,25 +182,31 @@ msgstr ""
 msgid "The file is not UTF-8 text. Save it as UTF-8 and try again."
 msgstr ""
 
-#: app/passages/routes.py:41
+#: app/passages/routes.py:42
 msgid "Choose the correct option."
 msgstr ""
 
-#: app/passages/routes.py:86 app/passages/routes.py:110 app/passages/routes.py:131
-#: app/passages/routes.py:149
+#: app/passages/routes.py:87 app/passages/routes.py:111 app/passages/routes.py:132
+#: app/passages/routes.py:150
 msgid "Passage not found"
 msgstr ""
 
-#: app/passages/routes.py:212
+#: app/passages/routes.py:213
 #, python-format
 msgid "Another passage already uses the slug %(slug)s."
 msgstr ""
 
-#: app/practice/routes.py:24 app/practice/routes.py:108
+#: app/practice/models.py:97 app/templates/base.html:56
+#: app/templates/grammar/attempt.html:12 app/templates/grammar/start.html:17
+#: app/templates/grammar/start.html:20
+msgid "Grammar"
+msgstr ""
+
+#: app/practice/routes.py:30 app/practice/routes.py:115
 msgid "Attempt not found"
 msgstr ""
 
-#: app/practice/routes.py:94
+#: app/practice/routes.py:101
 msgid "This attempt is already submitted."
 msgstr ""
 
@@ -216,83 +222,83 @@ msgstr ""
 msgid "Passages"
 msgstr ""
 
-#: app/templates/base.html:56
+#: app/templates/base.html:57
 msgid "Manage"
 msgstr ""
 
-#: app/templates/base.html:57 app/templates/profile/profile.html:26
+#: app/templates/base.html:58 app/templates/profile/profile.html:26
 msgid "Profile"
 msgstr ""
 
-#: app/templates/base.html:59
+#: app/templates/base.html:60
 msgid "Log out"
 msgstr ""
 
-#: app/templates/base.html:74
+#: app/templates/base.html:75
 msgid "show"
 msgstr ""
 
-#: app/templates/base.html:75 app/templates/practice/attempt.html:38
+#: app/templates/base.html:76 app/templates/practice/_attempt.html:44
 msgid "hide"
 msgstr ""
 
-#: app/templates/base.html:76
+#: app/templates/base.html:77
 msgid "Show timer"
 msgstr ""
 
-#: app/templates/base.html:77 app/templates/practice/attempt.html:38
+#: app/templates/base.html:78 app/templates/practice/_attempt.html:44
 msgid "Hide timer"
 msgstr ""
 
-#: app/templates/base.html:78
+#: app/templates/base.html:79
 #, python-brace-format
 msgid "Answered {answered} of {total} · {status}"
 msgstr ""
 
-#: app/templates/base.html:79
+#: app/templates/base.html:80
 msgid "saving…"
 msgstr ""
 
-#: app/templates/base.html:80
+#: app/templates/base.html:81
 msgid "saved"
 msgstr ""
 
-#: app/templates/base.html:81
+#: app/templates/base.html:82
 #, python-brace-format
 msgid "not saved ({code}); the answer will be sent when you submit"
 msgstr ""
 
-#: app/templates/base.html:82
+#: app/templates/base.html:83
 msgid "no connection: not saved; the answer will be sent when you submit"
 msgstr ""
 
-#: app/templates/base.html:83
+#: app/templates/base.html:84
 #, python-brace-format
 msgid "Questions without an answer: {count}. Submit anyway?"
 msgstr ""
 
-#: app/templates/base.html:84
+#: app/templates/base.html:85
 msgid "Checking…"
 msgstr ""
 
-#: app/templates/base.html:85
+#: app/templates/base.html:86
 msgid "Translation is not available yet."
 msgstr ""
 
-#: app/templates/base.html:86
+#: app/templates/base.html:87
 #, python-brace-format
 msgid "Server error ({code})."
 msgstr ""
 
-#: app/templates/base.html:87
+#: app/templates/base.html:88
 msgid "Translation not found."
 msgstr ""
 
-#: app/templates/base.html:88
+#: app/templates/base.html:89
 msgid "Network error. Try the link below."
 msgstr ""
 
-#: app/templates/base.html:89
+#: app/templates/base.html:90
 #, python-brace-format
 msgid "Question {num}"
 msgstr ""
@@ -442,6 +448,57 @@ msgstr ""
 msgid "Copied"
 msgstr ""
 
+#: app/templates/grammar/result.html:10
+msgid "New session"
+msgstr ""
+
+#: app/templates/grammar/start.html:26 app/templates/passages/list.html:58
+#, python-format
+msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
+msgstr ""
+
+#: app/templates/grammar/start.html:29 app/templates/passages/list.html:60
+#: app/templates/practice/_attempt.html:94
+msgid "Continue"
+msgstr ""
+
+#: app/templates/grammar/start.html:31 app/templates/practice/_attempt.html:97
+msgid "Discard this attempt and its saved answers?"
+msgstr ""
+
+#: app/templates/grammar/start.html:33 app/templates/practice/_attempt.html:99
+msgid "Discard and start over"
+msgstr ""
+
+#: app/templates/grammar/start.html:39
+msgid "No grammar questions yet."
+msgstr ""
+
+#: app/templates/grammar/start.html:45
+msgid "This pool has no questions yet."
+msgstr ""
+
+#: app/templates/grammar/start.html:49
+msgid "Common and mine"
+msgstr ""
+
+#: app/templates/grammar/start.html:49
+msgid "Only mine"
+msgstr ""
+
+#: app/templates/grammar/start.html:59
+msgid "Questions"
+msgstr ""
+
+#: app/templates/grammar/start.html:64 app/templates/passages/start.html:51
+msgid "Start"
+msgstr ""
+
+#: app/templates/passages/attempt.html:34 app/templates/passages/result.html:24
+#: app/templates/passages/start.html:54
+msgid "All passages"
+msgstr ""
+
 #: app/templates/passages/editor.html:20
 msgid "Edit passage"
 msgstr ""
@@ -572,15 +629,6 @@ msgstr[1] ""
 msgid "New"
 msgstr ""
 
-#: app/templates/passages/list.html:58
-#, python-format
-msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
-msgstr ""
-
-#: app/templates/passages/list.html:60 app/templates/practice/attempt.html:100
-msgid "Continue"
-msgstr ""
-
 #: app/templates/passages/list.html:62
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr ""
@@ -613,6 +661,14 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
+#: app/templates/passages/result.html:21
+msgid "Try again"
+msgstr ""
+
+#: app/templates/passages/result.html:37
+msgid "Russian translation"
+msgstr ""
+
 #: app/templates/passages/start.html:47
 #, python-format
 msgid "best score %(best)s%% in %(count)s attempt"
@@ -620,66 +676,41 @@ msgid_plural "best score %(best)s%% in %(count)s attempts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/passages/start.html:51
-msgid "Start"
-msgstr ""
-
-#: app/templates/passages/start.html:54 app/templates/practice/attempt.html:107
-#: app/templates/practice/result.html:37
-msgid "All passages"
-msgstr ""
-
-#: app/templates/practice/attempt.html:77
+#: app/templates/practice/_attempt.html:71
 #, python-format
 msgid "Answered %(answered)s of %(total)s · saved"
 msgstr ""
 
-#: app/templates/practice/attempt.html:80
+#: app/templates/practice/_attempt.html:74
 msgid "Check answers"
 msgstr ""
 
-#: app/templates/practice/attempt.html:90
+#: app/templates/practice/_attempt.html:84
 msgid "Paused"
 msgstr ""
 
-#: app/templates/practice/attempt.html:93
+#: app/templates/practice/_attempt.html:87
 #, python-format
 msgid ""
 "Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"
 "time>%(time)s</span> elapsed"
 msgstr ""
 
-#: app/templates/practice/attempt.html:103
-msgid "Discard this attempt and its saved answers?"
-msgstr ""
-
-#: app/templates/practice/attempt.html:105
-msgid "Discard and start over"
-msgstr ""
-
-#: app/templates/practice/result.html:18
+#: app/templates/practice/_result.html:24
 msgid "Result"
 msgstr ""
 
-#: app/templates/practice/result.html:29
+#: app/templates/practice/_result.html:35
 #, python-format
 msgid "%(percent)s%% correct in %(time)s"
 msgstr ""
 
-#: app/templates/practice/result.html:34
-msgid "Try again"
-msgstr ""
-
-#: app/templates/practice/result.html:61
+#: app/templates/practice/_result.html:59
 msgid "your answer"
 msgstr ""
 
-#: app/templates/practice/result.html:65
+#: app/templates/practice/_result.html:63
 msgid "No answer"
-msgstr ""
-
-#: app/templates/practice/result.html:82
-msgid "Russian translation"
 msgstr ""
 
 #: app/templates/profile/profile.html:29
@@ -730,35 +761,35 @@ msgstr ""
 msgid "Recent quizzes"
 msgstr ""
 
-#: app/templates/profile/profile.html:74
+#: app/templates/profile/profile.html:78
 msgid "Delete this result"
 msgstr ""
 
-#: app/templates/profile/profile.html:78
+#: app/templates/profile/profile.html:82
 msgid "Nothing here yet."
 msgstr ""
 
-#: app/templates/profile/profile.html:78
+#: app/templates/profile/profile.html:82
 msgid "Pick a passage"
 msgstr ""
 
-#: app/templates/profile/profile.html:83
+#: app/templates/profile/profile.html:87
 msgid "Account deletion"
 msgstr ""
 
-#: app/templates/profile/profile.html:84
+#: app/templates/profile/profile.html:88
 msgid "Deletes your account and all your attempts and answers. This can't be undone."
 msgstr ""
 
-#: app/templates/profile/profile.html:87
+#: app/templates/profile/profile.html:91
 msgid "Delete your account and all progress for good?"
 msgstr ""
 
-#: app/templates/profile/profile.html:88
+#: app/templates/profile/profile.html:92
 msgid "Confirm with your password"
 msgstr ""
 
-#: app/templates/profile/profile.html:92
+#: app/templates/profile/profile.html:96
 msgid "Delete account"
 msgstr ""
 

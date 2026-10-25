@@ -1,5 +1,3 @@
-import random
-from collections.abc import Callable
 from datetime import datetime, timedelta
 
 from sqlalchemy import select
@@ -7,14 +5,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.auth.models import User
-from app.core.permissions import visible
 from app.core.timeutils import as_utc, local_day
-from app.passages.models import Passage
 from app.practice.models import (
     Attempt,
     AttemptAnswer,
     AttemptContent,
-    OptionCopy,
     QuestionCopy,
 )
 from app.profile.streaks import record_activity
@@ -62,46 +57,9 @@ def has_option(content: AttemptContent, question_id: int, option_id: int) -> boo
     )
 
 
-def copy_passage(
-    passage: Passage, shuffle: Callable[[list[OptionCopy]], None] = random.shuffle
-) -> AttemptContent:
-    questions: list[QuestionCopy] = []
-    for q in passage.questions:
-        options: list[OptionCopy] = [
-            {"id": o.id, "text": o.text, "is_correct": o.is_correct} for o in q.options
-        ]
-        shuffle(options)
-        questions.append(
-            {
-                "id": q.id,
-                "prompt": q.prompt,
-                "explanation": q.explanation,
-                "options": options,
-            }
-        )
-
-    return {
-        "title": passage.title,
-        "level": passage.level,
-        "text": passage.text,
-        "translation_ru": passage.translation_ru,
-        "questions": questions,
-    }
-
-
 def _require_open(attempt: Attempt) -> None:
     if attempt.submitted_at is not None:
         raise AttemptClosed(f"Attempt {attempt.id} is already submitted.")
-
-
-def open_attempt_for(db: Session, user: User, passage: Passage) -> Attempt | None:
-    return db.scalar(
-        select(Attempt).where(
-            Attempt.user_id == user.id,
-            Attempt.passage_id == passage.id,
-            Attempt.submitted_at.is_(None),
-        )
-    )
 
 
 def load_attempt(db: Session, user: User, attempt_id: int) -> Attempt | None:
@@ -109,45 +67,6 @@ def load_attempt(db: Session, user: User, attempt_id: int) -> Attempt | None:
 
     if attempt is None or attempt.user_id != user.id:
         return None
-
-    return attempt
-
-
-def visible_passage_id(db: Session, user: User, attempt: Attempt) -> int | None:
-    if attempt.passage_id is None:
-        return None
-
-    return db.scalar(
-        select(Passage.id).where(
-            Passage.id == attempt.passage_id, visible(Passage, user)
-        )
-    )
-
-
-def start(db: Session, user: User, passage: Passage, now: datetime) -> Attempt:
-    existing = open_attempt_for(db, user, passage)
-    if existing is not None:
-        return existing
-
-    attempt = Attempt(
-        kind="passage",
-        user_id=user.id,
-        passage_id=passage.id,
-        content=copy_passage(passage),
-        started_at=now,
-        last_seen_at=now,
-        elapsed_seconds=0,
-    )
-    db.add(attempt)
-
-    try:
-        db.commit()
-    except IntegrityError:
-        db.rollback()
-        winner = open_attempt_for(db, user, passage)
-        if winner is None:
-            raise
-        return winner
 
     return attempt
 

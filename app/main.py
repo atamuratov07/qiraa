@@ -17,6 +17,7 @@ from app.core.i18n import N_, LocaleMiddleware, _
 from app.core.redirects import return_path
 from app.core.templating import render
 from app.core.views import ErrorPage
+from app.grammar.routes import router as grammar_router
 from app.passages.routes import router as passages_router
 from app.practice.api import router as api_router
 from app.practice.routes import router as practice_router
@@ -28,6 +29,7 @@ app.mount("/static", StaticFiles(directory=APP_DIR / "static"), name="static")
 
 for router in (
     auth_router,
+    grammar_router,
     passages_router,
     practice_router,
     api_router,

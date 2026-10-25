@@ -23,9 +23,11 @@ from app.passages.service import (
     delete_passage,
     load_passage,
     managed_passages,
+    open_attempt_for,
     passage_cards,
     passage_in,
     passage_stats,
+    start_attempt,
     update_passage,
 )
 from app.passages.views import (
@@ -35,7 +37,6 @@ from app.passages.views import (
     PassagesPage,
     PassageStartPage,
 )
-from app.practice.service import open_attempt_for, start
 from app.profile.streaks import visible_streak
 
 EDITOR_MESSAGES: dict[str, str] = {"bad_answer": N_("Choose the correct option.")}
@@ -125,12 +126,12 @@ def passage_start(
 
 
 @router.post("/passages/{pid}/attempts")
-def start_attempt(pid: int, db: DB, user: CurrentUser) -> RedirectResponse:
+def new_attempt(pid: int, db: DB, user: CurrentUser) -> RedirectResponse:
     passage = load_passage(db, user, pid)
     if passage is None:
         raise HTTPException(404, _("Passage not found"))
 
-    attempt = start(db, user, passage, now=datetime.now(UTC))
+    attempt = start_attempt(db, user, passage, now=datetime.now(UTC))
     return RedirectResponse(f"/attempts/{attempt.id}", status_code=303)
 
 

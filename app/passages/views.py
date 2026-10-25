@@ -5,14 +5,7 @@ from app.auth.models import User
 from app.content.schemas import MAX_OPTIONS, MIN_OPTIONS
 from app.passages.models import Passage
 from app.passages.schemas import MAX_LEVEL, MAX_TITLE
-
-
-@dataclass(frozen=True, slots=True)
-class UnfinishedInfo:
-    id: int
-    answered: int
-    total: int
-    elapsed_seconds: int
+from app.practice.views import UnfinishedInfo
 
 
 @dataclass(frozen=True, slots=True)

@@ -12,7 +12,7 @@
                        .accuracy         0-100 int, or None if nothing answered yet
                        .passages_done    distinct passages attempted
                        .passages_total   passages in the bank
-    recent           the latest SUBMITTED attempts, each with .id .score .total
+    recent           the latest SUBMITTED attempts, each with .id .kind .score .total
                      .submitted_at (datetime) .elapsed_seconds and .display_title
     calendar         optional; list of {"date": date, "count": int}, oldest first,
                      e.g. the last 35 days. Leave it out and the block is hidden.
@@ -64,7 +64,11 @@
   {% set pct = (100 * a.score / a.total) if a.total else 0 %}
     <div class="flex items-center gap-2 border-b border-line last:border-0">
     <a href="/attempts/{{ a.id }}" class="flex flex-1 items-center gap-4 py-2.5 hover:bg-paper">
+      {% if a.kind == "passage" %}
       <span class="flex-1 font-arabic text-lg" lang="ar" dir="rtl">{{ a.display_title }}</span>
+      {% else %}
+      <span class="flex-1">{{ a.display_title }}</span>
+      {% endif %}
       <span class="text-sm text-muted">{{ a.submitted_at | local_date("MMMd") }}</span>
       <span class="w-12 text-end text-sm tabular-nums text-muted">{{ mmss(a.elapsed_seconds) }}</span>
       <span class="w-12 text-end text-sm font-semibold {{ 'text-accent' if pct >= 80 else ('text-gold' if pct >= 50 else 'text-bad') }}">{{ a.score }}/{{ a.total }}</span>

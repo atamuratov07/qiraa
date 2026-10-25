@@ -1,0 +1,44 @@
+{#
+  passages/result.html: a submitted passage attempt, the review beside the passage.
+  The layout and the full context are in practice/_result.html; here:
+    title       the passage title, or the start of its text
+    passage_id  also for "Try again"; None once the passage is deleted or hidden (no
+                "Try again" then)
+    content     .text .translation_ru besides the questions
+#}
+{% extends "practice/_result.html" %}
+
+{% block columns %}lg:grid-cols-[1fr_1.15fr]{% endblock %}
+
+{% block heading %}
+<h1 class="w-fit font-arabic text-2xl font-bold" lang="ar" dir="rtl">{{ title }}</h1>
+{% endblock %}
+
+{% block actions %}
+{# a new attempt is created on the server, so this is a POST form, not a link #}
+{% if passage_id %}
+<form method="post" action="/passages/{{ passage_id }}/attempts">
+  <button class="cursor-pointer rounded-xl bg-accent px-4 py-2 font-semibold text-white hover:brightness-110">{{ _("Try again") }}</button>
+</form>
+{% endif %}
+<a href="/passages" class="rounded-xl border border-accent px-4 py-2 font-semibold text-accent hover:bg-accent-soft">{{ _("All passages") }}</a>
+{% endblock %}
+
+{% block aside %}
+<article class="rounded-2xl border border-line bg-white p-6 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-auto">
+  <div class="font-arabic text-2xl leading-[2.2]" lang="ar" dir="rtl"
+       data-tappable {% if passage_id %}data-passage-id="{{ passage_id }}"{% endif %}>
+    {% for para in content.text.strip().split("\n\n") %}
+    <p class="mb-4">{{ para }}</p>
+    {% endfor %}
+  </div>
+  {% if content.translation_ru %}
+  <details class="mt-2">
+    <summary class="cursor-pointer font-semibold text-accent">{{ _("Russian translation") }}</summary>
+    <div lang="ru" class="mt-2 space-y-3">
+      {% for para in content.translation_ru.strip().split("\n\n") %}<p>{{ para }}</p>{% endfor %}
+    </div>
+  </details>
+  {% endif %}
+</article>
+{% endblock %}

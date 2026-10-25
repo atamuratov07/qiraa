@@ -12,7 +12,7 @@ from app.grammar.schemas import GrammarEntry, GrammarFile
 from app.grammar.service import import_grammar
 from app.passages.models import Passage, PassageOption, PassageQuestion
 from app.passages.schemas import PassageEntry, PassageFile
-from app.passages.service import import_passages
+from app.passages.service import import_passages, start_attempt
 from app.practice import service
 from app.practice.models import Attempt
 from tests.factories import T0
@@ -60,7 +60,7 @@ def test_reimporting_updates_the_passage_and_keeps_results(
         [True, False],
     ]
 
-    attempt = service.start(db, user, passage, T0)
+    attempt = start_attempt(db, user, passage, T0)
     q1 = attempt.content["questions"][0]
     right = next(o["id"] for o in q1["options"] if o["is_correct"])
     service.submit(db, attempt, {q1["id"]: right}, T0)

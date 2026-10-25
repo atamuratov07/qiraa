@@ -12,8 +12,8 @@ from app.auth.service import SESSION_COOKIE, create_session
 from app.core.i18n import use_locale
 from app.core.templating import local_date
 from app.passages.models import Passage
+from app.passages.service import copy_passage
 from app.practice.models import Attempt, AttemptAnswer
-from app.practice.service import copy_passage
 from app.profile.service import CALENDAR_DAYS, profile_context
 from app.profile.views import ProfileStats
 from tests.factories import T0

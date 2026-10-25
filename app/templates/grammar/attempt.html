@@ -1,0 +1,13 @@
+{#
+  grammar/attempt.html: an unfinished grammar session. The layout and the context are in
+  practice/_attempt.html.
+#}
+{% extends "practice/_attempt.html" %}
+
+{% block columns %}mx-auto max-w-3xl{% endblock %}
+
+{% block discard_next %}/grammar{% endblock %}
+
+{% block back_link %}
+<a href="/grammar" class="mt-3 inline-block text-sm text-accent hover:underline">← {{ _("Grammar") }}</a>
+{% endblock %}

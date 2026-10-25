@@ -57,17 +57,23 @@ commands for running the site (`make-admin`, `import`, `check`). `app/locale/` h
 - `auth/`: `User`, `UserSession` · `deps.py` `CurrentUser`, `MaybeUser`, `LoginRequired` ·
   `security.py` password hashing, session tokens.
 - `passages/`: `Passage`, `PassageQuestion`, `PassageOption` · `schemas.py` `PassageIn`,
-  `QuestionIn` and their limits (shared by YAML and the editor) · `apply_passage()`, passage
-  list statistics, start card · `create_passage()`, `update_passage()`, `passage_in()`, the
-  manage list and the editor.
-- `content/`: content files, no models · `schemas.py` `PassageEntry`, `ContentFile` ·
-  `loader.py` `parse()`, `decode()` · `yaml_tree.py` line numbers (see
-  [CONTENT-LOADER.md](CONTENT-LOADER.md)) · `errors.py` `LineError`, `ContentError`,
-  `describe()` · `service.py` `import_passages()` · `prompt.py` the chatbot prompt ·
-  the import page.
+  `PassageEntry`, `PassageFile` · `prompt.py` · `apply_passage()`, `import_passages()` ·
+  starting an attempt (`start_attempt()`, `copy_passage()`, `visible_passage_id()`) ·
+  passage list statistics, start card · `create_passage()`, `update_passage()`,
+  `passage_in()`, the manage list and the editor.
+- `grammar/`: `GrammarQuestion`, `GrammarOption` · `schemas.py` `GrammarEntry`,
+  `GrammarFile` · `prompt.py` · `apply_question()`, `import_grammar()` · sessions
+  (`start_session()`, `open_session_for()`, `copy_questions()`) and the start page.
+- `content/`: what content files share, no models · `schemas.py` `QuestionIn`, its limits,
+  `Slug`, `WithSlug` · `loader.py` `parse()`, `parse_file()`, `decode()` · `yaml_tree.py`
+  line numbers (see [CONTENT-LOADER.md](CONTENT-LOADER.md)) · `errors.py` `LineError`,
+  `ContentError`, `describe()` · `service.py` `slug_scope()`, `commit_import()` ·
+  `prompt.py` the rules both prompts share · the import pages.
 - `practice/`: `Attempt`, `AttemptAnswer`, and the copy an attempt keeps (`AttemptContent`,
-  `QuestionCopy`, `OptionCopy`) · attempt service (`copy_passage()`, `has_option()`,
-  `grade()`) · pages, `api.py` and `schemas.py` for the JSON endpoints.
+  `QuestionCopy`, `OptionCopy`) · what every attempt shares once started (`save_answer()`,
+  `heartbeat()`, `submit()`, `grade()`, `has_option()`) · the attempt and result layouts
+  (`_attempt.html`, `_result.html`), which each kind's own pages extend · `api.py` and
+  `schemas.py` for the JSON endpoints.
 - `profile/`: `streaks.py` · profile statistics and page.
 
 A feature has `models.py`, `service.py`, `routes.py` and `views.py` (dataclasses and one
@@ -130,17 +136,18 @@ at the top.
     `base.html`, with `{name}` placeholders. `/api` errors stay English. After changing any
     text, run `pybabel extract` and `update`, then translate `ru` and `uz`.
 15. **Attempts read their own copy.** Starting an attempt copies what it shows into
-    `attempt.content` (`copy_passage()`). The attempt page, grading, autosave and the result
-    page read that copy, never the live passage; `Attempt` has no `passage` relationship.
-    Answers store ids from the copy with no foreign keys, so the service checks them
-    (`has_option()`). Editing or deleting content never changes a result: a deleted passage
-    only sets `passage_id` to NULL. The pages link to the passage only while I can see it
-    (`visible_passage_id()`).
+    `attempt.content` (`copy_passage()`; `copy_questions()` for a grammar session). The
+    attempt page, grading, autosave and the result page read that copy, never the live
+    passage; `Attempt` has no `passage` relationship. Answers store ids from the copy with
+    no foreign keys, so the service checks them (`has_option()`). Editing or deleting
+    content never changes a result: a deleted passage only sets `passage_id` to NULL. The
+    pages link to the passage only while I can see it (`visible_passage_id()`).
 
-16. **Content files.** Every passage in a file has a slug written by hand. An import looks
-    it up among common passages, or among the importer's private ones (a partial unique
-    index for each), updates what it finds and replaces its questions: clear, flush, then
-    insert, because one flush runs inserts before deletes. Errors are `LineError`s with a
+16. **Content files.** A file holds one kind of content (`passages:` or `grammar:`), and
+    every entry has a slug written by hand. An import looks it up among common rows of that
+    kind, or among the importer's private ones (a partial unique index for each), updates
+    what it finds and replaces its questions or options: clear, flush, then insert, because
+    one flush runs inserts before deletes. Errors are `LineError`s with a
     type (Pydantic's or ours) and the line from the YAML node tree, translated where they
     are shown (`describe()`), so the CLI prints English. Limits are constants in the
     schemas, and the chatbot prompt reads them.
@@ -149,6 +156,16 @@ at the top.
     it with `PassageIn.model_validate_json()` in its body, since a failed check in the
     signature shows the 404 page. `messages_by_path()` keys the errors by path, such as
     `questions[0].options[1]`, for the field that shows them.
+
+18. **Each content feature owns its content end to end.** `passages/`, `grammar/` and later
+    `speaking/` each hold their models, file schema, chatbot prompt, import, manage pages,
+    editor, and how an attempt on them starts (what goes into `attempt.content`).
+    `practice/` holds what every attempt shares once it has started, and imports no content
+    feature; `content/` holds what content files share. Code moves down into `practice/`,
+    `content/` or `core/` only when every kind uses it the same way; a few lines repeated
+    per feature, checked by a shared `TypedDict`, are better than one function that knows
+    every feature's models. Before building on an older decision, check that its reason
+    still holds: much of 1.0 assumed passages were the only content.
 
 ## Tests
 

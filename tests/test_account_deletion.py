@@ -15,6 +15,7 @@ from app.auth.security import hash_password
 from app.auth.service import delete_account
 from app.grammar.models import GrammarOption, GrammarQuestion
 from app.passages.models import Passage, PassageOption, PassageQuestion
+from app.passages.service import start_attempt
 from app.practice import service
 from app.practice.models import Attempt, AttemptAnswer
 from tests.factories import T0, make_grammar_question, make_passage, make_question
@@ -39,9 +40,9 @@ def content(db: Session, user: User, other_user: User) -> None:
     )
     db.commit()
 
-    mine = service.start(db, user, private, T0)
+    mine = start_attempt(db, user, private, T0)
     service.save_answer(db, mine, question_id=1, option_id=11)
-    theirs = service.start(db, other_user, published, T0)
+    theirs = start_attempt(db, other_user, published, T0)
     service.save_answer(db, theirs, question_id=2, option_id=22)
 
 

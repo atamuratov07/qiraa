@@ -17,6 +17,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.base import Base, unique_where
+from app.core.i18n import _
 from app.core.text import display_title
 
 if TYPE_CHECKING:
@@ -92,6 +93,9 @@ class Attempt(Base):
 
     @property
     def display_title(self) -> str:
+        if self.kind == "grammar":
+            return _("Grammar")
+
         return display_title(self.content["title"], self.content["text"])
 
 

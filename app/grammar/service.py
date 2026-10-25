@@ -1,4 +1,10 @@
-from sqlalchemy import select
+import random
+from collections.abc import Callable, Sequence
+from datetime import datetime
+from typing import Literal
+
+from sqlalchemy import ColumnElement, func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.auth.models import User
@@ -10,8 +16,145 @@ from app.content.service import (
     commit_import,
     slug_scope,
 )
+from app.core.permissions import visible
 from app.grammar.models import GrammarOption, GrammarQuestion
 from app.grammar.schemas import GrammarEntry
+from app.grammar.views import GrammarPage, PoolCounts
+from app.practice.models import Attempt, AttemptContent, OptionCopy, QuestionCopy
+from app.practice.views import UnfinishedInfo
+
+type Pool = Literal["all", "mine"]
+
+
+class EmptyPool(Exception):
+    pass
+
+
+def pool_filter(user: User, pool: Pool) -> ColumnElement[bool]:
+    if pool == "mine":
+        return GrammarQuestion.owner_id == user.id
+
+    return visible(GrammarQuestion, user)
+
+
+def pool_counts(db: Session, user: User) -> PoolCounts:
+    total, mine = db.execute(
+        select(
+            func.count(), func.count().filter(GrammarQuestion.owner_id == user.id)
+        ).where(visible(GrammarQuestion, user))
+    ).one()
+
+    return PoolCounts(total, mine)
+
+
+def open_session_for(db: Session, user: User) -> Attempt | None:
+    return db.scalar(
+        select(Attempt)
+        .where(
+            Attempt.user_id == user.id,
+            Attempt.kind == "grammar",
+            Attempt.submitted_at.is_(None),
+        )
+        .options(selectinload(Attempt.answers))
+    )
+
+
+def copy_questions(
+    questions: Sequence[GrammarQuestion],
+    shuffle: Callable[[list[OptionCopy]], None] = random.shuffle,
+) -> list[QuestionCopy]:
+    copies: list[QuestionCopy] = []
+
+    for q in questions:
+        options: list[OptionCopy] = [
+            {"id": o.id, "text": o.text, "is_correct": o.is_correct} for o in q.options
+        ]
+        shuffle(options)
+        copies.append(
+            {
+                "id": q.id,
+                "prompt": q.prompt,
+                "explanation": q.explanation,
+                "options": options,
+            }
+        )
+
+    return copies
+
+
+def start_session(
+    db: Session,
+    user: User,
+    pool: Pool,
+    size: int,
+    now: datetime,
+    sample: Callable[[Sequence[int], int], list[int]] = random.sample,
+) -> Attempt:
+    existing = open_session_for(db, user)
+    if existing is not None:
+        return existing
+
+    ids = db.scalars(select(GrammarQuestion.id).where(pool_filter(user, pool))).all()
+    if not ids:
+        raise EmptyPool
+
+    chosen = sample(ids, min(size, len(ids)))
+    rows = {
+        q.id: q
+        for q in db.scalars(
+            select(GrammarQuestion)
+            .where(GrammarQuestion.id.in_(chosen))
+            .options(selectinload(GrammarQuestion.options))
+        )
+    }
+
+    content: AttemptContent = {
+        "title": None,
+        "level": "",
+        "text": "",
+        "translation_ru": None,
+        "questions": copy_questions([rows[i] for i in chosen]),
+    }
+
+    attempt = Attempt(
+        kind="grammar",
+        user_id=user.id,
+        content=content,
+        started_at=now,
+        last_seen_at=now,
+        elapsed_seconds=0,
+    )
+    db.add(attempt)
+
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        winner = open_session_for(db, user)
+        if winner is None:
+            raise
+        return winner
+
+    return attempt
+
+
+def start_page(db: Session, user: User, *, empty_pool: bool = False) -> GrammarPage:
+    session = open_session_for(db, user)
+    unfinished = None
+    if session is not None:
+        unfinished = UnfinishedInfo(
+            id=session.id,
+            answered=len(session.answers),
+            total=len(session.content["questions"]),
+            elapsed_seconds=session.elapsed_seconds,
+        )
+
+    return {
+        "user": user,
+        "counts": pool_counts(db, user),
+        "unfinished": unfinished,
+        "empty_pool": empty_pool,
+    }
 
 
 def build_options(data: QuestionIn) -> list[GrammarOption]:

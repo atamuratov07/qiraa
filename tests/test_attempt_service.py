@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.auth.models import User
 from app.core import timeutils
+from app.passages import service as passage_service
 from app.passages.models import Passage
 from app.passages.service import passage_cards, passage_stats
 from app.practice import service
@@ -37,7 +38,7 @@ def loaded(db: Session, user: User, attempt: Attempt) -> Attempt:
 def test_start_creates_an_attempt_with_every_question_shuffled(
     db: Session, user: User, passage: Passage
 ) -> None:
-    attempt = service.start(db, user, passage, T0)
+    attempt = passage_service.start_attempt(db, user, passage, T0)
 
     assert attempt.id is not None
     assert timeutils.as_utc(attempt.started_at) == T0
@@ -52,7 +53,7 @@ def test_start_creates_an_attempt_with_every_question_shuffled(
 def test_start_saves_the_copy(
     db: Session, engine: Engine, user: User, passage: Passage
 ) -> None:
-    attempt = service.start(db, user, passage, T0)
+    attempt = passage_service.start_attempt(db, user, passage, T0)
 
     with Session(engine) as fresh:
         assert fresh.get_one(Attempt, attempt.id).content == attempt.content
@@ -61,8 +62,8 @@ def test_start_saves_the_copy(
 def test_start_twice_returns_the_same_open_attempt(
     db: Session, user: User, passage: Passage
 ) -> None:
-    first = service.start(db, user, passage, T0)
-    second = service.start(db, user, passage, T0)
+    first = passage_service.start_attempt(db, user, passage, T0)
+    second = passage_service.start_attempt(db, user, passage, T0)
     assert second.id == first.id
     assert len(db.scalars(select(Attempt)).all()) == 1
 
@@ -70,9 +71,9 @@ def test_start_twice_returns_the_same_open_attempt(
 def test_start_after_submitting_creates_a_new_attempt(
     db: Session, user: User, passage: Passage
 ) -> None:
-    first = loaded(db, user, service.start(db, user, passage, T0))
+    first = loaded(db, user, passage_service.start_attempt(db, user, passage, T0))
     service.submit(db, first, {}, T0)
-    assert service.start(db, user, passage, T0).id != first.id
+    assert passage_service.start_attempt(db, user, passage, T0).id != first.id
 
 
 def test_double_click_race_returns_the_winning_attempt(
@@ -88,14 +89,14 @@ def test_double_click_race_returns_the_winning_attempt(
         kind="passage",
         user_id=user.id,
         passage_id=passage.id,
-        content=service.copy_passage(passage),
+        content=passage_service.copy_passage(passage),
         started_at=T0,
         last_seen_at=T0,
     )
     db.add(winner)
     db.commit()
 
-    real_check = service.open_attempt_for
+    real_check = passage_service.open_attempt_for
     calls = 0
 
     def check_that_misses_once(*args: object) -> Attempt | None:
@@ -104,9 +105,9 @@ def test_double_click_race_returns_the_winning_attempt(
         return None if calls == 1 else real_check(db, user, passage)
 
     # monkeypatch replaces the function for this test only, then puts the original back
-    monkeypatch.setattr(service, "open_attempt_for", check_that_misses_once)
+    monkeypatch.setattr(passage_service, "open_attempt_for", check_that_misses_once)
 
-    result = service.start(db, user, passage, T0)
+    result = passage_service.start_attempt(db, user, passage, T0)
 
     assert result.id == winner.id
     assert calls == 2
@@ -151,7 +152,7 @@ def test_one_open_grammar_session_per_user(db: Session, user: User) -> None:
 def test_load_attempt_only_returns_your_own(
     db: Session, user: User, other_user: User, passage: Passage
 ) -> None:
-    attempt = service.start(db, user, passage, T0)
+    attempt = passage_service.start_attempt(db, user, passage, T0)
     assert service.load_attempt(db, user, attempt.id) is not None
     assert service.load_attempt(db, other_user, attempt.id) is None
     assert service.load_attempt(db, user, 999) is None
@@ -165,7 +166,7 @@ def test_load_attempt_only_returns_your_own(
 def test_save_answer_inserts_once_then_updates(
     db: Session, user: User, passage: Passage
 ) -> None:
-    attempt = service.start(db, user, passage, T0)
+    attempt = passage_service.start_attempt(db, user, passage, T0)
     service.save_answer(db, attempt, 1, 11)
     service.save_answer(db, attempt, 1, 12)
     service.save_answer(db, attempt, 1, 13)
@@ -185,7 +186,7 @@ def test_save_answer_race_between_two_fast_clicks(
     request) saves option 11 and commits. Click 2 then inserts too, the unique constraint
     on (attempt_id, question_id) rejects it, and save_answer must retry as an update.
     """
-    attempt = service.start(db, user, passage, T0)
+    attempt = passage_service.start_attempt(db, user, passage, T0)
     real_set_answer = service._set_answer  # pyright: ignore[reportPrivateUsage]
     calls = 0
 
@@ -231,7 +232,7 @@ def test_save_answer_rejects_options_that_dont_belong(
     question_id: int,
     option_id: int,
 ) -> None:
-    attempt = service.start(db, user, passage, T0)
+    attempt = passage_service.start_attempt(db, user, passage, T0)
     with pytest.raises(service.BadAnswer):
         service.save_answer(db, attempt, question_id, option_id)
     assert saved_rows(db) == []
@@ -245,7 +246,7 @@ def test_save_answer_rejects_options_that_dont_belong(
 def test_heartbeat_saves_and_returns_elapsed(
     db: Session, user: User, passage: Passage
 ) -> None:
-    attempt = service.start(db, user, passage, T0)
+    attempt = passage_service.start_attempt(db, user, passage, T0)
     assert service.heartbeat(db, attempt, T0 + timedelta(seconds=15)) == 15
     assert service.heartbeat(db, attempt, T0 + timedelta(seconds=30)) == 30
     db.expire_all()
@@ -259,7 +260,7 @@ def test_heartbeat_saves_and_returns_elapsed(
 
 
 def test_submit_grades_and_closes(db: Session, user: User, passage: Passage) -> None:
-    attempt = loaded(db, user, service.start(db, user, passage, T0))
+    attempt = loaded(db, user, passage_service.start_attempt(db, user, passage, T0))
 
     service.submit(db, attempt, {1: 11, 2: 22}, T0 + timedelta(seconds=20))
 
@@ -273,7 +274,7 @@ def test_submit_grades_and_closes(db: Session, user: User, passage: Passage) -> 
 def test_submit_keeps_autosaved_answers_and_ignores_bad_ids(
     db: Session, user: User, passage: Passage
 ) -> None:
-    attempt = service.start(db, user, passage, T0)
+    attempt = passage_service.start_attempt(db, user, passage, T0)
     service.save_answer(db, attempt, 2, 21)  # autosaved earlier (wrong answer)
     attempt = loaded(db, user, attempt)
 
@@ -287,7 +288,7 @@ def test_submit_keeps_autosaved_answers_and_ignores_bad_ids(
 def test_submit_ignores_an_option_of_another_question(
     db: Session, user: User, passage: Passage
 ) -> None:
-    attempt = loaded(db, user, service.start(db, user, passage, T0))
+    attempt = loaded(db, user, passage_service.start_attempt(db, user, passage, T0))
     service.submit(db, attempt, {1: 22, 2: 22}, T0)  # 22 is q2's correct option
     assert attempt.score == 1
     assert saved_rows(db) == [(2, 22)]
@@ -296,7 +297,7 @@ def test_submit_ignores_an_option_of_another_question(
 def test_submitted_attempt_cannot_change(
     db: Session, user: User, passage: Passage
 ) -> None:
-    attempt = loaded(db, user, service.start(db, user, passage, T0))
+    attempt = loaded(db, user, passage_service.start_attempt(db, user, passage, T0))
     service.submit(db, attempt, {1: 11}, T0)
 
     service.submit(db, attempt, {1: 12, 2: 22}, T0)  # a second submit does nothing
@@ -318,7 +319,7 @@ def test_submitted_attempt_cannot_change(
 def test_discard_deletes_the_attempt_and_its_answers(
     db: Session, user: User, passage: Passage
 ) -> None:
-    attempt = service.start(db, user, passage, T0)
+    attempt = passage_service.start_attempt(db, user, passage, T0)
     service.save_answer(db, attempt, 1, 11)
 
     service.discard(db, attempt)
@@ -331,7 +332,7 @@ def test_deleting_a_user_deletes_their_attempts(
     db: Session, user: User, passage: Passage
 ) -> None:
     """Checks the models' ON DELETE CASCADE, which account deletion relies on."""
-    attempt = service.start(db, user, passage, T0)
+    attempt = passage_service.start_attempt(db, user, passage, T0)
     service.save_answer(db, attempt, 1, 11)
 
     db.delete(user)
@@ -359,13 +360,15 @@ def test_passage_cards_for_a_new_user(
 def test_passage_cards_show_best_tries_and_unfinished(
     db: Session, user: User, other_user: User, passage: Passage, passage2: Passage
 ) -> None:
-    half = loaded(db, user, service.start(db, user, passage, T0))
+    half = loaded(db, user, passage_service.start_attempt(db, user, passage, T0))
     service.submit(db, half, {1: 11}, T0)  # 50%
-    full = loaded(db, user, service.start(db, user, passage, T0))
+    full = loaded(db, user, passage_service.start_attempt(db, user, passage, T0))
     service.submit(db, full, {1: 11, 2: 22}, T0)  # 100%
-    still_open = service.start(db, user, passage, T0)
+    still_open = passage_service.start_attempt(db, user, passage, T0)
     service.save_answer(db, still_open, 1, 11)
-    service.start(db, other_user, passage2, T0)  # someone else's: must not show up
+    passage_service.start_attempt(
+        db, other_user, passage2, T0
+    )  # someone else's: must not show up
 
     cards = {c.id: c for c in passage_cards(db, user)}
 
