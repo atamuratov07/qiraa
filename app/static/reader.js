@@ -20,6 +20,7 @@
   // splits "«الكتابُ،" into ["«", "الكتابُ", "،"]: letters + vowel marks in the middle
   const EDGES = /^([^\p{L}\p{M}]*)(.*?)([^\p{L}\p{M}]*)$/su;
   const MYMEMORY = "https://api.mymemory.translated.net/get";
+  const MAX_LENGTH = 500; // MyMemory refuses longer text
   const LANGUAGE_KEY = "qiraa.translateTo";
   const languageButtons = [...pop.querySelectorAll("[data-lang]")];
   let language = document.documentElement.lang;
@@ -113,8 +114,10 @@
     pop.style.top = `${top + window.scrollY}px`;
   }
 
+  // A translation is in the language picked; "…" and messages in the interface's.
   function show(answer, missing) {
     aEl.textContent = answer;
+    aEl.lang = missing ? document.documentElement.lang : language;
     aEl.classList.toggle("text-muted", missing);
   }
 
@@ -122,12 +125,15 @@
     const id = ++requestId;
     shown = { text, anchor };
     qEl.textContent = text;
-    aEl.lang = language;
     for (const b of languageButtons)
       b.setAttribute("aria-pressed", String(b.dataset.lang === language));
-    show("…", true);
     const google = { sl: "ar", tl: language, op: "translate", text };
     gLink.href = `https://translate.google.com/?${new URLSearchParams(google)}`;
+    if (text.length > MAX_LENGTH) {
+      show(t("tooLong"), true);
+      return place(anchor.getBoundingClientRect());
+    }
+    show("…", true);
     place(anchor.getBoundingClientRect());
 
     let answer = null;
@@ -186,7 +192,7 @@
       const sel = window.getSelection();
       if (sel.isCollapsed || !sel.rangeCount) return;
       const text = sel.toString().trim().replace(/\s+/g, " ");
-      if (!text || text.length > 120 || !ARABIC.test(text)) return;
+      if (!text || !ARABIC.test(text)) return;
       active?.classList.remove("on");
       active = null;
       lookup(text, sel.getRangeAt(0).cloneRange());

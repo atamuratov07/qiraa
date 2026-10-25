@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-25 21:27+0500\n"
+"POT-Creation-Date: 2026-10-25 22:34+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -324,14 +324,18 @@ msgid "Today's translation limit is used up. Try the link below."
 msgstr ""
 
 #: app/templates/base.html:120
-msgid "Translation not found."
+msgid "Too long to translate here. Try the link below."
 msgstr ""
 
 #: app/templates/base.html:121
-msgid "Network error. Try the link below."
+msgid "Translation not found."
 msgstr ""
 
 #: app/templates/base.html:122
+msgid "Network error. Try the link below."
+msgstr ""
+
+#: app/templates/base.html:123
 #, python-brace-format
 msgid "Question {num}"
 msgstr ""

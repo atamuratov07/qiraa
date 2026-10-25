@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-25 21:27+0500\n"
+"POT-Creation-Date: 2026-10-25 22:34+0500\n"
 "PO-Revision-Date: 2026-10-15 00:55+0500\n"
 "Last-Translator: Damir\n"
 "Language: ru\n"
@@ -323,14 +323,18 @@ msgid "Today's translation limit is used up. Try the link below."
 msgstr "Дневной лимит переводов исчерпан. Попробуйте ссылку ниже."
 
 #: app/templates/base.html:120
+msgid "Too long to translate here. Try the link below."
+msgstr "Слишком длинный текст для перевода здесь. Попробуйте ссылку ниже."
+
+#: app/templates/base.html:121
 msgid "Translation not found."
 msgstr "Перевод не найден."
 
-#: app/templates/base.html:121
+#: app/templates/base.html:122
 msgid "Network error. Try the link below."
 msgstr "Ошибка сети. Попробуйте ссылку ниже."
 
-#: app/templates/base.html:122
+#: app/templates/base.html:123
 #, python-brace-format
 msgid "Question {num}"
 msgstr "Вопрос {num}"

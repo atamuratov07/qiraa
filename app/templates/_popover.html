@@ -1,8 +1,8 @@
 {# The translation popup. Included by practice/_attempt.html and practice/_result.html; reader.js fills and positions it. #}
 <div id="tr-pop" hidden role="dialog" aria-live="polite"
      class="absolute z-41 w-max min-w-44 max-w-[min(340px,calc(100vw-16px))] rounded-xl border border-line bg-white px-4 py-3 shadow-xl">
-  <div data-q class="text-start font-content text-2xl font-semibold" dir="auto"></div>
-  <div data-a class="mt-1 mb-2 text-base"></div>
+  <div data-q class="line-clamp-3 text-start font-content text-2xl font-semibold" dir="auto"></div>
+  <div data-a class="mt-1 mb-2 max-h-48 overflow-y-auto text-base"></div>
   <div class="flex items-center justify-between gap-4 text-xs">
     <div class="flex gap-1" role="group" aria-label="{{ _("Translation language") }}">
       {% for code, name in languages.items() %}
