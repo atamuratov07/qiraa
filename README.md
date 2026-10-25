@@ -318,7 +318,6 @@ passages
   level             str, default ""         e.g. "A2"; never NULL, the list groups by it
   text              text                    a blank line starts a new paragraph
   translation_ru    text, nullable
-  glossary          JSON, default {}        {"السوق": "рынок"}; not used yet
 
 questions
   id                int, primary key

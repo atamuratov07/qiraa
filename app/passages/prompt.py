@@ -17,8 +17,6 @@ passages:
       В пятницу Ахмад пошёл на рынок с мамой.
 
       На рынке было много людей, поэтому они вернулись домой до полудня.
-    glossary:
-      سوق: рынок
     questions:
       - prompt: مَتَى ذَهَبَ أَحْمَدُ إِلَى السُّوقِ؟
         options:
@@ -41,8 +39,8 @@ The format, with one passage:
 {EXAMPLE}
 Rules:
 - The file has one key, `passages`: a list with one entry per passage in the material.
-  A passage has only these keys: slug, title, level, text, translation_ru, glossary,
-  questions. A question has only these keys: prompt, options, answer, explanation.
+  A passage has only these keys: slug, title, level, text, translation_ru, questions. A
+  question has only these keys: prompt, options, answer, explanation.
 - slug (required): lowercase Latin words joined by single hyphens, such as a2-market, at
   most {MAX_SLUG} characters, different for every passage in the file. Build it from the
   level and the topic.
@@ -51,7 +49,6 @@ Rules:
 - text (required): the Arabic passage exactly as in the source, keeping its vowel marks, in
   a `|` block. Separate paragraphs with one blank line.
 - translation_ru (optional): a Russian translation, also in a `|` block.
-- glossary (optional): difficult words without vowel marks, each with its Russian meaning.
 - questions (at least one): keep the source's questions in their order. If the source has
   none, write 4 to 6 comprehension questions in Arabic.
 {OPTION_RULES}\

@@ -266,12 +266,12 @@ Templates stay in `app/templates/<feature>/`.
 
 ## Routes added in 2.0 (draft)
 
-| Area     | Routes                                                                                                       |
-| -------- | ------------------------------------------------------------------------------------------------------------ |
-| Grammar  | `GET /grammar` (start form), `POST /grammar/sessions` → the session's attempt page                           |
-| Manage   | `/manage/{passages,grammar}` with `new`, `{id}/edit`, `{id}/delete`, `import`                                |
-| Settings | `POST /settings/language`                                                                                    |
-| API      | `GET /api/translate?q=…&to=…`                                                                                |
+| Area     | Routes                                                                             |
+| -------- | ---------------------------------------------------------------------------------- |
+| Grammar  | `GET /grammar` (start form), `POST /grammar/sessions` → the session's attempt page |
+| Manage   | `/manage/{passages,grammar}` with `new`, `{id}/edit`, `{id}/delete`, `import`      |
+| Settings | `POST /settings/language`                                                          |
+| API      | `GET /api/translate?q=…&to=…`                                                      |
 
 ## Later (after 2.0)
 
@@ -281,8 +281,8 @@ Templates stay in `app/templates/<feature>/`.
   - one timer for the whole list: the preparation countdown, then the speaking countdown;
   - a `speaking/` feature (rule 18): a `speaking_sets` table (id, `owner_id` → users.id
     nullable ON DELETE SET NULL, `is_common`, title, questions JSON list[str],
-    `prepare_seconds`, `speak_seconds`, created_at, CHECK `is_common OR owner_id IS NOT
-    NULL`), whose private sets account deletion removes;
+    `prepare_seconds`, `speak_seconds`, created_at, CHECK
+    `is_common OR owner_id IS NOT NULL`), whose private sets account deletion removes;
   - `/speaking` list, `/speaking/{id}` session page; before starting, both durations can be
     changed (defaults from the set, remembered in the browser per set);
   - `/manage/speaking` editor (one question per line, default durations), and speaking files

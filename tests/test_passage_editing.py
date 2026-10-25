@@ -20,7 +20,6 @@ def data(*answers: str) -> PassageIn:
         {
             "text": "الفقرة.",
             "translation_ru": "Абзац.",
-            "glossary": {"فقرة": "абзац"},
             "questions": [
                 {"prompt": f"سؤال {i}؟", "options": ["أ", "ب", "ج"], "answer": a}
                 for i, a in enumerate(answers, start=1)

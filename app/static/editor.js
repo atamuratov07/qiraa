@@ -1,8 +1,8 @@
 // The editors (passages/editor.html, grammar/editor.html). Alpine keeps the content while
 // it is edited; on submit it goes into one hidden field as JSON in the shape PassageIn or
-// QuestionIn reads. Questions, options and glossary rows carry a key, so x-for keeps each
-// input in its place, and the correct option is remembered by key: removing option A
-// must not move the answer from B to C.
+// QuestionIn reads. Questions and options carry a key, so x-for keeps each input in its
+// place, and the correct option is remembered by key: removing option A must not move
+// the answer from B to C.
 //
 // Both components render the question card from _editor.html, which asks path(qi, field)
 // for the error key: "questions[0].prompt" in a passage, "prompt" for one question.
@@ -74,23 +74,12 @@ document.addEventListener("alpine:init", () => {
       level: p.level ?? "",
       text: p.text ?? "",
       translation: p.translation_ru ?? "",
-      glossary: Object.entries(p.glossary ?? {}).map(([word, meaning]) => ({
-        key: kit.key(),
-        word,
-        meaning,
-      })),
       questions: (questions.length ? questions : [{}]).map(kit.question),
       limits: page.limits,
       errors: page.errors,
 
       path(qi, field) {
         return `questions[${qi}].${field}`;
-      },
-      glossaryError() {
-        const path = Object.keys(this.errors).find((p) =>
-          p.startsWith("glossary"),
-        );
-        return path ? this.errors[path] : "";
       },
       questionLabel(index) {
         return i18n.question.replace("{num}", index + 1);
@@ -104,14 +93,6 @@ document.addEventListener("alpine:init", () => {
         this.questions.splice(index, 1);
         this.errors = {};
       },
-      addWord() {
-        this.glossary.push({ key: kit.key(), word: "", meaning: "" });
-        this.errors = {};
-      },
-      removeWord(index) {
-        this.glossary.splice(index, 1);
-        this.errors = {};
-      },
 
       payload() {
         return {
@@ -119,11 +100,6 @@ document.addEventListener("alpine:init", () => {
           level: this.level,
           text: this.text,
           translation_ru: this.translation,
-          glossary: Object.fromEntries(
-            this.glossary
-              .filter((row) => row.word.trim() || row.meaning.trim())
-              .map((row) => [row.word, row.meaning]),
-          ),
           questions: this.questions.map(kit.payload),
         };
       },

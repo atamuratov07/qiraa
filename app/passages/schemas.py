@@ -31,7 +31,6 @@ class PassageIn(BaseModel):
     level: Annotated[str, StringConstraints(max_length=MAX_LEVEL)] = ""
     text: NonEmpty
     translation_ru: Annotated[str | None, AfterValidator(empty_to_none)] = None
-    glossary: dict[NonEmpty, NonEmpty] = Field(default_factory=dict)
     questions: Annotated[list[QuestionIn], Field(min_length=1)]
 
 

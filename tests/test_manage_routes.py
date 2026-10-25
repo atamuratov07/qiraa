@@ -22,7 +22,6 @@ def editor_form(*answers: str | None, prompt: str = "سؤال؟") -> dict[str, s
         "level": "A2",
         "text": "الفقرة.",
         "translation_ru": "",
-        "glossary": {},
         "questions": [
             {
                 "prompt": prompt,

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-25 16:39+0500\n"
+"POT-Creation-Date: 2026-10-25 20:03+0500\n"
 "PO-Revision-Date: 2026-10-15 00:55+0500\n"
 "Last-Translator: Damir\n"
 "Language: ru\n"
@@ -271,62 +271,62 @@ msgstr "Тексты"
 msgid "Profile"
 msgstr "Профиль"
 
-#: app/templates/base.html:92
+#: app/templates/base.html:91
 msgid "Log out"
 msgstr "Выйти"
 
-#: app/templates/base.html:111
+#: app/templates/base.html:110
 msgid "Show timer"
 msgstr "Показать таймер"
 
-#: app/templates/base.html:112 app/templates/practice/_attempt.html:42
+#: app/templates/base.html:111 app/templates/practice/_attempt.html:46
 msgid "Hide timer"
 msgstr "Скрыть таймер"
 
-#: app/templates/base.html:113
+#: app/templates/base.html:112
 #, python-brace-format
 msgid "Answered {answered} of {total} · {status}"
 msgstr "Отвечено {answered} из {total} · {status}"
 
-#: app/templates/base.html:114
+#: app/templates/base.html:113
 msgid "saving…"
 msgstr "сохранение…"
 
-#: app/templates/base.html:115
+#: app/templates/base.html:114
 msgid "saved"
 msgstr "сохранено"
 
-#: app/templates/base.html:116
+#: app/templates/base.html:115
 #, python-brace-format
 msgid "not saved ({code}); the answer will be sent when you submit"
 msgstr "не сохранено ({code}); ответ отправится при проверке"
 
-#: app/templates/base.html:117
+#: app/templates/base.html:116
 msgid "no connection: not saved; the answer will be sent when you submit"
 msgstr "нет сети: не сохранено; ответ отправится при проверке"
 
-#: app/templates/base.html:118
+#: app/templates/base.html:117
 msgid "Checking…"
 msgstr "Проверяем…"
 
-#: app/templates/base.html:119
+#: app/templates/base.html:118
 msgid "Translation is not available yet."
 msgstr "Перевод пока недоступен."
 
-#: app/templates/base.html:120
+#: app/templates/base.html:119
 #, python-brace-format
 msgid "Server error ({code})."
 msgstr "Ошибка сервера ({code})."
 
-#: app/templates/base.html:121
+#: app/templates/base.html:120
 msgid "Translation not found."
 msgstr "Перевод не найден."
 
-#: app/templates/base.html:122
+#: app/templates/base.html:121
 msgid "Network error. Try the link below."
 msgstr "Ошибка сети. Попробуйте ссылку ниже."
 
-#: app/templates/base.html:123
+#: app/templates/base.html:122
 #, python-brace-format
 msgid "Question {num}"
 msgstr "Вопрос {num}"
@@ -507,7 +507,7 @@ msgstr ""
 msgid "The question was not saved. Fix the marked fields."
 msgstr "Вопрос не сохранён. Исправьте отмеченные поля."
 
-#: app/templates/grammar/editor.html:47 app/templates/passages/editor.html:83
+#: app/templates/grammar/editor.html:47 app/templates/passages/editor.html:70
 msgid "Save"
 msgstr "Сохранить"
 
@@ -553,15 +553,15 @@ msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr "Не завершён · отвечено %(answered)s/%(total)s · %(time)s"
 
 #: app/templates/grammar/start.html:32 app/templates/passages/list.html:52
-#: app/templates/practice/_attempt.html:181
+#: app/templates/practice/_attempt.html:174
 msgid "Continue"
 msgstr "Продолжить"
 
-#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:184
+#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:177
 msgid "Discard this attempt and its saved answers?"
 msgstr "Сбросить эту попытку и сохранённые ответы?"
 
-#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:186
+#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:179
 msgid "Discard and start over"
 msgstr "Сбросить и начать заново"
 
@@ -631,27 +631,7 @@ msgstr "Перевод на русский"
 msgid "Add question"
 msgstr "Добавить вопрос"
 
-#: app/templates/passages/editor.html:70
-msgid "Glossary"
-msgstr "Словарик"
-
-#: app/templates/passages/editor.html:73
-msgid "Word"
-msgstr "Слово"
-
 #: app/templates/passages/editor.html:74
-msgid "Meaning"
-msgstr "Значение"
-
-#: app/templates/passages/editor.html:75
-msgid "Remove word"
-msgstr "Удалить слово"
-
-#: app/templates/passages/editor.html:79
-msgid "Add word"
-msgstr "Добавить слово"
-
-#: app/templates/passages/editor.html:87
 msgid "Common: every user sees this passage"
 msgstr "Общий: этот текст увидят все пользователи"
 
@@ -716,53 +696,52 @@ msgstr[0] "лучший результат %(best)s%% за %(count)s попыт�
 msgstr[1] "лучший результат %(best)s%% за %(count)s попытки"
 msgstr[2] "лучший результат %(best)s%% за %(count)s попыток"
 
-#: app/templates/practice/_attempt.html:85
+#: app/templates/practice/_attempt.html:74
+msgid "Flag"
+msgstr "Отметить"
+
+#: app/templates/practice/_attempt.html:93
 #, python-format
 msgid "Answered %(answered)s of %(total)s"
 msgstr "Отвечено %(answered)s из %(total)s"
 
-#: app/templates/practice/_attempt.html:88 app/templates/practice/_attempt.html:97
-#: app/templates/practice/_attempt.html:134
+#: app/templates/practice/_attempt.html:96 app/templates/practice/_attempt.html:130
 msgid "Check answers"
 msgstr "Проверить ответы"
 
-#: app/templates/practice/_attempt.html:102 app/templates/practice/_attempt.html:108
-msgid "Flag"
-msgstr "Отметить"
-
-#: app/templates/practice/_attempt.html:112
+#: app/templates/practice/_attempt.html:109
 msgid "Previous"
 msgstr "Назад"
 
-#: app/templates/practice/_attempt.html:118 app/templates/practice/_navigator.html:14
+#: app/templates/practice/_attempt.html:115 app/templates/practice/_navigator.html:14
 msgid "Question list"
 msgstr "Список вопросов"
 
-#: app/templates/practice/_attempt.html:126
+#: app/templates/practice/_attempt.html:123
 msgid "Next"
 msgstr "Далее"
 
-#: app/templates/practice/_attempt.html:145
+#: app/templates/practice/_attempt.html:138
 msgid "Check your answers"
 msgstr "Проверьте ответы"
 
-#: app/templates/practice/_attempt.html:149
+#: app/templates/practice/_attempt.html:142
 msgid "Not answered"
 msgstr "Без ответа"
 
-#: app/templates/practice/_attempt.html:155
+#: app/templates/practice/_attempt.html:148
 msgid "Submit"
 msgstr "Отправить"
 
-#: app/templates/practice/_attempt.html:159
+#: app/templates/practice/_attempt.html:152
 msgid "Back to questions"
 msgstr "Вернуться к вопросам"
 
-#: app/templates/practice/_attempt.html:171
+#: app/templates/practice/_attempt.html:164
 msgid "Paused"
 msgstr "Пауза"
 
-#: app/templates/practice/_attempt.html:174
+#: app/templates/practice/_attempt.html:167
 #, python-format
 msgid ""
 "Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"

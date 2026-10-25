@@ -173,12 +173,11 @@ ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_men
     function that knows every feature's models. Before building on an older decision, check
     that its reason still holds: much of 1.0 assumed passages were the only content.
 
-19. **Content is Arabic or English.** Content text (titles, passages, prompts, options,
-    glossary words) takes its direction from its first letter (`dir="auto"`), in the
-    editors as on the pages, and each passage paragraph has its own; it has no `lang`.
-    `font-content` sets Latin letters in Inter and Arabic in Noto Naskh Arabic.
-    Explanations and translations stay left to right, since they often open with a quoted
-    Arabic word.
+19. **Content is Arabic or English.** Content text (titles, passages, prompts, options)
+    takes its direction from its first letter (`dir="auto"`), in the editors as on the
+    pages, and each passage paragraph has its own; it has no `lang`. `font-content` sets
+    Latin letters in Inter and Arabic in Noto Naskh Arabic. Explanations and translations
+    stay left to right, since they often open with a quoted Arabic word.
 
 ## Tests
 
@@ -199,5 +198,4 @@ ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_men
 
 ## Known issues in 1.0 (to fix in 2.0)
 
-- `passages.glossary` exists but nothing uses it yet.
 - The × that deletes a result on the profile has no confirm dialog (Discard has one).

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-25 16:39+0500\n"
+"POT-Creation-Date: 2026-10-25 20:03+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -272,62 +272,62 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: app/templates/base.html:92
+#: app/templates/base.html:91
 msgid "Log out"
 msgstr ""
 
-#: app/templates/base.html:111
+#: app/templates/base.html:110
 msgid "Show timer"
 msgstr ""
 
-#: app/templates/base.html:112 app/templates/practice/_attempt.html:42
+#: app/templates/base.html:111 app/templates/practice/_attempt.html:46
 msgid "Hide timer"
 msgstr ""
 
-#: app/templates/base.html:113
+#: app/templates/base.html:112
 #, python-brace-format
 msgid "Answered {answered} of {total} · {status}"
 msgstr ""
 
-#: app/templates/base.html:114
+#: app/templates/base.html:113
 msgid "saving…"
 msgstr ""
 
-#: app/templates/base.html:115
+#: app/templates/base.html:114
 msgid "saved"
 msgstr ""
 
-#: app/templates/base.html:116
+#: app/templates/base.html:115
 #, python-brace-format
 msgid "not saved ({code}); the answer will be sent when you submit"
 msgstr ""
 
-#: app/templates/base.html:117
+#: app/templates/base.html:116
 msgid "no connection: not saved; the answer will be sent when you submit"
 msgstr ""
 
-#: app/templates/base.html:118
+#: app/templates/base.html:117
 msgid "Checking…"
 msgstr ""
 
-#: app/templates/base.html:119
+#: app/templates/base.html:118
 msgid "Translation is not available yet."
 msgstr ""
 
-#: app/templates/base.html:120
+#: app/templates/base.html:119
 #, python-brace-format
 msgid "Server error ({code})."
 msgstr ""
 
-#: app/templates/base.html:121
+#: app/templates/base.html:120
 msgid "Translation not found."
 msgstr ""
 
-#: app/templates/base.html:122
+#: app/templates/base.html:121
 msgid "Network error. Try the link below."
 msgstr ""
 
-#: app/templates/base.html:123
+#: app/templates/base.html:122
 #, python-brace-format
 msgid "Question {num}"
 msgstr ""
@@ -502,7 +502,7 @@ msgstr ""
 msgid "The question was not saved. Fix the marked fields."
 msgstr ""
 
-#: app/templates/grammar/editor.html:47 app/templates/passages/editor.html:83
+#: app/templates/grammar/editor.html:47 app/templates/passages/editor.html:70
 msgid "Save"
 msgstr ""
 
@@ -548,15 +548,15 @@ msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr ""
 
 #: app/templates/grammar/start.html:32 app/templates/passages/list.html:52
-#: app/templates/practice/_attempt.html:181
+#: app/templates/practice/_attempt.html:174
 msgid "Continue"
 msgstr ""
 
-#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:184
+#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:177
 msgid "Discard this attempt and its saved answers?"
 msgstr ""
 
-#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:186
+#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:179
 msgid "Discard and start over"
 msgstr ""
 
@@ -626,27 +626,7 @@ msgstr ""
 msgid "Add question"
 msgstr ""
 
-#: app/templates/passages/editor.html:70
-msgid "Glossary"
-msgstr ""
-
-#: app/templates/passages/editor.html:73
-msgid "Word"
-msgstr ""
-
 #: app/templates/passages/editor.html:74
-msgid "Meaning"
-msgstr ""
-
-#: app/templates/passages/editor.html:75
-msgid "Remove word"
-msgstr ""
-
-#: app/templates/passages/editor.html:79
-msgid "Add word"
-msgstr ""
-
-#: app/templates/passages/editor.html:87
 msgid "Common: every user sees this passage"
 msgstr ""
 
@@ -708,53 +688,52 @@ msgid_plural "best score %(best)s%% in %(count)s attempts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/practice/_attempt.html:85
+#: app/templates/practice/_attempt.html:74
+msgid "Flag"
+msgstr ""
+
+#: app/templates/practice/_attempt.html:93
 #, python-format
 msgid "Answered %(answered)s of %(total)s"
 msgstr ""
 
-#: app/templates/practice/_attempt.html:88 app/templates/practice/_attempt.html:97
-#: app/templates/practice/_attempt.html:134
+#: app/templates/practice/_attempt.html:96 app/templates/practice/_attempt.html:130
 msgid "Check answers"
 msgstr ""
 
-#: app/templates/practice/_attempt.html:102 app/templates/practice/_attempt.html:108
-msgid "Flag"
-msgstr ""
-
-#: app/templates/practice/_attempt.html:112
+#: app/templates/practice/_attempt.html:109
 msgid "Previous"
 msgstr ""
 
-#: app/templates/practice/_attempt.html:118 app/templates/practice/_navigator.html:14
+#: app/templates/practice/_attempt.html:115 app/templates/practice/_navigator.html:14
 msgid "Question list"
 msgstr ""
 
-#: app/templates/practice/_attempt.html:126
+#: app/templates/practice/_attempt.html:123
 msgid "Next"
 msgstr ""
 
-#: app/templates/practice/_attempt.html:145
+#: app/templates/practice/_attempt.html:138
 msgid "Check your answers"
 msgstr ""
 
-#: app/templates/practice/_attempt.html:149
+#: app/templates/practice/_attempt.html:142
 msgid "Not answered"
 msgstr ""
 
-#: app/templates/practice/_attempt.html:155
+#: app/templates/practice/_attempt.html:148
 msgid "Submit"
 msgstr ""
 
-#: app/templates/practice/_attempt.html:159
+#: app/templates/practice/_attempt.html:152
 msgid "Back to questions"
 msgstr ""
 
-#: app/templates/practice/_attempt.html:171
+#: app/templates/practice/_attempt.html:164
 msgid "Paused"
 msgstr ""
 
-#: app/templates/practice/_attempt.html:174
+#: app/templates/practice/_attempt.html:167
 #, python-format
 msgid ""
 "Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"
