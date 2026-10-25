@@ -16,8 +16,8 @@
   Context (AttemptPage):
     user
     title       for the browser tab
-    passage_id  for the word translation lookup; None for a session, or once the passage
-                is deleted or no longer visible to me
+    passage_id  None for a session, or once the passage is deleted or no longer visible
+                to me
     content     the copy taken when the attempt started: .questions in display order, each
                 with .id .prompt and .options in this attempt's shuffled order, each with
                 .id .text (a passage attempt's copy also has .text .level)
@@ -66,7 +66,7 @@
     <fieldset id="q{{ loop.index }}" class="mb-5 scroll-mt-24 border-b border-line pb-5" dir="auto" data-question-id="{{ q.id }}"
               data-step {% if loop.first %}data-current{% endif %} :data-current="current === {{ loop.index0 }}">
       <legend class="mb-3 flex w-full items-start gap-2 font-content text-xl font-semibold leading-loose">
-        <span class="flex-1" data-tappable {% if passage_id %}data-passage-id="{{ passage_id }}"{% endif %}>
+        <span class="flex-1" data-tappable>
           <span class="me-1 inline-grid size-7 place-items-center rounded-full bg-accent-soft align-middle font-sans text-sm font-bold text-accent">{{ loop.index }}</span>
           {{ q.prompt }}
         </span>

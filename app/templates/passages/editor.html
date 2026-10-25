@@ -66,19 +66,6 @@
     <span x-show="error('questions')" x-text="error('questions')" class="block text-sm text-bad"></span>
     <button type="button" @click="addQuestion" class="{{ editor.add }}">+ {{ _("Add question") }}</button>
 
-    <section class="space-y-3 rounded-2xl border border-line bg-white p-6">
-      <h2 class="font-semibold">{{ _("Glossary") }}</h2>
-      <template x-for="(row, wi) in glossary" :key="row.key">
-        <div class="flex items-center gap-3">
-          <input x-model="row.word" placeholder="{{ _("Word") }}" dir="auto" class="{{ editor.row_content }}">
-          <input x-model="row.meaning" placeholder="{{ _("Meaning") }}" class="{{ editor.row_input }}">
-          <button type="button" @click="removeWord(wi)" title="{{ _("Remove word") }}" aria-label="{{ _("Remove word") }}" class="{{ editor.remove }}">×</button>
-        </div>
-      </template>
-      <span x-show="glossaryError()" x-text="glossaryError()" class="block text-sm text-bad"></span>
-      <button type="button" @click="addWord" class="{{ editor.add }}">+ {{ _("Add word") }}</button>
-    </section>
-
     <div class="flex flex-wrap items-center gap-4">
       <button class="cursor-pointer rounded-xl bg-accent px-5 py-2.5 font-semibold text-white hover:brightness-110">{{ _("Save") }}</button>
       {% if user.is_admin %}

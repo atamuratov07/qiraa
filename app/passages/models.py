@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from sqlalchemy import (
-    JSON,
     CheckConstraint,
     ForeignKey,
     Index,
@@ -36,7 +35,6 @@ class Passage(Owned, Base):
     level: Mapped[str] = mapped_column(String(16), default="")
     text: Mapped[str] = mapped_column(Text)
     translation_ru: Mapped[str | None] = mapped_column(Text)
-    glossary: Mapped[dict[str, str]] = mapped_column(JSON, default=dict)
 
     questions: Mapped[list[PassageQuestion]] = relationship(
         back_populates="passage",

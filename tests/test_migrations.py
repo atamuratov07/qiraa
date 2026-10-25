@@ -64,7 +64,7 @@ def test_existing_passages_become_common(empty_db: Engine) -> None:
             )
         )
 
-    upgrade("head")
+    upgrade("b57f0a72f576")
 
     with empty_db.begin() as conn:
         assert conn.execute(text("SELECT owner_id, is_common FROM passages")).one() == (
@@ -190,7 +190,7 @@ def test_existing_attempts_get_a_copy_of_their_passage(empty_db: Engine) -> None
 
 
 def test_downgrading_drops_what_the_old_schema_cannot_hold(empty_db: Engine) -> None:
-    upgrade("head")
+    upgrade("d9a273a744e5")
     copy = (
         '{"title": "نص", "level": "A2", "text": "الفقرة.", "translation_ru": null, '
         '"questions": [{"id": 1, "prompt": "سؤال؟", "explanation": null, "options": '
@@ -235,3 +235,19 @@ def test_downgrading_drops_what_the_old_schema_cannot_hold(empty_db: Engine) -> 
         ).all()
     assert [tuple(row) for row in kept] == [(1, {"1": [12, 11]})]
     assert [tuple(row) for row in answers] == [(1, 1, 12)]
+
+
+def test_downgrading_gives_passages_an_empty_glossary(empty_db: Engine) -> None:
+    upgrade("6d5095db3a6d")
+    with empty_db.begin() as conn:
+        conn.execute(
+            text(
+                "INSERT INTO passages (title, level, text, is_common) "
+                "VALUES ('نص', 'A2', 'الفقرة.', true)"
+            )
+        )
+
+    downgrade("d9a273a744e5")
+
+    with empty_db.connect() as conn:
+        assert conn.scalar(text("SELECT glossary::text FROM passages")) == "{}"

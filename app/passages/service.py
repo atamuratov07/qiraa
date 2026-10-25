@@ -42,7 +42,6 @@ def passage_in(passage: Passage) -> PassageIn:
             "level": passage.level,
             "text": passage.text,
             "translation_ru": passage.translation_ru,
-            "glossary": dict(passage.glossary),
             "questions": [
                 {
                     "prompt": q.prompt,
@@ -82,7 +81,6 @@ def apply_passage(db: Session, passage: Passage, data: PassageIn) -> None:
     passage.level = data.level
     passage.text = data.text
     passage.translation_ru = data.translation_ru
-    passage.glossary = data.glossary
 
     if passage.questions:
         passage.questions.clear()

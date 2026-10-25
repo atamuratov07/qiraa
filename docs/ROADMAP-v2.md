@@ -5,22 +5,23 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 
 ## What 2.0 adds
 
-1. **Personal and common content.** Every passage, grammar question and speaking set is either
+1. **Personal and common content.** Every passage and grammar question is either
    private (only its author sees and edits it) or common (everyone sees it, admins edit it).
    Common content stays when its author deletes their account.
 2. **Grammar practice.** Standalone multiple-choice questions, practised as random sessions of
    any size from common and my questions, or only mine.
-3. **Speaking practice.** A set of questions shown as one numbered list, with a preparation
-   countdown followed by a speaking countdown. No recording, no checking of answers.
-4. **Question navigator.** One question at a time, a grid of question numbers (answered,
+3. **Question navigator.** One question at a time, a grid of question numbers (answered,
    current, flagged), previous/next, keyboard shortcuts, a review screen before submitting.
-5. **Interface in Uzbek (Latin), Russian and English.** Interface text and error messages only;
+4. **Interface in Uzbek (Latin), Russian and English.** Interface text and error messages only;
    Arabic content is not translated.
-6. **Managing content in the app.** Editors for passages, grammar questions and speaking sets;
+5. **Managing content in the app.** Editors for passages and grammar questions;
    YAML import in the app and from the command line. Editing content never changes past
    results.
-7. **Word translation** in the popup: passage glossary first, then MyMemory.
-8. **Sign-up with an invite code.**
+6. **Word translation** in the popup: an Arabic word or phrase into Uzbek, Russian or
+   English, through MyMemory.
+7. **Sign-up with an invite code.**
+
+Speaking practice is postponed until after the 2.0 release (see "Later").
 
 ## Decisions already made
 
@@ -28,7 +29,7 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Version number        | 2.0.0: existing attempts need a data migration and content management changes                                                                                                                                                                                                                                                    |
 | Branching             | build on `v2`; `main` keeps serving 1.x; merge `main` into `v2` after any fix                                                                                                                                                                                                                                                    |
-| Question tables       | passage questions (`passage_questions`, `passage_options`) and grammar questions (`grammar_questions`, `grammar_options`) have their own tables: attempts read their own copy, so nothing joins them; speaking gets its own table too                                                                                            |
+| Question tables       | passage questions (`passage_questions`, `passage_options`) and grammar questions (`grammar_questions`, `grammar_options`) have their own tables: attempts read their own copy, so nothing joins them                                                                                                                             |
 | Attempts              | one `attempts` table for passages and grammar sessions; each attempt keeps a copy of what it shows (`content`: title, text, translation, questions with their options in shuffled order and the correct one marked)                                                                                                              |
 | Editing content       | allowed at any time, also after attempts; a result shows the copy its attempt was taken on and keeps its score (no regrading); answers point into the copy, so editing or deleting content never removes a result                                                                                                                |
 | Passage title         | optional; when missing, show the start of the text                                                                                                                                                                                                                                                                               |
@@ -42,10 +43,9 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 | Bulk loading          | one kind per YAML file, each kind with its own import page (`/manage/passages/import`, `/manage/grammar/import`) into my area, or common for admins; `python -m app.cli import file.yaml --owner <username>` / `--common` reads the kind from the file's top key; importing again updates by slug; real content stays out of git |
 | Frontend              | stay server-rendered; add Alpine.js (one script tag) for the editors and the navigator; no React, no switch to Django                                                                                                                                                                                                            |
 | Passage editor        | Alpine keeps the passage and posts it as JSON in one form field; `PassageIn` validates it as it does YAML, and errors show under their fields                                                                                                                                                                                    |
-| Content language      | Arabic or English: content takes its direction from its own text (`dir="auto"`) and Latin letters are set in Inter; no language field until word translation needs one                                                                                                                                                           |
+| Content language      | Arabic or English: content takes its direction from its own text (`dir="auto"`) and Latin letters are set in Inter; no language field, since word translation looks up Arabic words only                                                                                                                                         |
 | Grammar session       | `/grammar` is a start form only (no page that lists the whole bank): pool "common + mine" or "only mine", any size, both remembered in the browser; the size is capped at the number of questions in the pool; one open session per user, which the start page offers to continue or discard                                     |
-| Speaking timer        | one timer for the whole list: a preparation countdown, then a speaking countdown. Each set stores default `prepare_seconds` and `speak_seconds`; the session page lets me change both before starting and remembers them in the browser per set                                                                                  |
-| Word translation      | passage glossary, then MyMemory; no cache table in 2.0                                                                                                                                                                                                                                                                           |
+| Word translation      | the popup asks MyMemory from the browser (no server endpoint, so each user has their own anonymous quota), into the language picked in the popup (Uzbek, Russian or English; the interface's by default, remembered in the browser); Arabic text only; the unused `passages.glossary` column is dropped                          |
 | Translations          | gettext with Babel and Jinja's i18n extension; English msgids, so English needs no catalog; catalogs for `ru` and `uz`                                                                                                                                                                                                           |
 | Language choice       | the `qiraa_lang` cookie (set from `users.locale` at login), then `Accept-Language`, then English                                                                                                                                                                                                                                 |
 | Dates                 | Babel's date formatting replaces the hand-written Russian month names                                                                                                                                                                                                                                                            |
@@ -55,10 +55,7 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 
 ## Open decisions (likely choice first)
 
-1. Does finishing a speaking session count for the streak? Leaning yes. The streak itself
-   only needs a call to `record_activity()`, but the profile calendar reads
-   `attempts.submitted_at`, so it also needs a small `speaking_sessions` table
-   (user, set, finished_at). If no, there is no table.
+None for 2.0.
 
 ## Data model changes
 
@@ -72,7 +69,7 @@ passages          + owner_id        → users.id, nullable, ON DELETE SET NULL
                     title           now nullable
                     slug            now nullable; unique WHERE is_common, and
                                     (owner_id, slug) unique WHERE NOT is_common
-                    glossary        used by word translation
+                  - glossary        never used; word translation needs none (step 10)
 
 passage_questions   renamed from questions; options renamed to passage_options
 
@@ -96,13 +93,6 @@ attempts            passage_id      now nullable (NULL = grammar session),
 
 attempt_answers     question_id     no foreign key: ids inside attempts.content
                     option_id       no foreign key: ids inside attempts.content
-
-speaking_sets     (new) id, owner_id → users.id nullable ON DELETE SET NULL,
-                  is_common, title, questions JSON list[str],
-                  prepare_seconds, speak_seconds, created_at
-                  CHECK: is_common OR owner_id IS NOT NULL
-
-speaking_sessions (new, only if open decision 1 is yes) id, user_id, set_id, finished_at
 ```
 
 Migrations:
@@ -116,8 +106,8 @@ Migrations:
   `kind` with the default `'passage'`, which fills the existing attempts, then drops the
   default.
 
-Account deletion is one service function and one commit: delete my private passages,
-grammar questions and speaking sets, then delete the user. The database sets `owner_id` to
+Account deletion is one service function and one commit: delete my private passages
+and grammar questions, then delete the user. The database sets `owner_id` to
 NULL on my common content. If the service forgets the first part, the CHECK constraints make
 the user delete fail instead of leaving private rows nobody can reach.
 
@@ -141,7 +131,6 @@ app/passages/   Passage and its questions, starting an attempt, list and start p
                 file schema, prompt, import, editor
 app/grammar/    GrammarQuestion, GrammarOption, starting a session, start page, file
                 schema, prompt, import, editor
-app/speaking/   SpeakingSet, session page, file schema, prompt, import, editor
 app/profile/    statistics, streaks, profile page
 app/content/    what content files share: question schema, slugs, loader, errors, the
                 import pages, CLI
@@ -151,7 +140,7 @@ app/models.py   imports every model so Alembic sees them
 Templates stay in `app/templates/<feature>/`.
 
 - [x] Move `core/`, `auth/`, `passages/`, `practice/`, `profile/`; the other folders and
-      modules (`grammar/`, `speaking/`, `content/`, `i18n`, `permissions`) arrive with their steps.
+      modules (`grammar/`, `content/`, `i18n`, `permissions`) arrive with their steps.
       Done when: one commit that only moves code; all tests pass before and after.
 
 ### 3. Ownership, admin role, permissions, invite code
@@ -203,7 +192,7 @@ Templates stay in `app/templates/<feature>/`.
 ### 6. Content format and import
 
 - [x] Pydantic schemas for passages, shared by the editor, YAML and the CLI (grammar and
-      speaking schemas come with steps 8 and 10). Errors carry a type and a line number and
+      the grammar schema came with step 8). Errors carry a type and a line number and
       are translated where they are shown.
 - [x] `python -m app.cli import file.yaml --owner <username> | --common`; `check` command.
 - [x] Move the four real passages from `seed.py` to a YAML file kept out of git
@@ -249,29 +238,20 @@ Templates stay in `app/templates/<feature>/`.
 - [x] Works as a plain list without JavaScript.
       Done when: used by passage attempts, grammar sessions and both result pages.
 
-### 10. Speaking practice
+### 10. Word translation
 
-- [ ] `speaking_sets` table with `owner_id` (SET NULL), `is_common` and the CHECK.
-- [ ] `/speaking` list, `/speaking/{id}` session page: all questions as one numbered list,
-      preparation countdown, then speaking countdown, then a "done" state. Before starting,
-      both durations can be changed (defaults from the set, remembered in the browser per set).
-- [ ] `/manage/speaking` editor (one question per line, default durations).
-- [ ] Speaking files (`speaking:`) with their own import page and chatbot prompt.
-- [ ] If open decision 1 is yes: `speaking_sessions` table, `POST /speaking/{id}/finish`
-      calls `record_activity()`, and the profile calendar reads both tables.
-      Done when: a set can be created and run with both countdowns (and, if decided, counted for the
-      streak and shown on the calendar).
+- [x] Drop `passages.glossary` (never used): the column, the schema field, the editor's
+      rows and the prompt line.
+- [x] The popup asks MyMemory itself (`fetch` from `reader.js`; MyMemory allows it with
+      `Access-Control-Allow-Origin: *`): Arabic text only, up to 500 characters
+      (MyMemory's limit; longer selections get a message), the answers kept for the
+      browser session, errors shown with the Google Translate link.
+- [x] The popup: uz · ru · en buttons, the interface language by default, the choice kept
+      in the browser; the Google Translate link follows it.
+      Done when: tapping a word and selecting a phrase each return a translation in the
+      language picked.
 
-### 11. Word translation
-
-- [ ] `/api/translate`: passage glossary, then MyMemory (`MYMEMORY_EMAIL` raises the free
-      quota from 5,000 to 50,000 characters a day).
-- [ ] Arabic normalisation: strip vowel marks, unify alef forms, try without و/ف/ب/ك/ل/ال prefixes.
-- [ ] English content (step 8): the word's script picks the MyMemory pair (`ar|ru` or
-      `en|ru`), and only Arabic words are normalised.
-      Done when: tapping a glossary word and a new word each return Russian.
-
-### 12. Release 2.0.0
+### 11. Release 2.0.0
 
 - [ ] Take a fresh Neon snapshot; rehearse `alembic upgrade head` on a Neon branch. While the
       migrations run, the 1.x instance may still serve for a few seconds and fail.
@@ -279,7 +259,7 @@ Templates stay in `app/templates/<feature>/`.
 - [ ] If the four 1.0 passages are on Neon, make them private to their author
       (`is_common = false`, `owner_id` set) before anyone else signs up. Content imports run
       from the machine with `DATABASE_URL`: `content/` is not in the Docker image.
-- [ ] Update README (settings table: `SIGNUP_CODE`, `MYMEMORY_EMAIL`; the data model, where
+- [ ] Update README (settings table: `SIGNUP_CODE`; the data model, where
       attempts now keep a copy instead of `option_order`), CHANGELOG; merge `v2`
       into `main`; tag `v2.0.0`; GitHub release.
 - [ ] Check production: log in, old results, each practice type, each language, sign-up with
@@ -287,17 +267,36 @@ Templates stay in `app/templates/<feature>/`.
 
 ## Routes added in 2.0 (draft)
 
-| Area     | Routes                                                                                                       |
-| -------- | ------------------------------------------------------------------------------------------------------------ |
-| Grammar  | `GET /grammar` (start form), `POST /grammar/sessions` → the session's attempt page                           |
-| Speaking | `GET /speaking`, `GET /speaking/{id}`, `POST /speaking/{id}/finish` (only if speaking counts for the streak) |
-| Manage   | `/manage/{passages,grammar,speaking}` with `new`, `{id}/edit`, `{id}/delete`, `import`                       |
-| Settings | `POST /settings/language`                                                                                    |
-| API      | `GET /api/translate?q=…&passage_id=…`                                                                        |
+| Area     | Routes                                                                             |
+| -------- | ---------------------------------------------------------------------------------- |
+| Grammar  | `GET /grammar` (start form), `POST /grammar/sessions` → the session's attempt page |
+| Manage   | `/manage/{passages,grammar}` with `new`, `{id}/edit`, `{id}/delete`, `import`      |
+| Settings | `POST /settings/language`                                                          |
 
 ## Later (after 2.0)
 
-- Translation cache table, if lookups feel slow or reach MyMemory's daily limit.
+- **Speaking practice**, postponed from 2.0 (it was step 10). The plan so far:
+  - a set of questions shown as one numbered list, with a preparation countdown followed by
+    a speaking countdown; no recording, no checking of answers;
+  - one timer for the whole list: the preparation countdown, then the speaking countdown;
+  - a `speaking/` feature (rule 18): a `speaking_sets` table (id, `owner_id` → users.id
+    nullable ON DELETE SET NULL, `is_common`, title, questions JSON list[str],
+    `prepare_seconds`, `speak_seconds`, created_at, CHECK
+    `is_common OR owner_id IS NOT NULL`), whose private sets account deletion removes;
+  - `/speaking` list, `/speaking/{id}` session page; before starting, both durations can be
+    changed (defaults from the set, remembered in the browser per set);
+  - `/manage/speaking` editor (one question per line, default durations), and speaking files
+    (`speaking:`) with their own import page and chatbot prompt;
+  - open question: does finishing a session count for the streak? Leaning yes; the profile
+    calendar reads `attempts.submitted_at`, so that needs a `speaking_sessions` table (user,
+    set, finished_at) and `POST /speaking/{id}/finish` calling `record_activity()`.
+
+- A translation endpoint on the server, if a provider with a key is needed (meanings in
+  context from a language model, a dictionary API, more quota than MyMemory's free one).
+  Keys can't be sent to the browser, so the popup would then ask our server.
+- A passage glossary (meanings chosen for this passage, in each interface language), if
+  MyMemory's word-by-word meanings fall short. The 1.0 `glossary` column was dropped in
+  step 10 without ever being used.
 - Personal single-use invite codes (an `invites` table created from the command line) instead
   of one shared `SIGNUP_CODE`.
 - Users publishing their own content as common: one way only (after publishing, only an admin
