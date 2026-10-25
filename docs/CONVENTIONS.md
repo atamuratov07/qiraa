@@ -41,7 +41,8 @@ throwaway database: every test drops all tables.
 
 ## Code layout
 
-Organised by feature. `app/main.py` creates the app, includes every router and handles errors.
+Organised by feature. `app/main.py` creates the app, includes every router, handles errors
+and registers what templates need from several features (`streak_today()`).
 `app/models.py` imports every model. `content/` holds YAML content files; only
 `example.yaml` is in git, so real passages stay private and local. `app/cli.py` holds
 commands for running the site (`make-admin`, `import`, `check`). `app/locale/` holds the
@@ -80,8 +81,8 @@ commands for running the site (`make-admin`, `import`, `check`). `app/locale/` h
 
 A feature has `models.py`, `service.py`, `routes.py` and `views.py` (dataclasses and one
 `TypedDict` per page) where it needs them. Templates are in `app/templates/<feature>/`; shared
-ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_menu.html`) stay
-at the top.
+ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_menu.html`,
+`_editor.html`) stay at the top.
 `migrations/versions/6ad753184ecc_initial_schema.py` is the single initial schema.
 
 ## Rules
@@ -170,6 +171,13 @@ at the top.
     per feature, checked by a shared `TypedDict`, are better than one function that knows
     every feature's models. Before building on an older decision, check that its reason
     still holds: much of 1.0 assumed passages were the only content.
+
+19. **Content is Arabic or English.** Content text (titles, passages, prompts, options,
+    glossary words) takes its direction from its first letter (`dir="auto"`), in the
+    editors as on the pages, and each passage paragraph has its own; it has no `lang`.
+    `font-content` sets Latin letters in Inter and Arabic in Noto Naskh Arabic.
+    Explanations and translations stay left to right, since they often open with a quoted
+    Arabic word.
 
 ## Tests
 

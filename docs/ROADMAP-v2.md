@@ -40,9 +40,10 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 | Admin                 | `users.is_admin`, set from the command line only                                                                                                                                                                                                                                                                                 |
 | Sign-ups              | closed to the public: the form asks for one shared invite code (`SIGNUP_CODE`); `ALLOW_SIGNUP=false` still closes sign-up completely                                                                                                                                                                                             |
 | Bulk loading          | one kind per YAML file, each kind with its own import page (`/manage/passages/import`, `/manage/grammar/import`) into my area, or common for admins; `python -m app.cli import file.yaml --owner <username>` / `--common` reads the kind from the file's top key; importing again updates by slug; real content stays out of git |
-| Frontend              | stay server-rendered; add Alpine.js (one script tag) for the passage editor and the navigator; no React, no switch to Django                                                                                                                                                                                                     |
+| Frontend              | stay server-rendered; add Alpine.js (one script tag) for the editors and the navigator; no React, no switch to Django                                                                                                                                                                                                            |
 | Passage editor        | Alpine keeps the passage and posts it as JSON in one form field; `PassageIn` validates it as it does YAML, and errors show under their fields                                                                                                                                                                                    |
-| Grammar session       | `/grammar` is a start form only (no page that lists the whole bank): pool "common + mine" or "only mine", any size, both remembered in the browser; the size is capped at the number of questions in the pool                                                                                                                    |
+| Content language      | Arabic or English: content takes its direction from its own text (`dir="auto"`) and Latin letters are set in Inter; no language field until word translation needs one                                                                                                                                                           |
+| Grammar session       | `/grammar` is a start form only (no page that lists the whole bank): pool "common + mine" or "only mine", any size, both remembered in the browser; the size is capped at the number of questions in the pool; one open session per user, which the start page offers to continue or discard                                     |
 | Speaking timer        | one timer for the whole list: a preparation countdown, then a speaking countdown. Each set stores default `prepare_seconds` and `speak_seconds`; the session page lets me change both before starting and remembers them in the browser per set                                                                                  |
 | Word translation      | passage glossary, then MyMemory; no cache table in 2.0                                                                                                                                                                                                                                                                           |
 | Translations          | gettext with Babel and Jinja's i18n extension; English msgids, so English needs no catalog; catalogs for `ru` and `uz`                                                                                                                                                                                                           |
@@ -227,14 +228,14 @@ Templates stay in `app/templates/<feature>/`.
       `'passage'`, then no default) with its CHECKs, and one open grammar session per user.
 - [x] Grammar files (`grammar:`, a slug per question) with their own import page, chatbot
       prompt and CLI support.
-- [ ] Starting a passage attempt moves from `practice/` to `passages/`.
-- [ ] `/grammar`: start form with pool ("common + mine" / "only mine") and size, showing how
+- [x] Starting a passage attempt moves from `practice/` to `passages/`.
+- [x] `/grammar`: start form with pool ("common + mine" / "only mine") and size, showing how
       many questions the pool has; both choices remembered in the browser. The server caps the
       size at the pool count and shows a message when the pool is empty.
-- [ ] Sessions use the attempt page without the passage column; results, profile and streak
-      include them.
-- [ ] `/manage/grammar`: list of my questions (and common ones for admins) with new, edit,
-      delete.
+- [x] Sessions and passage attempts have their own attempt and result pages on shared layouts
+      in `practice/`; results, profile and streak include sessions.
+- [x] `/manage/grammar`: list of my questions (and common ones for admins) with new, edit,
+      delete and import; `/passages` and `/grammar` link to their manage pages.
       Done when: a 10-question session can be started, autosaved, submitted and reviewed, and asking
       for 50 questions from a pool of 40 gives 40.
 
@@ -265,6 +266,8 @@ Templates stay in `app/templates/<feature>/`.
 - [ ] `/api/translate`: passage glossary, then MyMemory (`MYMEMORY_EMAIL` raises the free
       quota from 5,000 to 50,000 characters a day).
 - [ ] Arabic normalisation: strip vowel marks, unify alef forms, try without و/ف/ب/ك/ل/ال prefixes.
+- [ ] English content (step 8): the word's script picks the MyMemory pair (`ar|ru` or
+      `en|ru`), and only Arabic words are normalised.
       Done when: tapping a glossary word and a new word each return Russian.
 
 ### 12. Release 2.0.0
@@ -285,7 +288,7 @@ Templates stay in `app/templates/<feature>/`.
 
 | Area     | Routes                                                                                                       |
 | -------- | ------------------------------------------------------------------------------------------------------------ |
-| Grammar  | `GET /grammar` (start form), `POST /grammar/sessions` → existing attempt page                                |
+| Grammar  | `GET /grammar` (start form), `POST /grammar/sessions` → the session's attempt page                           |
 | Speaking | `GET /speaking`, `GET /speaking/{id}`, `POST /speaking/{id}/finish` (only if speaking counts for the streak) |
 | Manage   | `/manage/{passages,grammar,speaking}` with `new`, `{id}/edit`, `{id}/delete`, `import`                       |
 | Settings | `POST /settings/language`                                                                                    |
