@@ -4,7 +4,8 @@
 // 2. On tap/selection, asks MyMemory from the browser:
 //      GET https://api.mymemory.translated.net/get?q=<text>&langpair=ar|<language>
 //    and keeps the answers for the browser session. The popup also links to Google
-//    Translate.
+//    Translate. The language is the interface's until one is picked in the popup; the
+//    pick stays in localStorage.
 
 (() => {
   const pop = document.getElementById("tr-pop");
@@ -19,7 +20,15 @@
   // splits "«الكتابُ،" into ["«", "الكتابُ", "،"]: letters + vowel marks in the middle
   const EDGES = /^([^\p{L}\p{M}]*)(.*?)([^\p{L}\p{M}]*)$/su;
   const MYMEMORY = "https://api.mymemory.translated.net/get";
+  const LANGUAGE_KEY = "qiraa.translateTo";
+  const languageButtons = [...pop.querySelectorAll("[data-lang]")];
+  let language = document.documentElement.lang;
+  try {
+    const saved = localStorage.getItem(LANGUAGE_KEY);
+    if (languageButtons.some((b) => b.dataset.lang === saved)) language = saved;
+  } catch {} // storage can be blocked, e.g. in a private window
   let active = null;
+  let shown = null; // { text, anchor }: the text, and the word or range it came from
   let requestId = 0;
 
   // ---- 1. wrap words ------------------------------------------------------------
@@ -71,7 +80,7 @@
     try {
       const saved = sessionStorage.getItem(key);
       if (saved !== null) return JSON.parse(saved);
-    } catch {} // storage can be blocked, e.g. in a private window
+    } catch {}
 
     const params = new URLSearchParams({ q: text, langpair: `ar|${target}` });
     const res = await fetch(`${MYMEMORY}?${params}`, {
@@ -109,15 +118,17 @@
     aEl.classList.toggle("text-muted", missing);
   }
 
-  async function lookup(text, rect) {
+  async function lookup(text, anchor) {
     const id = ++requestId;
-    const language = document.documentElement.lang;
+    shown = { text, anchor };
     qEl.textContent = text;
     aEl.lang = language;
+    for (const b of languageButtons)
+      b.setAttribute("aria-pressed", String(b.dataset.lang === language));
     show("…", true);
     const google = { sl: "ar", tl: language, op: "translate", text };
     gLink.href = `https://translate.google.com/?${new URLSearchParams(google)}`;
-    place(rect);
+    place(anchor.getBoundingClientRect());
 
     let answer = null;
     let problem = null;
@@ -133,7 +144,7 @@
     if (problem) show(problem, true);
     else if (answer) show(answer, false);
     else show(t("noTranslation"), true);
-    place(rect);
+    place(anchor.getBoundingClientRect());
   }
 
   function close() {
@@ -141,6 +152,16 @@
     active?.classList.remove("on");
     active = null;
   }
+
+  pop.addEventListener("click", (e) => {
+    const button = e.target.closest("[data-lang]");
+    if (!button || button.dataset.lang === language) return;
+    language = button.dataset.lang;
+    try {
+      localStorage.setItem(LANGUAGE_KEY, language);
+    } catch {}
+    lookup(shown.text, shown.anchor);
+  });
 
   // tap one word
   document.addEventListener("click", (e) => {
@@ -151,7 +172,7 @@
       active?.classList.remove("on");
       active = word;
       word.classList.add("on");
-      lookup(word.textContent, word.getBoundingClientRect());
+      lookup(word.textContent, word);
     } else if (sel.isCollapsed) {
       close();
     }
@@ -168,10 +189,13 @@
       if (!text || text.length > 120 || !ARABIC.test(text)) return;
       active?.classList.remove("on");
       active = null;
-      lookup(text, sel.getRangeAt(0).getBoundingClientRect());
+      lookup(text, sel.getRangeAt(0).cloneRange());
     }, 350);
   });
 
-  document.addEventListener("keydown", (e) => e.key === "Escape" && close());
+  // Escape, and the navigator's ←/→, which show another question
+  document.addEventListener("keydown", (e) => {
+    if (["Escape", "ArrowLeft", "ArrowRight"].includes(e.key)) close();
+  });
   window.addEventListener("resize", close);
 })();

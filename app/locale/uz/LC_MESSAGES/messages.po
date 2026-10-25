@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-25 21:25+0500\n"
+"POT-Creation-Date: 2026-10-25 21:27+0500\n"
 "PO-Revision-Date: 2026-10-15 13:30+0500\n"
 "Last-Translator: Damir\n"
 "Language: uz\n"
@@ -247,6 +247,10 @@ msgid "Language"
 msgstr "Til"
 
 #: app/templates/_popover.html:7
+msgid "Translation language"
+msgstr "Tarjima tili"
+
+#: app/templates/_popover.html:13
 msgid "Google Translate"
 msgstr "Google Tarjimon"
 
