@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-25 22:34+0500\n"
+"POT-Creation-Date: 2026-10-25 22:44+0500\n"
 "PO-Revision-Date: 2026-10-15 13:30+0500\n"
 "Last-Translator: Damir\n"
 "Language: uz\n"
@@ -553,21 +553,21 @@ msgstr "Yangi mashgʻulot"
 msgid "Manage"
 msgstr "Boshqarish"
 
-#: app/templates/grammar/start.html:29 app/templates/passages/list.html:50
+#: app/templates/grammar/start.html:29 app/templates/passages/list.html:47
 #, python-format
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr "Tugallanmagan · javob berildi %(answered)s/%(total)s · %(time)s"
 
-#: app/templates/grammar/start.html:32 app/templates/passages/list.html:52
+#: app/templates/grammar/start.html:32 app/templates/passages/list.html:54
 #: app/templates/practice/_attempt.html:174
 msgid "Continue"
 msgstr "Davom etish"
 
-#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:177
+#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:178
 msgid "Discard this attempt and its saved answers?"
 msgstr "Bu urinish va saqlangan javoblar bekor qilinsinmi?"
 
-#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:179
+#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:180
 msgid "Discard and start over"
 msgstr "Bekor qilib, qaytadan boshlash"
 
@@ -645,7 +645,7 @@ msgstr "Umumiy: bu matnni barcha foydalanuvchilar koʻradi"
 msgid "Other"
 msgstr "Boshqa"
 
-#: app/templates/passages/list.html:35 app/templates/passages/manage.html:35
+#: app/templates/passages/list.html:36 app/templates/passages/manage.html:35
 #: app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
@@ -653,26 +653,26 @@ msgid_plural "%(count)s questions"
 msgstr[0] "%(count)s ta savol"
 msgstr[1] "%(count)s ta savol"
 
-#: app/templates/passages/list.html:39
+#: app/templates/passages/list.html:40
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
 msgstr[0] "Eng yaxshi natija %(best)s%% · %(count)s ta urinish"
 msgstr[1] "Eng yaxshi natija %(best)s%% · %(count)s ta urinish"
 
-#: app/templates/passages/list.html:42
+#: app/templates/passages/list.html:43
 msgid "New"
 msgstr "Yangi"
 
-#: app/templates/passages/list.html:54
+#: app/templates/passages/list.html:56
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr "Bu tugallanmagan urinish bekor qilinsinmi? Saqlangan javoblar oʻchiriladi."
 
-#: app/templates/passages/list.html:56
+#: app/templates/passages/list.html:58
 msgid "Discard"
 msgstr "Bekor qilish"
 
-#: app/templates/passages/list.html:65 app/templates/passages/manage.html:50
+#: app/templates/passages/list.html:67 app/templates/passages/manage.html:50
 msgid "No passages yet."
 msgstr "Hozircha matnlar yoʻq."
 

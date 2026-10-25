@@ -14,8 +14,8 @@
 // On a focused radio the browser's own arrow keys would pick another option (in a
 // right-to-left question, the previous one), so ←/→ cancel that.
 //
-// Flags stay in this browser (localStorage, per attempt) until the attempt is submitted
-// or discarded.
+// Flags stay in this browser (localStorage, per attempt); the forms that submit or
+// discard the attempt remove them (data-forget, forms.js).
 //
 // "Check answers", and → on the last question, open a review (the grid and the unanswered
 // count) instead of submitting; the review's own button submits. Cancelling the first button's click means
@@ -49,17 +49,9 @@ document.addEventListener("alpine:init", () => {
         const id = Number(e.target.closest("[data-step]").dataset.questionId);
         if (!this.answered.includes(id)) this.answered.push(id);
       });
-      // The discard form sits on the paused card, outside this component.
-      for (const form of [
-        this.$el,
-        document.querySelector("form[action$='/discard']"),
-      ]) {
-        form?.addEventListener("submit", (e) => {
-          if (e.defaultPrevented) return;
-          this.forgetFlags();
-          if (form === this.$el) this.submitting = true;
-        });
-      }
+      this.$el.addEventListener("submit", (e) => {
+        if (!e.defaultPrevented) this.submitting = true;
+      });
       window.addEventListener("hashchange", () => {
         const index = this.fromHash();
         if (index !== null) this.current = index;
@@ -84,11 +76,6 @@ document.addEventListener("alpine:init", () => {
         : [...this.flagged, id];
       try {
         localStorage.setItem(this.flagsKey, JSON.stringify(this.flagged));
-      } catch {}
-    },
-    forgetFlags() {
-      try {
-        localStorage.removeItem(this.flagsKey);
       } catch {}
     },
 

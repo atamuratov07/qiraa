@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-25 22:34+0500\n"
+"POT-Creation-Date: 2026-10-25 22:44+0500\n"
 "PO-Revision-Date: 2026-10-15 00:55+0500\n"
 "Last-Translator: Damir\n"
 "Language: ru\n"
@@ -555,21 +555,21 @@ msgstr "Новая сессия"
 msgid "Manage"
 msgstr "Управление"
 
-#: app/templates/grammar/start.html:29 app/templates/passages/list.html:50
+#: app/templates/grammar/start.html:29 app/templates/passages/list.html:47
 #, python-format
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr "Не завершён · отвечено %(answered)s/%(total)s · %(time)s"
 
-#: app/templates/grammar/start.html:32 app/templates/passages/list.html:52
+#: app/templates/grammar/start.html:32 app/templates/passages/list.html:54
 #: app/templates/practice/_attempt.html:174
 msgid "Continue"
 msgstr "Продолжить"
 
-#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:177
+#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:178
 msgid "Discard this attempt and its saved answers?"
 msgstr "Сбросить эту попытку и сохранённые ответы?"
 
-#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:179
+#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:180
 msgid "Discard and start over"
 msgstr "Сбросить и начать заново"
 
@@ -647,7 +647,7 @@ msgstr "Общий: этот текст увидят все пользовате
 msgid "Other"
 msgstr "Другое"
 
-#: app/templates/passages/list.html:35 app/templates/passages/manage.html:35
+#: app/templates/passages/list.html:36 app/templates/passages/manage.html:35
 #: app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
@@ -656,7 +656,7 @@ msgstr[0] "%(count)s вопрос"
 msgstr[1] "%(count)s вопроса"
 msgstr[2] "%(count)s вопросов"
 
-#: app/templates/passages/list.html:39
+#: app/templates/passages/list.html:40
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
@@ -664,19 +664,19 @@ msgstr[0] "Лучший результат %(best)s%% · %(count)s попытк�
 msgstr[1] "Лучший результат %(best)s%% · %(count)s попытки"
 msgstr[2] "Лучший результат %(best)s%% · %(count)s попыток"
 
-#: app/templates/passages/list.html:42
+#: app/templates/passages/list.html:43
 msgid "New"
 msgstr "Новый"
 
-#: app/templates/passages/list.html:54
+#: app/templates/passages/list.html:56
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr "Сбросить эту незавершённую попытку? Сохранённые ответы будут удалены."
 
-#: app/templates/passages/list.html:56
+#: app/templates/passages/list.html:58
 msgid "Discard"
 msgstr "Сбросить"
 
-#: app/templates/passages/list.html:65 app/templates/passages/manage.html:50
+#: app/templates/passages/list.html:67 app/templates/passages/manage.html:50
 msgid "No passages yet."
 msgstr "Текстов пока нет."
 

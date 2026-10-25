@@ -1,3 +1,14 @@
+// Forms marked <form data-forget="key ..."> remove those localStorage keys when they are
+// sent. This listener comes first: the next one cancels the browser's own submit.
+document.addEventListener("submit", (event) => {
+  if (event.defaultPrevented) return;
+  for (const key of event.target.dataset.forget?.split(" ") ?? []) {
+    try {
+      localStorage.removeItem(key);
+    } catch {}
+  }
+});
+
 // Forms marked <form data-background> are sent with fetch() instead of loading a new page.
 document.addEventListener("submit", async (event) => {
   const form = event.target.closest("form[data-background]");
