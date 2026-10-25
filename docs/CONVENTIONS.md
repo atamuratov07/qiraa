@@ -63,7 +63,9 @@ commands for running the site (`make-admin`, `import`, `check`). `app/locale/` h
   `passage_in()`, the manage list and the editor.
 - `grammar/`: `GrammarQuestion`, `GrammarOption` · `schemas.py` `GrammarEntry`,
   `GrammarFile` · `prompt.py` · `apply_question()`, `import_grammar()` · sessions
-  (`start_session()`, `open_session_for()`, `copy_questions()`) and the start page.
+  (`start_session()`, `open_session_for()`, `copy_questions()`) and the start page ·
+  `create_question()`, `update_question()`, `question_in()`, the manage list and the
+  editor.
 - `content/`: what content files share, no models · `schemas.py` `QuestionIn`, its limits,
   `Slug`, `WithSlug` · `loader.py` `parse()`, `parse_file()`, `decode()` · `yaml_tree.py`
   line numbers (see [CONTENT-LOADER.md](CONTENT-LOADER.md)) · `errors.py` `LineError`,
@@ -152,10 +154,12 @@ at the top.
     are shown (`describe()`), so the CLI prints English. Limits are constants in the
     schemas, and the chatbot prompt reads them.
 
-17. **The passage editor** posts the passage as JSON in one form field. The route validates
-    it with `PassageIn.model_validate_json()` in its body, since a failed check in the
-    signature shows the 404 page. `messages_by_path()` keys the errors by path, such as
-    `questions[0].options[1]`, for the field that shows them.
+17. **The editors** (passages, grammar questions) post their content as JSON in one form
+    field. The route validates it with `PassageIn` or `QuestionIn.model_validate_json()` in
+    its body, since a failed check in the signature shows the 404 page.
+    `messages_by_path()` keys the errors by path, such as `questions[0].options[1]` or
+    `options[1]`; the shared question card in `_editor.html` asks the component's
+    `path(qi, field)` for the key. `set_common()` applies the publishing rule for both.
 
 18. **Each content feature owns its content end to end.** `passages/`, `grammar/` and later
     `speaking/` each hold their models, file schema, chatbot prompt, import, manage pages,

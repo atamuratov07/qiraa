@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-25 10:42+0500\n"
+"POT-Creation-Date: 2026-10-25 12:25+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -76,6 +76,10 @@ msgstr ""
 
 #: app/auth/service.py:151
 msgid "Wrong password."
+msgstr ""
+
+#: app/content/editor.py:6
+msgid "Choose the correct option."
 msgstr ""
 
 #: app/content/errors.py:10
@@ -182,23 +186,28 @@ msgstr ""
 msgid "The file is not UTF-8 text. Save it as UTF-8 and try again."
 msgstr ""
 
-#: app/passages/routes.py:40
-msgid "Choose the correct option."
+#: app/grammar/routes.py:66 app/grammar/routes.py:108
+msgid "Question not found"
 msgstr ""
 
-#: app/passages/routes.py:85 app/passages/routes.py:108 app/passages/routes.py:129
-#: app/passages/routes.py:147
+#: app/grammar/routes.py:172
+#, python-format
+msgid "Another question already uses the slug %(slug)s."
+msgstr ""
+
+#: app/passages/routes.py:73 app/passages/routes.py:96 app/passages/routes.py:117
+#: app/passages/routes.py:135
 msgid "Passage not found"
 msgstr ""
 
-#: app/passages/routes.py:210
+#: app/passages/routes.py:198
 #, python-format
 msgid "Another passage already uses the slug %(slug)s."
 msgstr ""
 
 #: app/practice/models.py:97 app/templates/base.html:74
 #: app/templates/grammar/attempt.html:12 app/templates/grammar/start.html:17
-#: app/templates/grammar/start.html:20
+#: app/templates/grammar/start.html:21
 msgid "Grammar"
 msgstr ""
 
@@ -208,6 +217,30 @@ msgstr ""
 
 #: app/practice/routes.py:101
 msgid "This attempt is already submitted."
+msgstr ""
+
+#: app/templates/_editor.html:25
+msgid "Remove question"
+msgstr ""
+
+#: app/templates/_editor.html:28
+msgid "Question"
+msgstr ""
+
+#: app/templates/_editor.html:36
+msgid "Correct option"
+msgstr ""
+
+#: app/templates/_editor.html:39
+msgid "Remove option"
+msgstr ""
+
+#: app/templates/_editor.html:46
+msgid "Add option"
+msgstr ""
+
+#: app/templates/_editor.html:49
+msgid "Explanation"
 msgstr ""
 
 #: app/templates/_language_menu.html:16
@@ -231,87 +264,83 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: app/templates/base.html:73 app/templates/passages/list.html:18
-#: app/templates/passages/list.html:20
+#: app/templates/passages/list.html:21
 msgid "Passages"
 msgstr ""
 
-#: app/templates/base.html:75
-msgid "Manage"
-msgstr ""
-
-#: app/templates/base.html:76 app/templates/profile/profile.html:26
+#: app/templates/base.html:75 app/templates/profile/profile.html:26
 msgid "Profile"
 msgstr ""
 
-#: app/templates/base.html:83
+#: app/templates/base.html:82
 msgid "Log out"
 msgstr ""
 
-#: app/templates/base.html:102
+#: app/templates/base.html:101
 msgid "show"
 msgstr ""
 
-#: app/templates/base.html:103 app/templates/practice/_attempt.html:44
+#: app/templates/base.html:102 app/templates/practice/_attempt.html:44
 msgid "hide"
 msgstr ""
 
-#: app/templates/base.html:104
+#: app/templates/base.html:103
 msgid "Show timer"
 msgstr ""
 
-#: app/templates/base.html:105 app/templates/practice/_attempt.html:44
+#: app/templates/base.html:104 app/templates/practice/_attempt.html:44
 msgid "Hide timer"
 msgstr ""
 
-#: app/templates/base.html:106
+#: app/templates/base.html:105
 #, python-brace-format
 msgid "Answered {answered} of {total} · {status}"
 msgstr ""
 
-#: app/templates/base.html:107
+#: app/templates/base.html:106
 msgid "saving…"
 msgstr ""
 
-#: app/templates/base.html:108
+#: app/templates/base.html:107
 msgid "saved"
 msgstr ""
 
-#: app/templates/base.html:109
+#: app/templates/base.html:108
 #, python-brace-format
 msgid "not saved ({code}); the answer will be sent when you submit"
 msgstr ""
 
-#: app/templates/base.html:110
+#: app/templates/base.html:109
 msgid "no connection: not saved; the answer will be sent when you submit"
 msgstr ""
 
-#: app/templates/base.html:111
+#: app/templates/base.html:110
 #, python-brace-format
 msgid "Questions without an answer: {count}. Submit anyway?"
 msgstr ""
 
-#: app/templates/base.html:112
+#: app/templates/base.html:111
 msgid "Checking…"
 msgstr ""
 
-#: app/templates/base.html:113
+#: app/templates/base.html:112
 msgid "Translation is not available yet."
 msgstr ""
 
-#: app/templates/base.html:114
+#: app/templates/base.html:113
 #, python-brace-format
 msgid "Server error ({code})."
 msgstr ""
 
-#: app/templates/base.html:115
+#: app/templates/base.html:114
 msgid "Translation not found."
 msgstr ""
 
-#: app/templates/base.html:116
+#: app/templates/base.html:115
 msgid "Network error. Try the link below."
 msgstr ""
 
-#: app/templates/base.html:117
+#: app/templates/base.html:116
 #, python-brace-format
 msgid "Question {num}"
 msgstr ""
@@ -425,85 +454,146 @@ msgid_plural "Updated %(num)d passages"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/content/import.html:72
+#: app/templates/content/import.html:71
 msgid "YAML"
 msgstr ""
 
-#: app/templates/content/import.html:77
+#: app/templates/content/import.html:76
 msgid "Or a file (up to 1 MB)"
 msgstr ""
 
-#: app/templates/content/import.html:84
+#: app/templates/content/import.html:83
 msgid "Common: every user sees these questions"
 msgstr ""
 
-#: app/templates/content/import.html:84
+#: app/templates/content/import.html:83
 msgid "Common: every user sees these passages"
 msgstr ""
 
-#: app/templates/content/import.html:87 app/templates/passages/manage.html:23
+#: app/templates/content/import.html:86 app/templates/grammar/manage.html:22
+#: app/templates/passages/manage.html:23
 msgid "Import"
 msgstr ""
 
-#: app/templates/content/import.html:91
+#: app/templates/content/import.html:90
 msgid "Prompt for a chatbot: turn any material into this format"
 msgstr ""
 
-#: app/templates/content/import.html:92
+#: app/templates/content/import.html:91
 msgid "The chatbot marks answers it chose itself with # check. Check them before importing."
 msgstr ""
 
-#: app/templates/content/import.html:93
+#: app/templates/content/import.html:92
 msgid "Copy the prompt"
 msgstr ""
 
-#: app/templates/content/import.html:105
+#: app/templates/content/import.html:104
 msgid "Copied"
+msgstr ""
+
+#: app/templates/grammar/editor.html:21
+msgid "Edit question"
+msgstr ""
+
+#: app/templates/grammar/editor.html:21 app/templates/grammar/manage.html:21
+msgid "New question"
+msgstr ""
+
+#: app/templates/grammar/editor.html:26 app/templates/grammar/manage.html:15
+#: app/templates/grammar/manage.html:19
+msgid "Manage grammar"
+msgstr ""
+
+#: app/templates/grammar/editor.html:29 app/templates/passages/editor.html:29
+#, python-format
+msgid ""
+"Imported as <code>%(slug)s</code>. Importing the file again overwrites changes made "
+"here."
+msgstr ""
+
+#: app/templates/grammar/editor.html:35
+msgid "The question was not saved. Fix the marked fields."
+msgstr ""
+
+#: app/templates/grammar/editor.html:47 app/templates/passages/editor.html:83
+msgid "Save"
+msgstr ""
+
+#: app/templates/grammar/editor.html:51
+msgid "Common: every user sees this question"
+msgstr ""
+
+#: app/templates/grammar/manage.html:35 app/templates/passages/manage.html:37
+msgid "Common"
+msgstr ""
+
+#: app/templates/grammar/manage.html:39
+msgid "Delete this question for everyone? Results with it stay."
+msgstr ""
+
+#: app/templates/grammar/manage.html:39
+msgid "Delete this question? Results with it stay."
+msgstr ""
+
+#: app/templates/grammar/manage.html:40 app/templates/passages/manage.html:41
+msgid "Edit"
+msgstr ""
+
+#: app/templates/grammar/manage.html:43 app/templates/passages/manage.html:44
+msgid "Delete"
+msgstr ""
+
+#: app/templates/grammar/manage.html:49
+msgid "No questions yet."
 msgstr ""
 
 #: app/templates/grammar/result.html:10
 msgid "New session"
 msgstr ""
 
-#: app/templates/grammar/start.html:26 app/templates/passages/list.html:47
+#: app/templates/grammar/start.html:22 app/templates/passages/list.html:22
+msgid "Manage"
+msgstr ""
+
+#: app/templates/grammar/start.html:29 app/templates/passages/list.html:50
 #, python-format
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr ""
 
-#: app/templates/grammar/start.html:29 app/templates/passages/list.html:49
+#: app/templates/grammar/start.html:32 app/templates/passages/list.html:52
 #: app/templates/practice/_attempt.html:94
 msgid "Continue"
 msgstr ""
 
-#: app/templates/grammar/start.html:31 app/templates/practice/_attempt.html:97
+#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:97
 msgid "Discard this attempt and its saved answers?"
 msgstr ""
 
-#: app/templates/grammar/start.html:33 app/templates/practice/_attempt.html:99
+#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:99
 msgid "Discard and start over"
 msgstr ""
 
-#: app/templates/grammar/start.html:39
+#: app/templates/grammar/start.html:42
 msgid "No grammar questions yet."
 msgstr ""
 
-#: app/templates/grammar/start.html:45
+#: app/templates/grammar/start.html:48
 msgid "This pool has no questions yet."
 msgstr ""
 
-#: app/templates/grammar/start.html:49
+#: app/templates/grammar/start.html:52
 msgid "Common and mine"
 msgstr ""
 
-#: app/templates/grammar/start.html:49
+#: app/templates/grammar/start.html:52
 msgid "Only mine"
 msgstr ""
 
-#: app/templates/grammar/start.html:59
+#: app/templates/grammar/start.html:62
 msgid "Questions"
 msgstr ""
 
-#: app/templates/grammar/start.html:64 app/templates/passages/start.html:51
+#: app/templates/grammar/start.html:67 app/templates/passages/start.html:51
 msgid "Start"
 msgstr ""
 
@@ -520,99 +610,64 @@ msgstr ""
 msgid "New passage"
 msgstr ""
 
-#: app/templates/passages/editor.html:32 app/templates/passages/manage.html:16
+#: app/templates/passages/editor.html:26 app/templates/passages/manage.html:16
 #: app/templates/passages/manage.html:20
 msgid "Manage passages"
 msgstr ""
 
 #: app/templates/passages/editor.html:35
-#, python-format
-msgid ""
-"Imported as <code>%(slug)s</code>. Importing the file again overwrites changes made "
-"here."
-msgstr ""
-
-#: app/templates/passages/editor.html:41
 msgid "The passage was not saved. Fix the marked fields."
 msgstr ""
 
-#: app/templates/passages/editor.html:52
+#: app/templates/passages/editor.html:46
 msgid "Title"
 msgstr ""
 
-#: app/templates/passages/editor.html:56
+#: app/templates/passages/editor.html:50
 msgid "Level"
 msgstr ""
 
-#: app/templates/passages/editor.html:61
+#: app/templates/passages/editor.html:55
 msgid "Text"
 msgstr ""
 
-#: app/templates/passages/editor.html:65
+#: app/templates/passages/editor.html:59
 msgid "Translation into Russian"
 msgstr ""
 
-#: app/templates/passages/editor.html:76
-msgid "Remove question"
-msgstr ""
-
-#: app/templates/passages/editor.html:78
-msgid "Question"
-msgstr ""
-
-#: app/templates/passages/editor.html:86
-msgid "Correct option"
-msgstr ""
-
-#: app/templates/passages/editor.html:89
-msgid "Remove option"
-msgstr ""
-
-#: app/templates/passages/editor.html:96
-msgid "Add option"
-msgstr ""
-
-#: app/templates/passages/editor.html:99
-msgid "Explanation"
-msgstr ""
-
-#: app/templates/passages/editor.html:105
+#: app/templates/passages/editor.html:67
 msgid "Add question"
 msgstr ""
 
-#: app/templates/passages/editor.html:108
+#: app/templates/passages/editor.html:70
 msgid "Glossary"
 msgstr ""
 
-#: app/templates/passages/editor.html:111
+#: app/templates/passages/editor.html:73
 msgid "Word"
 msgstr ""
 
-#: app/templates/passages/editor.html:112
+#: app/templates/passages/editor.html:74
 msgid "Meaning"
 msgstr ""
 
-#: app/templates/passages/editor.html:113
+#: app/templates/passages/editor.html:75
 msgid "Remove word"
 msgstr ""
 
-#: app/templates/passages/editor.html:117
+#: app/templates/passages/editor.html:79
 msgid "Add word"
 msgstr ""
 
-#: app/templates/passages/editor.html:121
-msgid "Save"
-msgstr ""
-
-#: app/templates/passages/editor.html:125
+#: app/templates/passages/editor.html:87
 msgid "Common: every user sees this passage"
 msgstr ""
 
-#: app/templates/passages/list.html:26
+#: app/templates/passages/list.html:29
 msgid "Other"
 msgstr ""
 
-#: app/templates/passages/list.html:32 app/templates/passages/manage.html:35
+#: app/templates/passages/list.html:35 app/templates/passages/manage.html:35
 #: app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
@@ -620,31 +675,27 @@ msgid_plural "%(count)s questions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/passages/list.html:36
+#: app/templates/passages/list.html:39
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/passages/list.html:39
+#: app/templates/passages/list.html:42
 msgid "New"
 msgstr ""
 
-#: app/templates/passages/list.html:51
+#: app/templates/passages/list.html:54
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr ""
 
-#: app/templates/passages/list.html:53
+#: app/templates/passages/list.html:56
 msgid "Discard"
 msgstr ""
 
-#: app/templates/passages/list.html:62 app/templates/passages/manage.html:50
+#: app/templates/passages/list.html:65 app/templates/passages/manage.html:50
 msgid "No passages yet."
-msgstr ""
-
-#: app/templates/passages/manage.html:37
-msgid "Common"
 msgstr ""
 
 #: app/templates/passages/manage.html:40
@@ -653,14 +704,6 @@ msgstr ""
 
 #: app/templates/passages/manage.html:40
 msgid "Delete this passage? Results on it stay."
-msgstr ""
-
-#: app/templates/passages/manage.html:41
-msgid "Edit"
-msgstr ""
-
-#: app/templates/passages/manage.html:44
-msgid "Delete"
 msgstr ""
 
 #: app/templates/passages/result.html:21

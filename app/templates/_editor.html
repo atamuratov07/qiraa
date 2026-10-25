@@ -1,0 +1,57 @@
+{#
+  _editor.html: what the passage and grammar question editors share. Import it with
+  {% import "_editor.html" as editor %}: the classes below, and question_cards().
+
+  question_cards(numbered) renders every question in the Alpine component's `questions`
+  (static/editor.js). Error keys come from the component's path(qi, field), so the same
+  markup serves a passage ("questions[0].prompt") and one question ("prompt").
+  numbered: a "Question N" heading with a remove button, for a passage's list.
+#}
+{% set field = "block w-full rounded-lg border border-line bg-paper px-3 text-ink focus:outline-2 focus:outline-accent" %}
+{% set input = field ~ " mt-1 py-2" %}
+{% set arabic = input ~ " font-arabic text-xl leading-loose" %}
+{% set row_input = field ~ " py-1" %}
+{% set row_arabic = row_input ~ " font-arabic text-xl leading-loose" %}
+{% set remove = "grid size-8 shrink-0 cursor-pointer place-items-center rounded-full text-xl leading-none text-muted hover:bg-bad-soft hover:text-bad disabled:invisible" %}
+{% set add = "cursor-pointer text-sm font-semibold text-accent hover:underline" %}
+
+{% macro question_cards(numbered) %}
+<template x-for="(q, qi) in questions" :key="q.key">
+  <section class="space-y-4 rounded-2xl border border-line bg-white p-6">
+    {% if numbered %}
+    <div class="flex items-center justify-between">
+      <h2 class="font-semibold" x-text="questionLabel(qi)"></h2>
+      <button type="button" @click="removeQuestion(qi)" :disabled="questions.length === 1"
+              title="{{ _("Remove question") }}" aria-label="{{ _("Remove question") }}" class="{{ remove }}">×</button>
+    </div>
+    {% endif %}
+    <label class="block text-sm text-muted">
+      <span class="{{ 'sr-only' if numbered }}">{{ _("Question") }}</span>
+      <textarea x-model="q.prompt" rows="2" required dir="rtl" lang="ar" class="{{ arabic }}"></textarea>
+      <span x-show="error(path(qi, 'prompt'))" x-text="error(path(qi, 'prompt'))" class="mt-1 block text-bad"></span>
+    </label>
+
+    <div class="space-y-2">
+      <template x-for="(o, oi) in q.options" :key="o.key">
+        <div>
+          <div class="flex items-center gap-3">
+            <input type="radio" :name="q.key" :value="o.key" x-model="q.correct"
+                   title="{{ _("Correct option") }}" aria-label="{{ _("Correct option") }}" class="size-5 shrink-0 accent-accent">
+            <input x-model="o.text" required dir="rtl" lang="ar" class="{{ row_arabic }}">
+            <button type="button" @click="removeOption(q, oi)" :disabled="q.options.length <= limits.min_options"
+                    title="{{ _("Remove option") }}" aria-label="{{ _("Remove option") }}" class="{{ remove }}">×</button>
+          </div>
+          <span x-show="error(path(qi, `options[${oi}]`))" x-text="error(path(qi, `options[${oi}]`))" class="ms-8 block text-sm text-bad"></span>
+        </div>
+      </template>
+      <span x-show="error(path(qi, 'options'))" x-text="error(path(qi, 'options'))" class="block text-sm text-bad"></span>
+      <span x-show="error(path(qi, 'answer'))" x-text="error(path(qi, 'answer'))" class="block text-sm text-bad"></span>
+      <button type="button" @click="addOption(q)" x-show="q.options.length < limits.max_options" class="{{ add }}">+ {{ _("Add option") }}</button>
+    </div>
+
+    <label class="block text-sm text-muted">{{ _("Explanation") }}
+      <textarea x-model="q.explanation" rows="2" class="{{ input }}"></textarea>
+    </label>
+  </section>
+</template>
+{% endmacro %}

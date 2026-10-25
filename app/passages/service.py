@@ -12,24 +12,17 @@ from app.content.schemas import LETTERS, QuestionIn
 from app.content.service import (
     ImportedItem,
     ImportReport,
+    SlugTaken,
     check_importer,
     commit_import,
     slug_scope,
 )
-from app.core.permissions import editable, load_visible, visible
+from app.core.permissions import editable, load_visible, set_common, visible
 from app.passages.models import Passage, PassageOption, PassageQuestion
 from app.passages.schemas import PassageEntry, PassageIn
 from app.passages.views import ManagedPassage, PassageCard
 from app.practice.models import Attempt, AttemptContent, OptionCopy, QuestionCopy
 from app.practice.views import UnfinishedInfo
-
-
-class SlugTaken(Exception):
-    """Another passage in the same area already has this slug."""
-
-    def __init__(self, slug: str) -> None:
-        super().__init__(slug)
-        self.slug: str = slug
 
 
 def load_passage(db: Session, user: User, passage_id: int) -> Passage | None:
@@ -114,16 +107,11 @@ def create_passage(
 def update_passage(
     db: Session, user: User, passage: Passage, data: PassageIn, *, common: bool
 ) -> None:
-    common = common and user.is_admin
     slug = passage.slug
 
     try:
         apply_passage(db, passage, data)
-
-        if not common and passage.is_common and passage.owner_id is None:
-            passage.owner_id = user.id
-        passage.is_common = common
-
+        set_common(passage, user, common)
         db.commit()
 
     except IntegrityError as e:

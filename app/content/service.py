@@ -13,6 +13,14 @@ class NotAllowed(Exception):
     """Only admins import common content."""
 
 
+class SlugTaken(Exception):
+    """Another row of the same kind in the same area already has this slug."""
+
+    def __init__(self, slug: str) -> None:
+        super().__init__(slug)
+        self.slug: str = slug
+
+
 @dataclass(frozen=True)
 class ImportedItem:
     id: int

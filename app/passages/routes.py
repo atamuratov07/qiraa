@@ -1,6 +1,5 @@
-import json
 from datetime import UTC, datetime
-from typing import Annotated, cast
+from typing import Annotated
 
 from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -9,15 +8,16 @@ from sqlalchemy.orm import selectinload
 
 from app.auth.deps import CurrentUser
 from app.auth.models import User
+from app.content.editor import EDITOR_MESSAGES, posted
 from app.content.errors import messages_by_path
+from app.content.service import SlugTaken
 from app.core.db import DB
-from app.core.i18n import N_, _
+from app.core.i18n import _
 from app.core.permissions import load_editable
 from app.core.templating import render
 from app.passages.models import Passage, PassageQuestion
 from app.passages.schemas import PassageIn
 from app.passages.service import (
-    SlugTaken,
     create_passage,
     delete_passage,
     load_passage,
@@ -36,18 +36,6 @@ from app.passages.views import (
     PassagesPage,
     PassageStartPage,
 )
-
-EDITOR_MESSAGES: dict[str, str] = {"bad_answer": N_("Choose the correct option.")}
-
-
-def posted(raw: str) -> dict[str, object] | None:
-    """What was posted, to refill the editor"""
-    try:
-        value = cast(object, json.loads(raw))
-    except ValueError:
-        return None
-
-    return cast(dict[str, object], value) if isinstance(value, dict) else None
 
 
 def render_editor(

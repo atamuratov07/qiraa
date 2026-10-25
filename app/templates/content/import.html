@@ -58,8 +58,7 @@
     <ul class="mt-1 mb-3 list-disc ps-6 marker:text-accent/50 last:mb-0" dir="rtl">
       {% for item in items %}
       <li class="font-arabic text-lg" lang="ar">
-        {%- if grammar %}<span class="block px-3 py-1">{{ item.title }}</span>
-        {%- else %}<a href="/passages/{{ item.id }}" class="block rounded-lg px-3 py-1 transition-colors hover:bg-accent/10">{{ item.title }}</a>{% endif -%}
+        <a href="{{ '/manage/grammar/%d/edit' % item.id if grammar else '/passages/%d' % item.id }}" class="block rounded-lg px-3 py-1 transition-colors hover:bg-accent/10">{{ item.title }}</a>
       </li>
       {% endfor %}
     </ul>

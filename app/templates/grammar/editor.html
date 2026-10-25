@@ -1,0 +1,62 @@
+{#
+  grammar/editor.html: a new grammar question, or one I may edit.
+  Routes: GET/POST /manage/grammar/new, GET/POST /manage/grammar/{question_id}/edit
+
+  Context:
+    user         logged-in user; .is_admin shows the "Common" checkbox
+    question_id  int, or None for a new question
+    slug         str or None; shown, never edited
+    common       bool, refills the checkbox
+    data         the question in QuestionIn's JSON shape (answer as a letter): the saved
+                 one, what was posted after errors, or None for an empty form
+    errors       {path: message}. "options[1]" is a field, "" the whole form.
+    limits       EditorLimits, a dict: min_options, max_options
+
+  Alpine (static/editor.js, questionEditor) holds the question and writes it into the
+  hidden field "question" as JSON on submit. POST fields: question, common (admins only;
+  an unticked checkbox sends nothing). The radios, named by key, are sent too and ignored.
+#}
+{% extends "base.html" %}
+{% import "_editor.html" as editor %}
+{% set heading = _("Edit question") if question_id else _("New question") %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-6">
+  <div>
+    <a href="/manage/grammar" class="text-sm text-accent hover:underline">← {{ _("Manage grammar") }}</a>
+    <h1 class="mt-1 text-2xl font-bold">{{ heading }}</h1>
+    {% if slug %}
+    <p class="mt-1 text-sm text-muted">{% trans slug=slug %}Imported as <code>{{ slug }}</code>. Importing the file again overwrites changes made here.{% endtrans %}</p>
+    {% endif %}
+  </div>
+
+  {% if errors %}
+  <div class="rounded-2xl bg-bad-soft p-4 text-sm text-bad">
+    <p class="font-semibold">{{ _("The question was not saved. Fix the marked fields.") }}</p>
+    {% if "" in errors %}<p class="mt-1">{{ errors[""] }}</p>{% endif %}
+  </div>
+  {% endif %}
+
+  <form method="post" action="{{ '/manage/grammar/%d/edit' % question_id if question_id else '/manage/grammar/new' }}"
+        x-data="questionEditor" @submit="save" class="space-y-6">
+    <input type="hidden" name="question" x-ref="json">
+
+    {{ editor.question_cards(numbered=false) }}
+
+    <div class="flex flex-wrap items-center gap-4">
+      <button class="cursor-pointer rounded-xl bg-accent px-5 py-2.5 font-semibold text-white hover:brightness-110">{{ _("Save") }}</button>
+      {% if user.is_admin %}
+      <label class="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="common" {{ "checked" if common }} class="accent-accent">
+        {{ _("Common: every user sees this question") }}
+      </label>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="application/json" id="editor-data">{{ {"data": data, "errors": errors, "limits": limits} | tojson }}</script>
+<script src="/static/editor.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.17.4/dist/cdn.min.js" defer></script>
+{% endblock %}

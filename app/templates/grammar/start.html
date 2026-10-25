@@ -17,7 +17,10 @@
 {% block title %}{{ _("Grammar") }}{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-xl space-y-6">
-  <h1 class="text-2xl font-bold">{{ _("Grammar") }}</h1>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-2xl font-bold">{{ _("Grammar") }}</h1>
+    <a href="/manage/grammar" class="rounded-xl border border-accent px-4 py-2 text-sm font-semibold text-accent hover:bg-accent-soft">{{ _("Manage") }}</a>
+  </div>
 
   {% if unfinished %}
   {% set u = unfinished %}
