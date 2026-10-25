@@ -683,8 +683,8 @@ msgstr[1] "%(count)s ta urinishda eng yaxshi natija %(best)s%%"
 
 #: app/templates/practice/_attempt.html:71
 #, python-format
-msgid "Answered %(answered)s of %(total)s · saved"
-msgstr "Javob berildi: %(answered)s/%(total)s · saqlandi"
+msgid "Answered %(answered)s of %(total)s"
+msgstr "Javob berildi: %(answered)s/%(total)s"
 
 #: app/templates/practice/_attempt.html:74
 msgid "Check answers"
@@ -712,11 +712,15 @@ msgstr "Natija"
 msgid "%(percent)s%% correct in %(time)s"
 msgstr "%(time)s ichida %(percent)s%% toʻgʻri"
 
-#: app/templates/practice/_result.html:59
-msgid "your answer"
-msgstr "sizning javobingiz"
+#: app/templates/practice/_result.html:60
+msgid "Correct answer"
+msgstr "Toʻgʻri javob"
 
-#: app/templates/practice/_result.html:63
+#: app/templates/practice/_result.html:64
+msgid "Your answer, wrong"
+msgstr "Sizning javobingiz, notoʻgʻri"
+
+#: app/templates/practice/_result.html:71
 msgid "No answer"
 msgstr "Javob yoʻq"
 

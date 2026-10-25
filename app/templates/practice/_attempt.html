@@ -66,11 +66,11 @@
     </fieldset>
     {% endfor %}
 
-    <div class="flex items-center justify-between gap-3">
+    <div class="flex flex-col items-center gap-3 lg:flex-row lg:justify-between">
       <span data-save-status class="text-xs text-muted">
-        {% if answered %}{% trans total=content.questions | length %}Answered {{ answered }} of {{ total }} · saved{% endtrans %}{% endif %}
+        {% trans total=content.questions | length %}Answered {{ answered }} of {{ total }}{% endtrans %}
       </span>
-      <button data-submit class="cursor-pointer rounded-xl bg-accent px-6 py-3 font-semibold text-white hover:brightness-110 disabled:opacity-60">
+      <button data-submit class="w-full cursor-pointer rounded-xl bg-accent px-6 py-3 font-semibold text-white hover:brightness-110 disabled:opacity-60 lg:w-auto">
         {{ _("Check answers") }}
       </button>
     </div>

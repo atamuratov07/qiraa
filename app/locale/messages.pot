@@ -680,7 +680,7 @@ msgstr[1] ""
 
 #: app/templates/practice/_attempt.html:71
 #, python-format
-msgid "Answered %(answered)s of %(total)s · saved"
+msgid "Answered %(answered)s of %(total)s"
 msgstr ""
 
 #: app/templates/practice/_attempt.html:74
@@ -707,11 +707,15 @@ msgstr ""
 msgid "%(percent)s%% correct in %(time)s"
 msgstr ""
 
-#: app/templates/practice/_result.html:59
-msgid "your answer"
+#: app/templates/practice/_result.html:60
+msgid "Correct answer"
 msgstr ""
 
-#: app/templates/practice/_result.html:63
+#: app/templates/practice/_result.html:64
+msgid "Your answer, wrong"
+msgstr ""
+
+#: app/templates/practice/_result.html:71
 msgid "No answer"
 msgstr ""
 

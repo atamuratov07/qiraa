@@ -688,8 +688,8 @@ msgstr[2] "лучший результат %(best)s%% за %(count)s попыт�
 
 #: app/templates/practice/_attempt.html:71
 #, python-format
-msgid "Answered %(answered)s of %(total)s · saved"
-msgstr "Отвечено %(answered)s из %(total)s · сохранено"
+msgid "Answered %(answered)s of %(total)s"
+msgstr "Отвечено %(answered)s из %(total)s"
 
 #: app/templates/practice/_attempt.html:74
 msgid "Check answers"
@@ -717,11 +717,15 @@ msgstr "Результат"
 msgid "%(percent)s%% correct in %(time)s"
 msgstr "%(percent)s%% верно за %(time)s"
 
-#: app/templates/practice/_result.html:59
-msgid "your answer"
-msgstr "ваш ответ"
+#: app/templates/practice/_result.html:60
+msgid "Correct answer"
+msgstr "Правильный ответ"
 
-#: app/templates/practice/_result.html:63
+#: app/templates/practice/_result.html:64
+msgid "Your answer, wrong"
+msgstr "Ваш ответ, неверный"
+
+#: app/templates/practice/_result.html:71
 msgid "No answer"
 msgstr "Нет ответа"
 
