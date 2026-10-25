@@ -89,6 +89,7 @@ def test_a_session_from_start_to_result(
 
     page = main(logged_in.get(url).text)
     assert "<article" not in page and "Грамматика" in page
+    assert 'data-back="/grammar"' in page  # where attempt.js goes once it is discarded
     [first, _second] = [int(i) for i in re.findall(r'data-question-id="(\d+)"', page)]
 
     saved = logged_in.put(

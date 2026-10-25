@@ -1,10 +1,15 @@
 {#
-  practice/_attempt.html: the layout of an unfinished attempt: questions, timer, autosave,
-  the paused card. passages/attempt.html and grammar/attempt.html extend it and fill:
+  practice/_attempt.html: the layout of an unfinished attempt: the questions, the timer in
+  the top corner, autosave, the paused card. static/navigator.js shows one question at a
+  time, flags it from its corner, and runs a bar at the bottom of the screen
+  (previous/next, the grid, "Check answers"); without scripts the questions are a plain
+  list with a submit button under them.
+  passages/attempt.html and grammar/attempt.html extend it and fill:
     columns       classes for the grid around the aside and the questions
     aside         content before the questions (the passage), or nothing
     pause_title   heading on the paused card, or nothing
-    discard_next  where Discard returns to
+    discard_next  where Discard returns to, and where attempt.js goes when the attempt is
+                  gone (discarded in another tab)
     back_link     the link under the paused card
   Route: GET /attempts/{attempt_id} while attempt.submitted_at is None
 
@@ -30,31 +35,49 @@
 #}
 {% extends "base.html" %}
 {% from "_macros.html" import mmss %}
+{% import "practice/_navigator.html" as navigator %}
 {% block title %}{{ title }}{% endblock %}
+
 {% block content %}
 {% set answered = answers | length %}
 
+{# ---- the timer floats in the top corner; attempt.js keeps it just under the header and
+   hides or shows the time on a click ---- #}
+<button type="button" id="timer" title="{{ _("Hide timer") }}"
+        class="fixed end-4 top-24 z-30 flex cursor-pointer items-center gap-1.5 rounded-full border border-line bg-white/95 px-3 py-1.5 text-sm text-muted shadow-sm hover:border-accent hover:text-ink">
+  {# the "clock" icon from Heroicons (MIT) #}
+  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="size-4">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+  </svg>
+  <span data-time class="font-semibold tabular-nums text-ink">{{ mmss(attempt.elapsed_seconds) }}</span>
+</button>
+
 <div id="attempt-root" data-attempt-id="{{ attempt.id }}" data-elapsed="{{ attempt.elapsed_seconds or 0 }}"
-     data-paused="{{ 'true' if paused else 'false' }}" data-total="{{ content.questions | length }}"></div>
+     data-paused="{{ 'true' if paused else 'false' }}" data-total="{{ content.questions | length }}"
+     data-back="{{ self.discard_next() }}"></div>
 
-{# ---- timer, bottom corner (the page gets extra bottom padding so it never covers the submit button) ---- #}
-<div id="timer" class="fixed end-4 bottom-4 z-20 flex items-center gap-2 rounded-full border border-line bg-white/95 py-1.5 ps-3 pe-1.5 text-sm shadow-sm">
-  <span aria-hidden="true">⏱</span>
-  <span data-time class="min-w-12 font-semibold tabular-nums">{{ mmss(attempt.elapsed_seconds) }}</span>
-  <button type="button" data-toggle class="cursor-pointer rounded-full px-2 py-0.5 text-xs text-muted hover:bg-paper" title="{{ _("Hide timer") }}">{{ _("hide") }}</button>
-</div>
-
-<div id="attempt-content" class="grid items-start gap-6 pb-16 {% block columns %}{% endblock %}" {% if paused %}inert{% endif %}>
+<div id="attempt-content" class="grid items-start gap-6 pt-10 pb-40 {% block columns %}{% endblock %}" {% if paused %}inert{% endif %}>
   {% block aside %}{% endblock %}
 
   <form id="answers-form" method="post" action="/attempts/{{ attempt.id }}/submit"
-        class="rounded-2xl border border-line bg-white p-6">
+        x-data="attemptNavigator" @keydown.window="key($event)"
+        class="scroll-mt-24 rounded-2xl border border-line bg-white p-6">
     {% for q in content.questions %}
-    <fieldset class="mb-5 border-b border-line pb-5" dir="auto" data-question-id="{{ q.id }}">
-      <legend class="mb-3 font-content text-xl font-semibold leading-loose"
-              data-tappable {% if passage_id %}data-passage-id="{{ passage_id }}"{% endif %}>
-        <span class="me-1 inline-grid size-7 place-items-center rounded-full bg-accent-soft align-middle font-sans text-sm font-bold text-accent">{{ loop.index }}</span>
-        {{ q.prompt }}
+    <fieldset id="q{{ loop.index }}" class="mb-5 scroll-mt-24 border-b border-line pb-5" dir="auto" data-question-id="{{ q.id }}"
+              data-step {% if loop.first %}data-current{% endif %} :data-current="current === {{ loop.index0 }}">
+      <legend class="mb-3 flex w-full items-start gap-2 font-content text-xl font-semibold leading-loose">
+        <span class="flex-1" data-tappable {% if passage_id %}data-passage-id="{{ passage_id }}"{% endif %}>
+          <span class="me-1 inline-grid size-7 place-items-center rounded-full bg-accent-soft align-middle font-sans text-sm font-bold text-accent">{{ loop.index }}</span>
+          {{ q.prompt }}
+        </span>
+        <button type="button" x-cloak @click="toggleFlag({{ q.id }})" :aria-pressed="flagged.includes({{ q.id }})"
+                title="{{ _("Flag") }}" aria-label="{{ _("Flag") }}"
+                class="group grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg font-sans text-muted hover:bg-paper hover:text-gold aria-pressed:text-gold">
+          {# the "flag" icon from Heroicons (MIT) #}
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="size-5 group-aria-pressed:fill-current">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"/>
+          </svg>
+        </button>
       </legend>
       {% for o in q.options %}
       <label class="mb-2 flex cursor-pointer items-center gap-3 rounded-xl border border-line px-4 py-2.5 font-content text-lg hover:border-accent has-checked:border-accent has-checked:bg-accent-soft">
@@ -66,20 +89,77 @@
     </fieldset>
     {% endfor %}
 
-    <div class="flex flex-col items-center gap-3 lg:flex-row lg:justify-between">
-      <span data-save-status class="text-xs text-muted">
-        {% trans total=content.questions | length %}Answered {{ answered }} of {{ total }}{% endtrans %}
-      </span>
-      <button data-submit class="w-full cursor-pointer rounded-xl bg-accent px-6 py-3 font-semibold text-white hover:brightness-110 disabled:opacity-60 lg:w-auto">
-        {{ _("Check answers") }}
-      </button>
+    <p data-save-status class="text-center text-xs text-muted">
+      {% trans total=content.questions | length %}Answered {{ answered }} of {{ total }}{% endtrans %}
+    </p>
+    {# without scripts the bar is hidden, so the list ends in a plain submit button #}
+    <button data-nojs @click="review($event)" class="mt-4 w-full cursor-pointer whitespace-nowrap rounded-xl bg-accent px-5 py-2.5 font-semibold text-white hover:brightness-110 disabled:opacity-60">{{ _("Check answers") }}</button>
+
+    {# ---- the bar at the bottom of the screen. ---- #}
+    <div x-cloak class="fixed inset-x-0 bottom-0 z-40" @click.outside="gridOpen = false" @keydown.escape.window="gridOpen = false">
+      <div x-show="gridOpen" x-transition.opacity class="pointer-events-none absolute inset-x-0 bottom-full mb-3 flex justify-center px-4">
+        <div class="pointer-events-auto w-fit max-w-sm rounded-2xl border border-line bg-white p-4 shadow-lg *:justify-center">
+          {{ navigator.grid(content.questions, answers) }}
+        </div>
+      </div>
+      <div class="border-t border-line bg-white/95 backdrop-blur">
+        <div class="mx-auto flex max-w-6xl flex-col gap-2.5 px-4 py-2.5 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+          <span class="max-sm:hidden"></span>
+          <div class="flex items-center justify-between sm:gap-1.5">
+            <button type="button" @click="prev" :disabled="current === 0" title="{{ _("Previous") }}" aria-label="{{ _("Previous") }}" class="grid size-10 cursor-pointer place-items-center rounded-xl border-2 border-line text-ink hover:border-accent hover:text-accent disabled:invisible">
+              {# the "arrow-left" icon from Heroicons (MIT) #}
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/>
+              </svg>
+            </button>
+            <button type="button" @click="gridOpen = !gridOpen" :aria-expanded="gridOpen" title="{{ _("Question list") }}"
+                    class="group flex cursor-pointer items-center gap-1 rounded-xl px-3 py-2 text-sm font-semibold tabular-nums hover:bg-paper">
+              <span x-text="`${current + 1} / ${total}`"></span>
+              {# the "chevron-up" icon from Heroicons (MIT) #}
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-4 transition-transform group-aria-expanded:rotate-180">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5"/>
+              </svg>
+            </button>
+            <button type="button" @click="next" title="{{ _("Next") }}" aria-label="{{ _("Next") }}" class="grid size-10 cursor-pointer place-items-center rounded-xl border-2 border-line text-ink hover:border-accent hover:text-accent disabled:invisible">
+              {# the "arrow-right" icon from Heroicons (MIT) #}
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+              </svg>
+            </button>
+          </div>
+          <button data-submit @click="review($event)" class="w-full sm:w-auto sm:justify-self-end cursor-pointer whitespace-nowrap rounded-xl bg-accent px-5 py-2.5 font-semibold text-white hover:brightness-110 disabled:opacity-60">{{ _("Check answers") }}</button>
+        </div>
+      </div>
+    </div>
+
+    {# ---- review: every "Check answers" opens it when navigator.js runs ---- #}
+    <div x-cloak x-show="reviewing" data-review @click.self="reviewing = false" @keydown.escape.window="reviewing = false"
+         class="fixed inset-0 z-45 flex overflow-y-auto bg-paper/60 p-4 backdrop-blur-sm">
+      <div role="dialog" aria-modal="true" aria-label="{{ _("Check your answers") }}"
+           class="m-auto w-full max-w-md rounded-2xl border border-line bg-white p-6 shadow-xl">
+        {{ navigator.grid(content.questions, answers) }}
+        <dl class="mt-4 flex justify-between text-sm">
+          <dt class="text-muted">{{ _("Not answered") }}</dt>
+          <dd class="font-semibold tabular-nums" x-text="total - answered.length"></dd>
+        </dl>
+        <div class="mt-6 flex flex-col gap-3">
+          <button x-ref="confirm" :disabled="submitting"
+                  class="w-full cursor-pointer rounded-xl bg-accent px-6 py-3 font-semibold text-white hover:brightness-110 disabled:opacity-60">
+            {{ _("Submit") }}
+          </button>
+          <button type="button" @click="reviewing = false"
+                  class="w-full cursor-pointer rounded-xl border border-line px-6 py-3 font-semibold text-muted hover:border-accent hover:text-ink">
+            {{ _("Back to questions") }}
+          </button>
+        </div>
+      </div>
     </div>
   </form>
 </div>
 
 {# ---- paused card: shown on load when paused, and by attempt.js after you leave the tab ---- #}
 <div id="pause-overlay" {% if not paused %}hidden{% endif %}
-     class="fixed inset-0 z-30 flex items-center justify-center bg-paper/40 p-4 backdrop-blur-xl">
+     class="fixed inset-0 z-50 flex items-center justify-center bg-paper/40 p-4 backdrop-blur-xl">
   <div class="w-full max-w-sm rounded-2xl border border-line bg-white p-6 text-center shadow-xl">
     <p class="text-sm font-semibold uppercase tracking-wider text-gold">{{ _("Paused") }}</p>
     {% block pause_title %}{% endblock %}
@@ -107,4 +187,6 @@
 {% block scripts %}
 <script src="/static/reader.js" defer></script>
 <script src="/static/attempt.js" defer></script>
+<script src="/static/navigator.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.17.4/dist/cdn.min.js" defer></script>
 {% endblock %}

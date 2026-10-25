@@ -241,11 +241,12 @@ Templates stay in `app/templates/<feature>/`.
 
 ### 9. Question navigator
 
-- [ ] One question at a time (passage stays visible beside it; above it on phones).
-- [ ] Number grid: current, answered, unanswered, flagged; ←/→, 1–4, F shortcuts; `#q3` in
+- [x] One question at a time (passage stays visible beside it; above it on phones), with the
+      controls in a bar fixed to the bottom of the screen and the timer in the top corner.
+- [x] Number grid: current, answered, unanswered, flagged; ←/→, 1–6, F shortcuts; `#q3` in
       the URL; flags kept in the browser per attempt.
-- [ ] Review screen before submitting replaces the confirm dialog; result page reuses the grid.
-- [ ] Works as a plain list without JavaScript.
+- [x] Review screen before submitting replaces the confirm dialog; result page reuses the grid.
+- [x] Works as a plain list without JavaScript.
       Done when: used by passage attempts, grammar sessions and both result pages.
 
 ### 10. Speaking practice

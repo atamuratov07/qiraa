@@ -13,6 +13,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {# Before anything is drawn: styles that only apply when scripts run hang off .js #}
+  <script>document.documentElement.classList.add("js")</script>
   <title>{% block title %}Qiraa{% endblock %} · قراءة</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>ق</text></svg>">
 
@@ -38,7 +40,14 @@
     }
   </style>
   <style>
-    /* Arabic words that reader.js made tappable */
+    /* An attempt shows one question at a time when navigator.js runs; otherwise a list. */
+    .js [data-step]:not([data-current]) { display: none; }
+    .js [data-nojs] { display: none; }
+    /* Links within a page (the result page's question grid) glide to their target. */
+    @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+    /* Controls that need Alpine stay hidden until it starts, and without scripts. */
+    [x-cloak] { display: none !important; }
+    /* Words that reader.js made tappable */
     .w { cursor: pointer; border-radius: 4px; transition: background .1s; }
     .w:hover { background: #dcefe6; }
     .w.on { background: #fbe7a6; }
@@ -98,8 +107,6 @@
 
   {# Text for the scripts in static/; they fill in the {name} placeholders. #}
   <script type="application/json" id="i18n">{{ {
-    "show": _("show"),
-    "hide": _("hide"),
     "showTimer": _("Show timer"),
     "hideTimer": _("Hide timer"),
     "status": _("Answered {answered} of {total} · {status}"),
@@ -107,7 +114,6 @@
     "saved": _("saved"),
     "notSaved": _("not saved ({code}); the answer will be sent when you submit"),
     "offline": _("no connection: not saved; the answer will be sent when you submit"),
-    "unanswered": _("Questions without an answer: {count}. Submit anyway?"),
     "checking": _("Checking…"),
     "noTranslator": _("Translation is not available yet."),
     "serverError": _("Server error ({code})."),

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-25 12:25+0500\n"
+"POT-Creation-Date: 2026-10-25 16:39+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -205,7 +205,7 @@ msgstr ""
 msgid "Another passage already uses the slug %(slug)s."
 msgstr ""
 
-#: app/practice/models.py:97 app/templates/base.html:74
+#: app/practice/models.py:97 app/templates/base.html:83
 #: app/templates/grammar/attempt.html:12 app/templates/grammar/start.html:17
 #: app/templates/grammar/start.html:21
 msgid "Grammar"
@@ -223,23 +223,23 @@ msgstr ""
 msgid "Remove question"
 msgstr ""
 
-#: app/templates/_editor.html:28
+#: app/templates/_editor.html:29
 msgid "Question"
 msgstr ""
 
-#: app/templates/_editor.html:36
+#: app/templates/_editor.html:39
 msgid "Correct option"
 msgstr ""
 
-#: app/templates/_editor.html:39
+#: app/templates/_editor.html:42
 msgid "Remove option"
 msgstr ""
 
-#: app/templates/_editor.html:46
+#: app/templates/_editor.html:49
 msgid "Add option"
 msgstr ""
 
-#: app/templates/_editor.html:49
+#: app/templates/_editor.html:52
 msgid "Explanation"
 msgstr ""
 
@@ -251,96 +251,83 @@ msgstr ""
 msgid "Google Translate"
 msgstr ""
 
-#: app/templates/base.html:54
+#: app/templates/base.html:63
 #, python-format
 msgid "Marhaba, %(name)s"
 msgstr ""
 
-#: app/templates/base.html:56 app/templates/base.html:61
+#: app/templates/base.html:65 app/templates/base.html:70
 #, python-format
 msgid "%(count)s day in a row"
 msgid_plural "%(count)s days in a row"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/base.html:73 app/templates/passages/list.html:18
+#: app/templates/base.html:82 app/templates/passages/list.html:18
 #: app/templates/passages/list.html:21
 msgid "Passages"
 msgstr ""
 
-#: app/templates/base.html:75 app/templates/profile/profile.html:26
+#: app/templates/base.html:84 app/templates/profile/profile.html:26
 msgid "Profile"
 msgstr ""
 
-#: app/templates/base.html:82
+#: app/templates/base.html:92
 msgid "Log out"
 msgstr ""
 
-#: app/templates/base.html:101
-msgid "show"
-msgstr ""
-
-#: app/templates/base.html:102 app/templates/practice/_attempt.html:44
-msgid "hide"
-msgstr ""
-
-#: app/templates/base.html:103
+#: app/templates/base.html:111
 msgid "Show timer"
 msgstr ""
 
-#: app/templates/base.html:104 app/templates/practice/_attempt.html:44
+#: app/templates/base.html:112 app/templates/practice/_attempt.html:42
 msgid "Hide timer"
-msgstr ""
-
-#: app/templates/base.html:105
-#, python-brace-format
-msgid "Answered {answered} of {total} · {status}"
-msgstr ""
-
-#: app/templates/base.html:106
-msgid "saving…"
-msgstr ""
-
-#: app/templates/base.html:107
-msgid "saved"
-msgstr ""
-
-#: app/templates/base.html:108
-#, python-brace-format
-msgid "not saved ({code}); the answer will be sent when you submit"
-msgstr ""
-
-#: app/templates/base.html:109
-msgid "no connection: not saved; the answer will be sent when you submit"
-msgstr ""
-
-#: app/templates/base.html:110
-#, python-brace-format
-msgid "Questions without an answer: {count}. Submit anyway?"
-msgstr ""
-
-#: app/templates/base.html:111
-msgid "Checking…"
-msgstr ""
-
-#: app/templates/base.html:112
-msgid "Translation is not available yet."
 msgstr ""
 
 #: app/templates/base.html:113
 #, python-brace-format
-msgid "Server error ({code})."
+msgid "Answered {answered} of {total} · {status}"
 msgstr ""
 
 #: app/templates/base.html:114
-msgid "Translation not found."
+msgid "saving…"
 msgstr ""
 
 #: app/templates/base.html:115
-msgid "Network error. Try the link below."
+msgid "saved"
 msgstr ""
 
 #: app/templates/base.html:116
+#, python-brace-format
+msgid "not saved ({code}); the answer will be sent when you submit"
+msgstr ""
+
+#: app/templates/base.html:117
+msgid "no connection: not saved; the answer will be sent when you submit"
+msgstr ""
+
+#: app/templates/base.html:118
+msgid "Checking…"
+msgstr ""
+
+#: app/templates/base.html:119
+msgid "Translation is not available yet."
+msgstr ""
+
+#: app/templates/base.html:120
+#, python-brace-format
+msgid "Server error ({code})."
+msgstr ""
+
+#: app/templates/base.html:121
+msgid "Translation not found."
+msgstr ""
+
+#: app/templates/base.html:122
+msgid "Network error. Try the link below."
+msgstr ""
+
+#: app/templates/base.html:123
 #, python-brace-format
 msgid "Question {num}"
 msgstr ""
@@ -561,15 +548,15 @@ msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr ""
 
 #: app/templates/grammar/start.html:32 app/templates/passages/list.html:52
-#: app/templates/practice/_attempt.html:94
+#: app/templates/practice/_attempt.html:181
 msgid "Continue"
 msgstr ""
 
-#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:97
+#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:184
 msgid "Discard this attempt and its saved answers?"
 msgstr ""
 
-#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:99
+#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:186
 msgid "Discard and start over"
 msgstr ""
 
@@ -721,44 +708,77 @@ msgid_plural "best score %(best)s%% in %(count)s attempts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/practice/_attempt.html:71
+#: app/templates/practice/_attempt.html:85
 #, python-format
 msgid "Answered %(answered)s of %(total)s"
 msgstr ""
 
-#: app/templates/practice/_attempt.html:74
+#: app/templates/practice/_attempt.html:88 app/templates/practice/_attempt.html:97
+#: app/templates/practice/_attempt.html:134
 msgid "Check answers"
 msgstr ""
 
-#: app/templates/practice/_attempt.html:84
+#: app/templates/practice/_attempt.html:102 app/templates/practice/_attempt.html:108
+msgid "Flag"
+msgstr ""
+
+#: app/templates/practice/_attempt.html:112
+msgid "Previous"
+msgstr ""
+
+#: app/templates/practice/_attempt.html:118 app/templates/practice/_navigator.html:14
+msgid "Question list"
+msgstr ""
+
+#: app/templates/practice/_attempt.html:126
+msgid "Next"
+msgstr ""
+
+#: app/templates/practice/_attempt.html:145
+msgid "Check your answers"
+msgstr ""
+
+#: app/templates/practice/_attempt.html:149
+msgid "Not answered"
+msgstr ""
+
+#: app/templates/practice/_attempt.html:155
+msgid "Submit"
+msgstr ""
+
+#: app/templates/practice/_attempt.html:159
+msgid "Back to questions"
+msgstr ""
+
+#: app/templates/practice/_attempt.html:171
 msgid "Paused"
 msgstr ""
 
-#: app/templates/practice/_attempt.html:87
+#: app/templates/practice/_attempt.html:174
 #, python-format
 msgid ""
 "Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"
 "time>%(time)s</span> elapsed"
 msgstr ""
 
-#: app/templates/practice/_result.html:24
+#: app/templates/practice/_result.html:25
 msgid "Result"
 msgstr ""
 
-#: app/templates/practice/_result.html:35
+#: app/templates/practice/_result.html:36
 #, python-format
 msgid "%(percent)s%% correct in %(time)s"
 msgstr ""
 
-#: app/templates/practice/_result.html:60
+#: app/templates/practice/_result.html:62
 msgid "Correct answer"
 msgstr ""
 
-#: app/templates/practice/_result.html:64
+#: app/templates/practice/_result.html:66
 msgid "Your answer, wrong"
 msgstr ""
 
-#: app/templates/practice/_result.html:71
+#: app/templates/practice/_result.html:73
 msgid "No answer"
 msgstr ""
 

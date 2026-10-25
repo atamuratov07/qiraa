@@ -21,6 +21,7 @@
 #}
 {% extends "base.html" %}
 {% from "_macros.html" import mmss %}
+{% import "practice/_navigator.html" as navigator %}
 {% block title %}{{ _("Result") }} · {{ title }}{% endblock %}
 {% block content %}
 {% set percent = ((100 * attempt.score / attempt.total) | round | int) if attempt.total else 0 %}
@@ -40,11 +41,12 @@
 <div class="grid items-start gap-6 {{ self.width() }} {% block columns %}{% endblock %}">
 
   <section class="rounded-2xl border border-line bg-white p-6">
+    <div class="mb-6">{{ navigator.grid(content.questions, answers, result=true) }}</div>
     {% for q in content.questions %}
     {% set chosen = answers.get(q.id) %}
     {% set chosen_option = q.options | selectattr("id", "equalto", chosen) | first %}
     {% set right = chosen_option is defined and chosen_option.is_correct %}
-    <div class="mb-5 border-s-4 ps-4 pb-1 {{ 'border-accent' if right else 'border-bad' }}" dir="auto">
+    <div id="q{{ loop.index }}" class="mb-5 scroll-mt-24 border-s-4 ps-4 pb-1 {{ 'border-accent' if right else 'border-bad' }}" dir="auto">
       <p class="mb-2 font-content text-xl font-semibold leading-loose" data-tappable {% if passage_id %}data-passage-id="{{ passage_id }}"{% endif %}>
         <span class="me-1 inline-grid size-7 place-items-center rounded-full bg-accent-soft align-middle font-sans text-sm font-bold text-accent">{{ loop.index }}</span>
         {{ q.prompt }}
