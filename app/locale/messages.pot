@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-25 22:34+0500\n"
+"POT-Creation-Date: 2026-10-25 22:44+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -550,21 +550,21 @@ msgstr ""
 msgid "Manage"
 msgstr ""
 
-#: app/templates/grammar/start.html:29 app/templates/passages/list.html:50
+#: app/templates/grammar/start.html:29 app/templates/passages/list.html:47
 #, python-format
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr ""
 
-#: app/templates/grammar/start.html:32 app/templates/passages/list.html:52
+#: app/templates/grammar/start.html:32 app/templates/passages/list.html:54
 #: app/templates/practice/_attempt.html:174
 msgid "Continue"
 msgstr ""
 
-#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:177
+#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:178
 msgid "Discard this attempt and its saved answers?"
 msgstr ""
 
-#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:179
+#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:180
 msgid "Discard and start over"
 msgstr ""
 
@@ -642,7 +642,7 @@ msgstr ""
 msgid "Other"
 msgstr ""
 
-#: app/templates/passages/list.html:35 app/templates/passages/manage.html:35
+#: app/templates/passages/list.html:36 app/templates/passages/manage.html:35
 #: app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
@@ -650,26 +650,26 @@ msgid_plural "%(count)s questions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/passages/list.html:39
+#: app/templates/passages/list.html:40
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/passages/list.html:42
+#: app/templates/passages/list.html:43
 msgid "New"
 msgstr ""
 
-#: app/templates/passages/list.html:54
+#: app/templates/passages/list.html:56
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr ""
 
-#: app/templates/passages/list.html:56
+#: app/templates/passages/list.html:58
 msgid "Discard"
 msgstr ""
 
-#: app/templates/passages/list.html:65 app/templates/passages/manage.html:50
+#: app/templates/passages/list.html:67 app/templates/passages/manage.html:50
 msgid "No passages yet."
 msgstr ""
 
