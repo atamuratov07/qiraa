@@ -9,9 +9,9 @@
 #}
 {% set field = "block w-full rounded-lg border border-line bg-paper px-3 text-ink focus:outline-2 focus:outline-accent" %}
 {% set input = field ~ " mt-1 py-2" %}
-{% set arabic = input ~ " font-arabic text-xl leading-loose" %}
+{% set content = input ~ " font-content text-xl leading-loose" %}
 {% set row_input = field ~ " py-1" %}
-{% set row_arabic = row_input ~ " font-arabic text-xl leading-loose" %}
+{% set row_content = row_input ~ " font-content text-xl leading-loose" %}
 {% set remove = "grid size-8 shrink-0 cursor-pointer place-items-center rounded-full text-xl leading-none text-muted hover:bg-bad-soft hover:text-bad disabled:invisible" %}
 {% set add = "cursor-pointer text-sm font-semibold text-accent hover:underline" %}
 
@@ -27,7 +27,7 @@
     {% endif %}
     <label class="block text-sm text-muted">
       <span class="{{ 'sr-only' if numbered }}">{{ _("Question") }}</span>
-      <textarea x-model="q.prompt" rows="2" required dir="rtl" lang="ar" class="{{ arabic }}"></textarea>
+      <textarea x-model="q.prompt" rows="2" required dir="auto" class="{{ content }}"></textarea>
       <span x-show="error(path(qi, 'prompt'))" x-text="error(path(qi, 'prompt'))" class="mt-1 block text-bad"></span>
     </label>
 
@@ -37,7 +37,7 @@
           <div class="flex items-center gap-3">
             <input type="radio" :name="q.key" :value="o.key" x-model="q.correct"
                    title="{{ _("Correct option") }}" aria-label="{{ _("Correct option") }}" class="size-5 shrink-0 accent-accent">
-            <input x-model="o.text" required dir="rtl" lang="ar" class="{{ row_arabic }}">
+            <input x-model="o.text" required dir="auto" class="{{ row_content }}">
             <button type="button" @click="removeOption(q, oi)" :disabled="q.options.length <= limits.min_options"
                     title="{{ _("Remove option") }}" aria-label="{{ _("Remove option") }}" class="{{ remove }}">×</button>
           </div>

@@ -55,9 +55,9 @@
     {% endif %}
     {% for items, group_heading in groups if items %}
     <p class="font-semibold text-accent">{{ group_heading }}</p>
-    <ul class="mt-1 mb-3 list-disc ps-6 marker:text-accent/50 last:mb-0" dir="rtl">
+    <ul class="mt-1 mb-3 list-disc ps-6 marker:text-accent/50 last:mb-0" dir="auto">
       {% for item in items %}
-      <li class="font-arabic text-lg" lang="ar">
+      <li class="font-content text-lg">
         <a href="{{ '/manage/grammar/%d/edit' % item.id if grammar else '/passages/%d' % item.id }}" class="block rounded-lg px-3 py-1 transition-colors hover:bg-accent/10">{{ item.title }}</a>
       </li>
       {% endfor %}

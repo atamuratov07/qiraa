@@ -50,14 +50,14 @@
   <form id="answers-form" method="post" action="/attempts/{{ attempt.id }}/submit"
         class="rounded-2xl border border-line bg-white p-6">
     {% for q in content.questions %}
-    <fieldset class="mb-5 border-b border-line pb-5" dir="rtl" lang="ar" data-question-id="{{ q.id }}">
-      <legend class="mb-3 font-arabic text-xl font-semibold leading-loose"
+    <fieldset class="mb-5 border-b border-line pb-5" dir="auto" data-question-id="{{ q.id }}">
+      <legend class="mb-3 font-content text-xl font-semibold leading-loose"
               data-tappable {% if passage_id %}data-passage-id="{{ passage_id }}"{% endif %}>
         <span class="me-1 inline-grid size-7 place-items-center rounded-full bg-accent-soft align-middle font-sans text-sm font-bold text-accent">{{ loop.index }}</span>
         {{ q.prompt }}
       </legend>
       {% for o in q.options %}
-      <label class="mb-2 flex cursor-pointer items-center gap-3 rounded-xl border border-line px-4 py-2.5 font-arabic text-lg hover:border-accent has-checked:border-accent has-checked:bg-accent-soft">
+      <label class="mb-2 flex cursor-pointer items-center gap-3 rounded-xl border border-line px-4 py-2.5 font-content text-lg hover:border-accent has-checked:border-accent has-checked:bg-accent-soft">
         <input type="radio" name="q{{ q.id }}" value="{{ o.id }}" class="size-4 shrink-0 accent-accent"
                {% if answers.get(q.id) == o.id %}checked{% endif %}>
         <span>{{ o.text }}</span>

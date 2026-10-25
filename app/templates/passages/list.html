@@ -31,7 +31,7 @@
     {% for p in items %}
     <div class="flex flex-col overflow-hidden rounded-2xl border bg-white transition hover:-translate-y-0.5 {{ 'border-gold' if p.unfinished else 'border-line hover:border-accent' }}">
       <a href="/passages/{{ p.id }}" class="flex flex-1 flex-col gap-2 p-4">
-        <span class="font-arabic text-xl font-semibold" lang="ar" dir="rtl">{{ p.title }}</span>
+        <span class="font-content text-xl font-semibold" dir="auto">{{ p.title }}</span>
         <span class="text-xs text-muted">{% trans count=p.question_count %}{{ count }} question{% pluralize %}{{ count }} questions{% endtrans %}</span>
         {% if p.best is not none %}
           {% set color = 'text-accent' if p.best >= 80 else ('text-gold' if p.best >= 50 else 'text-bad') %}

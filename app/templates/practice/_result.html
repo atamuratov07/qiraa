@@ -44,15 +44,15 @@
     {% set chosen = answers.get(q.id) %}
     {% set chosen_option = q.options | selectattr("id", "equalto", chosen) | first %}
     {% set right = chosen_option is defined and chosen_option.is_correct %}
-    <div class="mb-5 border-s-4 ps-4 pb-1 {{ 'border-accent' if right else 'border-bad' }}" dir="rtl" lang="ar">
-      <p class="mb-2 font-arabic text-xl font-semibold leading-loose" data-tappable {% if passage_id %}data-passage-id="{{ passage_id }}"{% endif %}>
+    <div class="mb-5 border-s-4 ps-4 pb-1 {{ 'border-accent' if right else 'border-bad' }}" dir="auto">
+      <p class="mb-2 font-content text-xl font-semibold leading-loose" data-tappable {% if passage_id %}data-passage-id="{{ passage_id }}"{% endif %}>
         <span class="me-1 inline-grid size-7 place-items-center rounded-full bg-accent-soft align-middle font-sans text-sm font-bold text-accent">{{ loop.index }}</span>
         {{ q.prompt }}
       </p>
       <ul>
         {% for o in q.options %}
         {% set wrong = o.id == chosen and not o.is_correct %}
-        <li class="mb-1 flex items-center gap-3 rounded-lg px-3 py-1.5 font-arabic text-lg
+        <li class="mb-1 flex items-center gap-3 rounded-lg px-3 py-1.5 font-content text-lg
                    {{ 'bg-accent-soft font-semibold' if o.is_correct }} {{ 'bg-bad-soft' if wrong }}">
           <span>{{ o.text }}</span>
           {# the "check" and "x-mark" icons from Heroicons (MIT) #}

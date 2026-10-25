@@ -28,7 +28,7 @@
     {% for q in questions %}
     <li class="flex items-center gap-4 px-5 py-3">
       <div class="min-w-0 flex-1">
-        <p class="truncate font-arabic text-lg" lang="ar" dir="rtl">{{ q.prompt }}</p>
+        <p class="truncate font-content text-lg" dir="auto">{{ q.prompt }}</p>
         {% if q.slug or q.is_common %}
         <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
           {% if q.slug %}<code>{{ q.slug }}</code>{% endif %}

@@ -65,7 +65,7 @@
     <div class="flex items-center gap-2 border-b border-line last:border-0">
     <a href="/attempts/{{ a.id }}" class="flex flex-1 items-center gap-4 py-2.5 hover:bg-paper">
       {% if a.kind == "passage" %}
-      <span class="flex-1 font-arabic text-lg" lang="ar" dir="rtl">{{ a.display_title }}</span>
+      <span class="flex-1 font-content text-lg" dir="auto">{{ a.display_title }}</span>
       {% else %}
       <span class="flex-1">{{ a.display_title }}</span>
       {% endif %}

@@ -44,7 +44,7 @@
     <section class="space-y-4 rounded-2xl border border-line bg-white p-6">
       <div class="grid gap-4 sm:grid-cols-[1fr_8rem]">
         <label class="block text-sm text-muted">{{ _("Title") }}
-          <input x-model="title" maxlength="{{ limits.title }}" dir="rtl" lang="ar" class="{{ editor.arabic }}">
+          <input x-model="title" maxlength="{{ limits.title }}" dir="auto" class="{{ editor.content }}">
           <span x-show="error('title')" x-text="error('title')" class="mt-1 block text-bad"></span>
         </label>
         <label class="block text-sm text-muted">{{ _("Level") }}
@@ -53,7 +53,7 @@
         </label>
       </div>
       <label class="block text-sm text-muted">{{ _("Text") }}
-        <textarea x-model="text" rows="10" required dir="rtl" lang="ar" class="{{ editor.arabic }}"></textarea>
+        <textarea x-model="text" rows="10" required dir="auto" class="{{ editor.content }}"></textarea>
         <span x-show="error('text')" x-text="error('text')" class="mt-1 block text-bad"></span>
       </label>
       <label class="block text-sm text-muted">{{ _("Translation into Russian") }}
@@ -70,7 +70,7 @@
       <h2 class="font-semibold">{{ _("Glossary") }}</h2>
       <template x-for="(row, wi) in glossary" :key="row.key">
         <div class="flex items-center gap-3">
-          <input x-model="row.word" placeholder="{{ _("Word") }}" dir="rtl" lang="ar" class="{{ editor.row_arabic }}">
+          <input x-model="row.word" placeholder="{{ _("Word") }}" dir="auto" class="{{ editor.row_content }}">
           <input x-model="row.meaning" placeholder="{{ _("Meaning") }}" class="{{ editor.row_input }}">
           <button type="button" @click="removeWord(wi)" title="{{ _("Remove word") }}" aria-label="{{ _("Remove word") }}" class="{{ editor.remove }}">×</button>
         </div>
