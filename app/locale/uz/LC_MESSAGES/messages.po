@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-25 20:03+0500\n"
+"POT-Creation-Date: 2026-10-25 21:25+0500\n"
 "PO-Revision-Date: 2026-10-15 13:30+0500\n"
 "Last-Translator: Damir\n"
 "Language: uz\n"
@@ -246,7 +246,7 @@ msgstr "Izoh"
 msgid "Language"
 msgstr "Til"
 
-#: app/templates/_popover.html:8
+#: app/templates/_popover.html:7
 msgid "Google Translate"
 msgstr "Google Tarjimon"
 
@@ -310,13 +310,13 @@ msgid "Checking…"
 msgstr "Tekshirilmoqda…"
 
 #: app/templates/base.html:118
-msgid "Translation is not available yet."
-msgstr "Tarjima hozircha mavjud emas."
-
-#: app/templates/base.html:119
 #, python-brace-format
 msgid "Server error ({code})."
 msgstr "Server xatosi ({code})."
+
+#: app/templates/base.html:119
+msgid "Today's translation limit is used up. Try the link below."
+msgstr "Bugungi tarjima limiti tugadi. Quyidagi havoladan foydalanib koʻring."
 
 #: app/templates/base.html:120
 msgid "Translation not found."

@@ -2,7 +2,7 @@
   passages/attempt.html: an unfinished passage attempt, the passage beside the questions.
   The layout and the full context are in practice/_attempt.html; here:
     title       the passage title, or the start of its text
-    passage_id  also where Discard returns to; None once the passage is deleted or hidden
+    passage_id  where Discard returns to; None once the passage is deleted or hidden
     content     .text .level besides the questions
 #}
 {% extends "practice/_attempt.html" %}
@@ -16,7 +16,7 @@
   {% endif %}
   <h1 class="mt-3 mb-4 font-content text-3xl font-bold leading-relaxed" dir="auto">{{ title }}</h1>
   <div class="font-content text-2xl leading-[2.2]" dir="auto"
-       data-tappable {% if passage_id %}data-passage-id="{{ passage_id }}"{% endif %}>
+       data-tappable>
     {% for para in content.text.strip().split("\n\n") %}
     <p class="mb-4" dir="auto">{{ para }}</p>
     {% endfor %}

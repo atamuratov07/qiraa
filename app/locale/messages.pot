@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-25 20:03+0500\n"
+"POT-Creation-Date: 2026-10-25 21:25+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -247,7 +247,7 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
-#: app/templates/_popover.html:8
+#: app/templates/_popover.html:7
 msgid "Google Translate"
 msgstr ""
 
@@ -311,12 +311,12 @@ msgid "Checking…"
 msgstr ""
 
 #: app/templates/base.html:118
-msgid "Translation is not available yet."
+#, python-brace-format
+msgid "Server error ({code})."
 msgstr ""
 
 #: app/templates/base.html:119
-#, python-brace-format
-msgid "Server error ({code})."
+msgid "Today's translation limit is used up. Try the link below."
 msgstr ""
 
 #: app/templates/base.html:120
