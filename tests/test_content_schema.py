@@ -3,8 +3,8 @@
 import pytest
 from pydantic import BaseModel, ValidationError
 
-from app.content.schemas import ContentFile, PassageEntry
-from app.passages.schemas import PassageIn, QuestionIn
+from app.content.schemas import QuestionIn
+from app.passages.schemas import PassageEntry, PassageFile, PassageIn
 
 QUESTION = {"prompt": "سؤال؟", "options": ["أ", "ب", "ج"], "answer": "B"}
 PASSAGE = {"slug": "b1-media", "text": "الفقرة.", "questions": [QUESTION]}
@@ -53,4 +53,4 @@ def test_a_slug_is_lowercase_words_with_hyphens(slug: str) -> None:
 def test_slugs_are_unique_in_a_file() -> None:
     data = {"passages": [PASSAGE, {**PASSAGE, "text": "نص آخر."}]}
 
-    assert error_types(ContentFile, data) == ["duplicate_slug"]
+    assert error_types(PassageFile, data) == ["duplicate_slug"]

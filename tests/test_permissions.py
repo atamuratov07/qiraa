@@ -1,5 +1,6 @@
 """
-Passages used here (users: peter 1, sarah 2, admin 3):
+Passages used here (users: peter 1, sarah 2, admin 3), and grammar questions with the
+same ids and owners:
     10  peter's, private
     11  sarah's, private
     12  peter's, published
@@ -15,8 +16,9 @@ from sqlalchemy.orm import Session
 from app.auth.models import User
 from app.auth.service import SESSION_COOKIE, create_session
 from app.core.permissions import load_editable, load_visible, visible
+from app.grammar.models import GrammarQuestion
 from app.passages.models import Passage
-from tests.factories import make_passage, make_question
+from tests.factories import make_grammar_question, make_passage, make_question
 
 
 @pytest.fixture
@@ -28,6 +30,11 @@ def owned(db: Session, user: User, other_user: User, admin: User) -> None:
             make_passage(12, [], owner=user, is_common=True),
             make_passage(13, [], owner=admin, is_common=True),
             make_passage(14, [], owner=None),
+            make_grammar_question(10, owner=user),
+            make_grammar_question(11, owner=other_user),
+            make_grammar_question(12, owner=user, is_common=True),
+            make_grammar_question(13, owner=admin, is_common=True),
+            make_grammar_question(14, owner=None),
         ]
     )
     db.commit()
@@ -48,22 +55,24 @@ def owned(db: Session, user: User, other_user: User, admin: User) -> None:
         pytest.param(14, "admin", True, True, id="orphaned common / admin"),
     ],
 )
+@pytest.mark.parametrize("model", [Passage, GrammarQuestion])
 @pytest.mark.usefixtures("owned")
 def test_who_can_view_and_edit(
     db: Session,
     user: User,
     admin: User,
+    model: type[Passage | GrammarQuestion],
     passage_id: int,
     viewer: str,
     can_view: bool,
     can_edit: bool,
 ) -> None:
     who = {"peter": user, "admin": admin}[viewer]
-    listed = db.scalars(select(Passage.id).where(visible(Passage, who))).all()
+    listed = db.scalars(select(model.id).where(visible(model, who))).all()
 
-    assert (load_visible(db, who, Passage, passage_id) is not None) is can_view
+    assert (load_visible(db, who, model, passage_id) is not None) is can_view
     assert (passage_id in listed) is can_view
-    assert (load_editable(db, who, Passage, passage_id) is not None) is can_edit
+    assert (load_editable(db, who, model, passage_id) is not None) is can_edit
 
 
 @pytest.mark.parametrize("viewer", ["peter", "admin"])

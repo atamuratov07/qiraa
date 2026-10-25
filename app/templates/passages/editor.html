@@ -18,13 +18,7 @@
 #}
 {% extends "base.html" %}
 {% set heading = _("Edit passage") if passage_id else _("New passage") %}
-{% set field = "block w-full rounded-lg border border-line bg-paper px-3 text-ink focus:outline-2 focus:outline-accent" %}
-{% set input = field ~ " mt-1 py-2" %}
-{% set arabic = input ~ " font-arabic text-xl leading-loose" %}
-{% set row_input = field ~ " py-1" %}
-{% set row_arabic = row_input ~ " font-arabic text-xl leading-loose" %}
-{% set remove = "grid size-8 shrink-0 cursor-pointer place-items-center rounded-full text-xl leading-none text-muted hover:bg-bad-soft hover:text-bad disabled:invisible" %}
-{% set add = "cursor-pointer text-sm font-semibold text-accent hover:underline" %}
+{% import "_editor.html" as editor %}
 {% block title %}{{ heading }}{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-3xl space-y-6">
@@ -45,76 +39,44 @@
 
   <form method="post" action="{{ '/manage/passages/%d/edit' % passage_id if passage_id else '/manage/passages/new' }}"
         x-data="passageEditor" @submit="save" class="space-y-6">
-    <input type="hidden" name="passage" x-ref="passage">
+    <input type="hidden" name="passage" x-ref="json">
 
     <section class="space-y-4 rounded-2xl border border-line bg-white p-6">
       <div class="grid gap-4 sm:grid-cols-[1fr_8rem]">
         <label class="block text-sm text-muted">{{ _("Title") }}
-          <input x-model="title" maxlength="{{ limits.title }}" dir="rtl" lang="ar" class="{{ arabic }}">
+          <input x-model="title" maxlength="{{ limits.title }}" dir="auto" class="{{ editor.content }}">
           <span x-show="error('title')" x-text="error('title')" class="mt-1 block text-bad"></span>
         </label>
         <label class="block text-sm text-muted">{{ _("Level") }}
-          <input x-model="level" maxlength="{{ limits.level }}" placeholder="A2" class="{{ input }}">
+          <input x-model="level" maxlength="{{ limits.level }}" placeholder="A2" class="{{ editor.input }}">
           <span x-show="error('level')" x-text="error('level')" class="mt-1 block text-bad"></span>
         </label>
       </div>
       <label class="block text-sm text-muted">{{ _("Text") }}
-        <textarea x-model="text" rows="10" required dir="rtl" lang="ar" class="{{ arabic }}"></textarea>
+        <textarea x-model="text" rows="10" required dir="auto" class="{{ editor.content }}"></textarea>
         <span x-show="error('text')" x-text="error('text')" class="mt-1 block text-bad"></span>
       </label>
       <label class="block text-sm text-muted">{{ _("Translation into Russian") }}
-        <textarea x-model="translation" rows="5" class="{{ input }}"></textarea>
+        <textarea x-model="translation" rows="5" class="{{ editor.input }}"></textarea>
         <span x-show="error('translation_ru')" x-text="error('translation_ru')" class="mt-1 block text-bad"></span>
       </label>
     </section>
 
-    <template x-for="(q, qi) in questions" :key="q.key">
-      <section class="space-y-4 rounded-2xl border border-line bg-white p-6">
-        <div class="flex items-center justify-between">
-          <h2 class="font-semibold" x-text="questionLabel(qi)"></h2>
-          <button type="button" @click="removeQuestion(qi)" :disabled="questions.length === 1"
-                  title="{{ _("Remove question") }}" aria-label="{{ _("Remove question") }}" class="{{ remove }}">×</button>
-        </div>
-        <textarea x-model="q.prompt" rows="2" required dir="rtl" lang="ar" aria-label="{{ _("Question") }}" class="{{ arabic }}"></textarea>
-        <span x-show="error(`questions[${qi}].prompt`)" x-text="error(`questions[${qi}].prompt`)" class="block text-sm text-bad"></span>
-
-        <div class="space-y-2">
-          <template x-for="(o, oi) in q.options" :key="o.key">
-            <div>
-              <div class="flex items-center gap-3">
-                <input type="radio" :name="q.key" :value="o.key" x-model="q.correct"
-                       title="{{ _("Correct option") }}" aria-label="{{ _("Correct option") }}" class="size-5 shrink-0 accent-accent">
-                <input x-model="o.text" required dir="rtl" lang="ar" class="{{ row_arabic }}">
-                <button type="button" @click="removeOption(q, oi)" :disabled="q.options.length <= limits.min_options"
-                        title="{{ _("Remove option") }}" aria-label="{{ _("Remove option") }}" class="{{ remove }}">×</button>
-              </div>
-              <span x-show="error(`questions[${qi}].options[${oi}]`)" x-text="error(`questions[${qi}].options[${oi}]`)" class="ms-8 block text-sm text-bad"></span>
-            </div>
-          </template>
-          <span x-show="error(`questions[${qi}].options`)" x-text="error(`questions[${qi}].options`)" class="block text-sm text-bad"></span>
-          <span x-show="error(`questions[${qi}].answer`)" x-text="error(`questions[${qi}].answer`)" class="block text-sm text-bad"></span>
-          <button type="button" @click="addOption(q)" x-show="q.options.length < limits.max_options" class="{{ add }}">+ {{ _("Add option") }}</button>
-        </div>
-
-        <label class="block text-sm text-muted">{{ _("Explanation") }}
-          <textarea x-model="q.explanation" rows="2" class="{{ input }}"></textarea>
-        </label>
-      </section>
-    </template>
+    {{ editor.question_cards(numbered=true) }}
     <span x-show="error('questions')" x-text="error('questions')" class="block text-sm text-bad"></span>
-    <button type="button" @click="addQuestion" class="{{ add }}">+ {{ _("Add question") }}</button>
+    <button type="button" @click="addQuestion" class="{{ editor.add }}">+ {{ _("Add question") }}</button>
 
     <section class="space-y-3 rounded-2xl border border-line bg-white p-6">
       <h2 class="font-semibold">{{ _("Glossary") }}</h2>
       <template x-for="(row, wi) in glossary" :key="row.key">
         <div class="flex items-center gap-3">
-          <input x-model="row.word" placeholder="{{ _("Word") }}" dir="rtl" lang="ar" class="{{ row_arabic }}">
-          <input x-model="row.meaning" placeholder="{{ _("Meaning") }}" class="{{ row_input }}">
-          <button type="button" @click="removeWord(wi)" title="{{ _("Remove word") }}" aria-label="{{ _("Remove word") }}" class="{{ remove }}">×</button>
+          <input x-model="row.word" placeholder="{{ _("Word") }}" dir="auto" class="{{ editor.row_content }}">
+          <input x-model="row.meaning" placeholder="{{ _("Meaning") }}" class="{{ editor.row_input }}">
+          <button type="button" @click="removeWord(wi)" title="{{ _("Remove word") }}" aria-label="{{ _("Remove word") }}" class="{{ editor.remove }}">×</button>
         </div>
       </template>
       <span x-show="glossaryError()" x-text="glossaryError()" class="block text-sm text-bad"></span>
-      <button type="button" @click="addWord" class="{{ add }}">+ {{ _("Add word") }}</button>
+      <button type="button" @click="addWord" class="{{ editor.add }}">+ {{ _("Add word") }}</button>
     </section>
 
     <div class="flex flex-wrap items-center gap-4">

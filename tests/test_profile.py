@@ -12,8 +12,8 @@ from app.auth.service import SESSION_COOKIE, create_session
 from app.core.i18n import use_locale
 from app.core.templating import local_date
 from app.passages.models import Passage
+from app.passages.service import copy_passage
 from app.practice.models import Attempt, AttemptAnswer
-from app.practice.service import copy_passage
 from app.profile.service import CALENDAR_DAYS, profile_context
 from app.profile.views import ProfileStats
 from tests.factories import T0
@@ -26,6 +26,7 @@ def submitted(
     user: User, passage: Passage, score: int, total: int, at: datetime
 ) -> Attempt:
     return Attempt(
+        kind="passage",
         user_id=user.id,
         passage_id=passage.id,
         content=copy_passage(passage),
@@ -66,6 +67,7 @@ def test_profile_numbers_and_calendar(
             submitted(user, passage, 5, 5, datetime(2026, 10, 6, 10, tzinfo=UTC)),
             submitted(user, passage2, 2, 4, datetime(2026, 9, 1, 10, tzinfo=UTC)),
             Attempt(  # still open: counted nowhere
+                kind="passage",
                 user_id=user.id,
                 passage_id=passage2.id,
                 content=copy_passage(passage2),
@@ -135,15 +137,13 @@ def test_profile_page_before_and_after_a_quiz(
 
 
 @pytest.mark.usefixtures("passage")
-def test_passage_list_shows_the_streak(logged_in: TestClient) -> None:
-    page = logged_in.get("/passages")
-    assert 'text-muted">0</span>' in page.text  # grey 0 before any quiz
+def test_the_header_shows_the_streak(logged_in: TestClient) -> None:
+    assert "0 дней подряд" in logged_in.get("/profile").text
 
     attempt_url = logged_in.post("/passages/1/attempts").headers["location"]
     logged_in.post(f"{attempt_url}/submit", data={"q1": "11"})
 
-    page = logged_in.get("/passages")
-    assert 'text-gold">1</span>' in page.text
+    assert "1 день подряд" in logged_in.get("/profile").text
 
 
 def test_wrong_password_on_delete_shows_the_real_profile(

@@ -11,9 +11,15 @@ from app.core.deps import FormFields
 from app.core.i18n import _
 from app.core.redirects import safe_next
 from app.core.templating import render
+from app.passages.service import visible_passage_id
 from app.practice import service
-from app.practice.models import Attempt
+from app.practice.models import Attempt, AttemptKind
 from app.practice.views import AttemptPage, ResultPage
+
+PAGES: dict[AttemptKind, tuple[str, str]] = {
+    "passage": ("passages/attempt.html", "passages/result.html"),
+    "grammar": ("grammar/attempt.html", "grammar/result.html"),
+}
 
 router = APIRouter(tags=["attempts"])
 
@@ -43,7 +49,8 @@ def _answers_from_form(fields: dict[str, str]) -> dict[int, int]:
 def attempt_page(request: Request, aid: int, db: DB, user: CurrentUser) -> HTMLResponse:
     attempt = _own_attempt(db, user, aid)
     answers = service.saved_answers(attempt)
-    passage_id = service.visible_passage_id(db, user, attempt)
+    passage_id = visible_passage_id(db, user, attempt)
+    attempt_template, result_template = PAGES[attempt.kind]
 
     if attempt.submitted_at is not None:
         result_ctx: ResultPage = {
@@ -54,7 +61,7 @@ def attempt_page(request: Request, aid: int, db: DB, user: CurrentUser) -> HTMLR
             "attempt": attempt,
             "answers": answers,
         }
-        return render(request, "practice/result.html", result_ctx)
+        return render(request, result_template, result_ctx)
 
     ctx: AttemptPage = {
         "user": user,
@@ -65,7 +72,7 @@ def attempt_page(request: Request, aid: int, db: DB, user: CurrentUser) -> HTMLR
         "answers": answers,
         "paused": service.is_paused(attempt, datetime.now(UTC)),
     }
-    return render(request, "practice/attempt.html", ctx)
+    return render(request, attempt_template, ctx)
 
 
 @router.post("/attempts/{aid}/submit")

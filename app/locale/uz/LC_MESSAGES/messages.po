@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-23 04:36+0500\n"
+"POT-Creation-Date: 2026-10-25 12:25+0500\n"
 "PO-Revision-Date: 2026-10-15 13:30+0500\n"
 "Last-Translator: Damir\n"
 "Language: uz\n"
@@ -14,31 +14,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:57
+#: app/main.py:70
 msgid "Bad Request"
 msgstr "Notoʻgʻri soʻrov"
 
-#: app/main.py:58
+#: app/main.py:71
 msgid "Unauthorized"
 msgstr "Kirish talab qilinadi"
 
-#: app/main.py:59
+#: app/main.py:72
 msgid "Forbidden"
 msgstr "Ruxsat yoʻq"
 
-#: app/main.py:60 app/main.py:91
+#: app/main.py:73 app/main.py:104
 msgid "Not Found"
 msgstr "Sahifa topilmadi"
 
-#: app/main.py:61
+#: app/main.py:74
 msgid "Method Not Allowed"
 msgstr "Bu usulga ruxsat berilmagan"
 
-#: app/main.py:62
+#: app/main.py:75
 msgid "Conflict"
 msgstr "Ziddiyat"
 
-#: app/main.py:63
+#: app/main.py:76
 msgid "Internal Server Error"
 msgstr "Serverda ichki xatolik"
 
@@ -46,34 +46,38 @@ msgstr "Serverda ichki xatolik"
 msgid "Sign-up is closed."
 msgstr "Roʻyxatdan oʻtish yopiq."
 
-#: app/auth/service.py:45
+#: app/auth/service.py:46
 msgid "Wrong invite code."
 msgstr "Taklif kodi notoʻgʻri."
 
-#: app/auth/service.py:49
+#: app/auth/service.py:50
 msgid "Username: 3–32 characters, Latin letters, digits or _."
 msgstr "Foydalanuvchi nomi: 3–32 ta belgi, lotin harflari, raqamlar yoki _."
 
-#: app/auth/service.py:53
+#: app/auth/service.py:54
 #, python-format
 msgid "The password must be %(min)d–%(max)d characters long."
 msgstr "Parol %(min)d–%(max)d ta belgidan iborat boʻlishi kerak."
 
-#: app/auth/service.py:59
+#: app/auth/service.py:60
 msgid "The passwords don't match."
 msgstr "Parollar mos kelmadi."
 
-#: app/auth/service.py:61
+#: app/auth/service.py:62
 msgid "This username is already taken."
 msgstr "Bu foydalanuvchi nomi band."
 
-#: app/auth/service.py:81 app/auth/service.py:84
+#: app/auth/service.py:82 app/auth/service.py:85
 msgid "Wrong username or password."
 msgstr "Foydalanuvchi nomi yoki parol notoʻgʻri."
 
-#: app/auth/service.py:150
+#: app/auth/service.py:151
 msgid "Wrong password."
 msgstr "Parol notoʻgʻri."
+
+#: app/content/editor.py:6
+msgid "Choose the correct option."
+msgstr "Toʻgʻri variantni tanlang."
 
 #: app/content/errors.py:10
 #, python-format
@@ -165,12 +169,12 @@ msgstr ""
 
 #: app/content/errors.py:40
 #, python-format
-msgid "The slug %(slug)s is used by more than one passage."
-msgstr "%(slug)s slugi bir nechta matnda koʻrsatilgan."
+msgid "The slug %(slug)s is used twice in this file."
+msgstr "%(slug)s slugi faylda ikki marta uchraydi."
 
 #: app/content/errors.py:42
-msgid "Someone imported the same passage at the same moment. Import the file again."
-msgstr "Kimdir aynan shu matnni xuddi shu paytda import qildi. Faylni qayta import qiling."
+msgid "Someone imported the same content at the same moment. Import the file again."
+msgstr "Kimdir aynan shu kontentni xuddi shu paytda import qildi. Faylni qayta import qiling."
 
 #: app/content/errors.py:44
 #, python-format
@@ -181,27 +185,62 @@ msgstr "Fayl %(limit)s dan katta."
 msgid "The file is not UTF-8 text. Save it as UTF-8 and try again."
 msgstr "Fayl UTF-8 kodlashida emas. Uni UTF-8 da saqlang va qaytadan urinib koʻring."
 
-#: app/passages/routes.py:42
-msgid "Choose the correct option."
-msgstr "Toʻgʻri variantni tanlang."
+#: app/grammar/routes.py:66 app/grammar/routes.py:108
+msgid "Question not found"
+msgstr "Savol topilmadi"
 
-#: app/passages/routes.py:87 app/passages/routes.py:111 app/passages/routes.py:132
-#: app/passages/routes.py:150
+#: app/grammar/routes.py:172
+#, python-format
+msgid "Another question already uses the slug %(slug)s."
+msgstr "%(slug)s slugi boshqa savolda band."
+
+#: app/passages/routes.py:73 app/passages/routes.py:96 app/passages/routes.py:117
+#: app/passages/routes.py:135
 msgid "Passage not found"
 msgstr "Matn topilmadi"
 
-#: app/passages/routes.py:213
+#: app/passages/routes.py:198
 #, python-format
 msgid "Another passage already uses the slug %(slug)s."
 msgstr "%(slug)s slugi boshqa matnda band."
 
-#: app/practice/routes.py:24 app/practice/routes.py:107
+#: app/practice/models.py:97 app/templates/base.html:74
+#: app/templates/grammar/attempt.html:12 app/templates/grammar/start.html:17
+#: app/templates/grammar/start.html:21
+msgid "Grammar"
+msgstr "Grammatika"
+
+#: app/practice/routes.py:30 app/practice/routes.py:115
 msgid "Attempt not found"
 msgstr "Urinish topilmadi"
 
-#: app/practice/routes.py:93
+#: app/practice/routes.py:101
 msgid "This attempt is already submitted."
 msgstr "Bu urinish allaqachon tekshirishga yuborilgan."
+
+#: app/templates/_editor.html:25
+msgid "Remove question"
+msgstr "Savolni oʻchirish"
+
+#: app/templates/_editor.html:28
+msgid "Question"
+msgstr "Savol"
+
+#: app/templates/_editor.html:36
+msgid "Correct option"
+msgstr "Toʻgʻri variant"
+
+#: app/templates/_editor.html:39
+msgid "Remove option"
+msgstr "Variantni oʻchirish"
+
+#: app/templates/_editor.html:46
+msgid "Add option"
+msgstr "Variant qoʻshish"
+
+#: app/templates/_editor.html:49
+msgid "Explanation"
+msgstr "Izoh"
 
 #: app/templates/_language_menu.html:16
 msgid "Language"
@@ -211,87 +250,96 @@ msgstr "Til"
 msgid "Google Translate"
 msgstr "Google Tarjimon"
 
-#: app/templates/base.html:55 app/templates/passages/list.html:19
+#: app/templates/base.html:54
+#, python-format
+msgid "Marhaba, %(name)s"
+msgstr "Marhaba, %(name)s"
+
+#: app/templates/base.html:56 app/templates/base.html:61
+#, python-format
+msgid "%(count)s day in a row"
+msgid_plural "%(count)s days in a row"
+msgstr[0] "Ketma-ket %(count)s kun"
+msgstr[1] "Ketma-ket %(count)s kun"
+
+#: app/templates/base.html:73 app/templates/passages/list.html:18
+#: app/templates/passages/list.html:21
 msgid "Passages"
 msgstr "Matnlar"
 
-#: app/templates/base.html:56
-msgid "Manage"
-msgstr "Boshqarish"
-
-#: app/templates/base.html:57 app/templates/profile/profile.html:26
+#: app/templates/base.html:75 app/templates/profile/profile.html:26
 msgid "Profile"
 msgstr "Profil"
 
-#: app/templates/base.html:59
+#: app/templates/base.html:82
 msgid "Log out"
 msgstr "Chiqish"
 
-#: app/templates/base.html:74
+#: app/templates/base.html:101
 msgid "show"
 msgstr "koʻrsatish"
 
-#: app/templates/base.html:75 app/templates/practice/attempt.html:38
+#: app/templates/base.html:102 app/templates/practice/_attempt.html:44
 msgid "hide"
 msgstr "yashirish"
 
-#: app/templates/base.html:76
+#: app/templates/base.html:103
 msgid "Show timer"
 msgstr "Taymerni koʻrsatish"
 
-#: app/templates/base.html:77 app/templates/practice/attempt.html:38
+#: app/templates/base.html:104 app/templates/practice/_attempt.html:44
 msgid "Hide timer"
 msgstr "Taymerni yashirish"
 
-#: app/templates/base.html:78
+#: app/templates/base.html:105
 #, python-brace-format
 msgid "Answered {answered} of {total} · {status}"
 msgstr "Javob berildi: {answered}/{total} · {status}"
 
-#: app/templates/base.html:79
+#: app/templates/base.html:106
 msgid "saving…"
 msgstr "saqlanmoqda…"
 
-#: app/templates/base.html:80
+#: app/templates/base.html:107
 msgid "saved"
 msgstr "saqlandi"
 
-#: app/templates/base.html:81
+#: app/templates/base.html:108
 #, python-brace-format
 msgid "not saved ({code}); the answer will be sent when you submit"
 msgstr "saqlanmadi ({code}); javob tekshirishda yuboriladi"
 
-#: app/templates/base.html:82
+#: app/templates/base.html:109
 msgid "no connection: not saved; the answer will be sent when you submit"
 msgstr "internet yoʻq: saqlanmadi; javob tekshirishda yuboriladi"
 
-#: app/templates/base.html:83
+#: app/templates/base.html:110
 #, python-brace-format
 msgid "Questions without an answer: {count}. Submit anyway?"
 msgstr "Javobsiz savollar: {count}. Baribir tekshirilsinmi?"
 
-#: app/templates/base.html:84
+#: app/templates/base.html:111
 msgid "Checking…"
 msgstr "Tekshirilmoqda…"
 
-#: app/templates/base.html:85
+#: app/templates/base.html:112
 msgid "Translation is not available yet."
 msgstr "Tarjima hozircha mavjud emas."
 
-#: app/templates/base.html:86
+#: app/templates/base.html:113
 #, python-brace-format
 msgid "Server error ({code})."
 msgstr "Server xatosi ({code})."
 
-#: app/templates/base.html:87
+#: app/templates/base.html:114
 msgid "Translation not found."
 msgstr "Tarjima topilmadi."
 
-#: app/templates/base.html:88
+#: app/templates/base.html:115
 msgid "Network error. Try the link below."
 msgstr "Tarmoq xatosi. Quyidagi havoladan foydalanib koʻring."
 
-#: app/templates/base.html:89
+#: app/templates/base.html:116
 #, python-brace-format
 msgid "Question {num}"
 msgstr "{num}-savol"
@@ -352,70 +400,210 @@ msgstr "Hisob yaratish"
 msgid "Already have an account?"
 msgstr "Hisobingiz bormi?"
 
-#: app/templates/content/import.html:17 app/templates/content/import.html:21
+#: app/templates/content/import.html:19
+msgid "Import grammar questions"
+msgstr "Grammatika savollarini import qilish"
+
+#: app/templates/content/import.html:19
 msgid "Import passages"
 msgstr "Matnlarni import qilish"
 
-#: app/templates/content/import.html:22
+#: app/templates/content/import.html:25
+msgid "A question whose slug was imported before is updated."
+msgstr "Slugi avval import qilingan savol yangilanadi."
+
+#: app/templates/content/import.html:25
 msgid "A passage whose slug was imported before is updated."
 msgstr "Slugi avval import qilingan matn yangilanadi."
 
-#: app/templates/content/import.html:27
+#: app/templates/content/import.html:30
 msgid "Nothing was imported. Fix these problems and try again:"
 msgstr "Hech narsa import qilinmadi. Quyidagi xatolarni tuzatib, qaytadan urinib koʻring:"
 
-#: app/templates/content/import.html:31
+#: app/templates/content/import.html:34
 #, python-format
 msgid "Line %(line)s"
 msgstr "%(line)s-qator"
 
-#: app/templates/content/import.html:43
+#: app/templates/content/import.html:47
+#, python-format
+msgid "Added %(num)d question"
+msgid_plural "Added %(num)d questions"
+msgstr[0] "%(num)d ta savol qoʻshildi"
+msgstr[1] "%(num)d ta savol qoʻshildi"
+
+#: app/templates/content/import.html:48
+#, python-format
+msgid "Updated %(num)d question"
+msgid_plural "Updated %(num)d questions"
+msgstr[0] "%(num)d ta savol yangilandi"
+msgstr[1] "%(num)d ta savol yangilandi"
+
+#: app/templates/content/import.html:52
 #, python-format
 msgid "Added %(num)d passage"
 msgid_plural "Added %(num)d passages"
 msgstr[0] "%(num)d ta matn qoʻshildi"
 msgstr[1] "%(num)d ta matn qoʻshildi"
 
-#: app/templates/content/import.html:44
+#: app/templates/content/import.html:53
 #, python-format
 msgid "Updated %(num)d passage"
 msgid_plural "Updated %(num)d passages"
 msgstr[0] "%(num)d ta matn yangilandi"
 msgstr[1] "%(num)d ta matn yangilandi"
 
-#: app/templates/content/import.html:58
+#: app/templates/content/import.html:71
 msgid "YAML"
 msgstr "YAML"
 
-#: app/templates/content/import.html:63
+#: app/templates/content/import.html:76
 msgid "Or a file (up to 1 MB)"
 msgstr "Yoki fayl (1 MB gacha)"
 
-#: app/templates/content/import.html:70
+#: app/templates/content/import.html:83
+msgid "Common: every user sees these questions"
+msgstr "Umumiy: bu savollarni barcha foydalanuvchilar koʻradi"
+
+#: app/templates/content/import.html:83
 msgid "Common: every user sees these passages"
 msgstr "Umumiy: bu matnlarni barcha foydalanuvchilar koʻradi"
 
-#: app/templates/content/import.html:73 app/templates/passages/manage.html:23
+#: app/templates/content/import.html:86 app/templates/grammar/manage.html:22
+#: app/templates/passages/manage.html:23
 msgid "Import"
 msgstr "Import qilish"
 
-#: app/templates/content/import.html:77
+#: app/templates/content/import.html:90
 msgid "Prompt for a chatbot: turn any material into this format"
 msgstr "Chat-bot uchun prompt: istalgan materialni shu formatga oʻtkazish"
 
-#: app/templates/content/import.html:78
+#: app/templates/content/import.html:91
 msgid "The chatbot marks answers it chose itself with # check. Check them before importing."
 msgstr ""
 "Chat-bot oʻzi tanlagan javoblarni # check bilan belgilaydi. Import qilishdan oldin "
 "ularni tekshiring."
 
-#: app/templates/content/import.html:79
+#: app/templates/content/import.html:92
 msgid "Copy the prompt"
 msgstr "Promptni nusxalash"
 
-#: app/templates/content/import.html:91
+#: app/templates/content/import.html:104
 msgid "Copied"
 msgstr "Nusxalandi"
+
+#: app/templates/grammar/editor.html:21
+msgid "Edit question"
+msgstr "Savolni tahrirlash"
+
+#: app/templates/grammar/editor.html:21 app/templates/grammar/manage.html:21
+msgid "New question"
+msgstr "Yangi savol"
+
+#: app/templates/grammar/editor.html:26 app/templates/grammar/manage.html:15
+#: app/templates/grammar/manage.html:19
+msgid "Manage grammar"
+msgstr "Grammatikani boshqarish"
+
+#: app/templates/grammar/editor.html:29 app/templates/passages/editor.html:29
+#, python-format
+msgid ""
+"Imported as <code>%(slug)s</code>. Importing the file again overwrites changes made "
+"here."
+msgstr ""
+"<code>%(slug)s</code> sifatida import qilingan. Faylni qayta import qilish bu yerdagi"
+" oʻzgarishlarni almashtiradi."
+
+#: app/templates/grammar/editor.html:35
+msgid "The question was not saved. Fix the marked fields."
+msgstr "Savol saqlanmadi. Belgilangan maydonlarni tuzating."
+
+#: app/templates/grammar/editor.html:47 app/templates/passages/editor.html:83
+msgid "Save"
+msgstr "Saqlash"
+
+#: app/templates/grammar/editor.html:51
+msgid "Common: every user sees this question"
+msgstr "Umumiy: bu savolni barcha foydalanuvchilar koʻradi"
+
+#: app/templates/grammar/manage.html:35 app/templates/passages/manage.html:37
+msgid "Common"
+msgstr "Umumiy"
+
+#: app/templates/grammar/manage.html:39
+msgid "Delete this question for everyone? Results with it stay."
+msgstr "Savol hamma uchun oʻchirilsinmi? U bilan natijalar saqlanib qoladi."
+
+#: app/templates/grammar/manage.html:39
+msgid "Delete this question? Results with it stay."
+msgstr "Savol oʻchirilsinmi? U bilan natijalar saqlanib qoladi."
+
+#: app/templates/grammar/manage.html:40 app/templates/passages/manage.html:41
+msgid "Edit"
+msgstr "Tahrirlash"
+
+#: app/templates/grammar/manage.html:43 app/templates/passages/manage.html:44
+msgid "Delete"
+msgstr "Oʻchirish"
+
+#: app/templates/grammar/manage.html:49
+msgid "No questions yet."
+msgstr "Hozircha savollar yoʻq."
+
+#: app/templates/grammar/result.html:10
+msgid "New session"
+msgstr "Yangi mashgʻulot"
+
+#: app/templates/grammar/start.html:22 app/templates/passages/list.html:22
+msgid "Manage"
+msgstr "Boshqarish"
+
+#: app/templates/grammar/start.html:29 app/templates/passages/list.html:50
+#, python-format
+msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
+msgstr "Tugallanmagan · javob berildi %(answered)s/%(total)s · %(time)s"
+
+#: app/templates/grammar/start.html:32 app/templates/passages/list.html:52
+#: app/templates/practice/_attempt.html:94
+msgid "Continue"
+msgstr "Davom etish"
+
+#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:97
+msgid "Discard this attempt and its saved answers?"
+msgstr "Bu urinish va saqlangan javoblar bekor qilinsinmi?"
+
+#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:99
+msgid "Discard and start over"
+msgstr "Bekor qilib, qaytadan boshlash"
+
+#: app/templates/grammar/start.html:42
+msgid "No grammar questions yet."
+msgstr "Grammatika savollari hali yoʻq."
+
+#: app/templates/grammar/start.html:48
+msgid "This pool has no questions yet."
+msgstr "Bu toʻplamda hali savollar yoʻq."
+
+#: app/templates/grammar/start.html:52
+msgid "Common and mine"
+msgstr "Umumiy va meniki"
+
+#: app/templates/grammar/start.html:52
+msgid "Only mine"
+msgstr "Faqat meniki"
+
+#: app/templates/grammar/start.html:62
+msgid "Questions"
+msgstr "Savollar soni"
+
+#: app/templates/grammar/start.html:67 app/templates/passages/start.html:51
+msgid "Start"
+msgstr "Boshlash"
+
+#: app/templates/passages/attempt.html:34 app/templates/passages/result.html:24
+#: app/templates/passages/start.html:54
+msgid "All passages"
+msgstr "Barcha matnlar"
 
 #: app/templates/passages/editor.html:20
 msgid "Edit passage"
@@ -425,112 +613,64 @@ msgstr "Matnni tahrirlash"
 msgid "New passage"
 msgstr "Yangi matn"
 
-#: app/templates/passages/editor.html:32 app/templates/passages/manage.html:16
+#: app/templates/passages/editor.html:26 app/templates/passages/manage.html:16
 #: app/templates/passages/manage.html:20
 msgid "Manage passages"
 msgstr "Matnlarni boshqarish"
 
 #: app/templates/passages/editor.html:35
-#, python-format
-msgid ""
-"Imported as <code>%(slug)s</code>. Importing the file again overwrites changes made "
-"here."
-msgstr ""
-"<code>%(slug)s</code> sifatida import qilingan. Faylni qayta import qilish bu yerdagi"
-" oʻzgarishlarni almashtiradi."
-
-#: app/templates/passages/editor.html:41
 msgid "The passage was not saved. Fix the marked fields."
 msgstr "Matn saqlanmadi. Belgilangan maydonlarni tuzating."
 
-#: app/templates/passages/editor.html:52
+#: app/templates/passages/editor.html:46
 msgid "Title"
 msgstr "Sarlavha"
 
-#: app/templates/passages/editor.html:56
+#: app/templates/passages/editor.html:50
 msgid "Level"
 msgstr "Daraja"
 
-#: app/templates/passages/editor.html:61
+#: app/templates/passages/editor.html:55
 msgid "Text"
 msgstr "Matn"
 
-#: app/templates/passages/editor.html:65
+#: app/templates/passages/editor.html:59
 msgid "Translation into Russian"
 msgstr "Rus tiliga tarjima"
 
-#: app/templates/passages/editor.html:76
-msgid "Remove question"
-msgstr "Savolni oʻchirish"
-
-#: app/templates/passages/editor.html:78
-msgid "Question"
-msgstr "Savol"
-
-#: app/templates/passages/editor.html:86
-msgid "Correct option"
-msgstr "Toʻgʻri variant"
-
-#: app/templates/passages/editor.html:89
-msgid "Remove option"
-msgstr "Variantni oʻchirish"
-
-#: app/templates/passages/editor.html:96
-msgid "Add option"
-msgstr "Variant qoʻshish"
-
-#: app/templates/passages/editor.html:99
-msgid "Explanation"
-msgstr "Izoh"
-
-#: app/templates/passages/editor.html:105
+#: app/templates/passages/editor.html:67
 msgid "Add question"
 msgstr "Savol qoʻshish"
 
-#: app/templates/passages/editor.html:108
+#: app/templates/passages/editor.html:70
 msgid "Glossary"
 msgstr "Lugʻat"
 
-#: app/templates/passages/editor.html:111
+#: app/templates/passages/editor.html:73
 msgid "Word"
 msgstr "Soʻz"
 
-#: app/templates/passages/editor.html:112
+#: app/templates/passages/editor.html:74
 msgid "Meaning"
 msgstr "Maʼnosi"
 
-#: app/templates/passages/editor.html:113
+#: app/templates/passages/editor.html:75
 msgid "Remove word"
 msgstr "Soʻzni oʻchirish"
 
-#: app/templates/passages/editor.html:117
+#: app/templates/passages/editor.html:79
 msgid "Add word"
 msgstr "Soʻz qoʻshish"
 
-#: app/templates/passages/editor.html:121
-msgid "Save"
-msgstr "Saqlash"
-
-#: app/templates/passages/editor.html:125
+#: app/templates/passages/editor.html:87
 msgid "Common: every user sees this passage"
 msgstr "Umumiy: bu matnni barcha foydalanuvchilar koʻradi"
 
-#: app/templates/passages/list.html:26
-msgid "day in a row"
-msgid_plural "days in a row"
-msgstr[0] "ketma-ket kun"
-msgstr[1] "ketma-ket kun"
-
 #: app/templates/passages/list.html:29
-#, python-format
-msgid "Marhaba, %(name)s"
-msgstr "Marhaba, %(name)s"
-
-#: app/templates/passages/list.html:37
 msgid "Other"
 msgstr "Boshqa"
 
-#: app/templates/passages/list.html:43 app/templates/passages/manage.html:35
+#: app/templates/passages/list.html:35 app/templates/passages/manage.html:35
 #: app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
@@ -538,41 +678,28 @@ msgid_plural "%(count)s questions"
 msgstr[0] "%(count)s ta savol"
 msgstr[1] "%(count)s ta savol"
 
-#: app/templates/passages/list.html:47
+#: app/templates/passages/list.html:39
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
 msgstr[0] "Eng yaxshi natija %(best)s%% · %(count)s ta urinish"
 msgstr[1] "Eng yaxshi natija %(best)s%% · %(count)s ta urinish"
 
-#: app/templates/passages/list.html:50
+#: app/templates/passages/list.html:42
 msgid "New"
 msgstr "Yangi"
 
-#: app/templates/passages/list.html:58
-#, python-format
-msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
-msgstr "Tugallanmagan · javob berildi %(answered)s/%(total)s · %(time)s"
-
-#: app/templates/passages/list.html:60 app/templates/practice/attempt.html:100
-msgid "Continue"
-msgstr "Davom etish"
-
-#: app/templates/passages/list.html:62
+#: app/templates/passages/list.html:54
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr "Bu tugallanmagan urinish bekor qilinsinmi? Saqlangan javoblar oʻchiriladi."
 
-#: app/templates/passages/list.html:64
+#: app/templates/passages/list.html:56
 msgid "Discard"
 msgstr "Bekor qilish"
 
-#: app/templates/passages/list.html:73 app/templates/passages/manage.html:50
+#: app/templates/passages/list.html:65 app/templates/passages/manage.html:50
 msgid "No passages yet."
 msgstr "Hozircha matnlar yoʻq."
-
-#: app/templates/passages/manage.html:37
-msgid "Common"
-msgstr "Umumiy"
 
 #: app/templates/passages/manage.html:40
 msgid "Delete this passage for everyone? Results on it stay."
@@ -582,13 +709,13 @@ msgstr "Matn hamma uchun oʻchirilsinmi? Undagi natijalar saqlanib qoladi."
 msgid "Delete this passage? Results on it stay."
 msgstr "Matn oʻchirilsinmi? Undagi natijalar saqlanib qoladi."
 
-#: app/templates/passages/manage.html:41
-msgid "Edit"
-msgstr "Tahrirlash"
+#: app/templates/passages/result.html:21
+msgid "Try again"
+msgstr "Qayta urinish"
 
-#: app/templates/passages/manage.html:44
-msgid "Delete"
-msgstr "Oʻchirish"
+#: app/templates/passages/result.html:37
+msgid "Russian translation"
+msgstr "Rus tilidagi tarjima"
 
 #: app/templates/passages/start.html:47
 #, python-format
@@ -597,29 +724,20 @@ msgid_plural "best score %(best)s%% in %(count)s attempts"
 msgstr[0] "%(count)s ta urinishda eng yaxshi natija %(best)s%%"
 msgstr[1] "%(count)s ta urinishda eng yaxshi natija %(best)s%%"
 
-#: app/templates/passages/start.html:51
-msgid "Start"
-msgstr "Boshlash"
-
-#: app/templates/passages/start.html:54 app/templates/practice/attempt.html:107
-#: app/templates/practice/result.html:37
-msgid "All passages"
-msgstr "Barcha matnlar"
-
-#: app/templates/practice/attempt.html:77
+#: app/templates/practice/_attempt.html:71
 #, python-format
-msgid "Answered %(answered)s of %(total)s · saved"
-msgstr "Javob berildi: %(answered)s/%(total)s · saqlandi"
+msgid "Answered %(answered)s of %(total)s"
+msgstr "Javob berildi: %(answered)s/%(total)s"
 
-#: app/templates/practice/attempt.html:80
+#: app/templates/practice/_attempt.html:74
 msgid "Check answers"
 msgstr "Javoblarni tekshirish"
 
-#: app/templates/practice/attempt.html:90
+#: app/templates/practice/_attempt.html:84
 msgid "Paused"
 msgstr "Pauza"
 
-#: app/templates/practice/attempt.html:93
+#: app/templates/practice/_attempt.html:87
 #, python-format
 msgid ""
 "Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"
@@ -628,38 +746,26 @@ msgstr ""
 "Javob berildi: <span data-answered>%(answered)s</span>/%(total)s · oʻtgan vaqt <span "
 "data-pause-time>%(time)s</span>"
 
-#: app/templates/practice/attempt.html:103
-msgid "Discard this attempt and its saved answers?"
-msgstr "Bu urinish va saqlangan javoblar bekor qilinsinmi?"
-
-#: app/templates/practice/attempt.html:105
-msgid "Discard and start over"
-msgstr "Bekor qilib, qaytadan boshlash"
-
-#: app/templates/practice/result.html:18
+#: app/templates/practice/_result.html:24
 msgid "Result"
 msgstr "Natija"
 
-#: app/templates/practice/result.html:29
+#: app/templates/practice/_result.html:35
 #, python-format
 msgid "%(percent)s%% correct in %(time)s"
 msgstr "%(time)s ichida %(percent)s%% toʻgʻri"
 
-#: app/templates/practice/result.html:34
-msgid "Try again"
-msgstr "Qayta urinish"
+#: app/templates/practice/_result.html:60
+msgid "Correct answer"
+msgstr "Toʻgʻri javob"
 
-#: app/templates/practice/result.html:61
-msgid "your answer"
-msgstr "sizning javobingiz"
+#: app/templates/practice/_result.html:64
+msgid "Your answer, wrong"
+msgstr "Sizning javobingiz, notoʻgʻri"
 
-#: app/templates/practice/result.html:65
+#: app/templates/practice/_result.html:71
 msgid "No answer"
 msgstr "Javob yoʻq"
-
-#: app/templates/practice/result.html:82
-msgid "Russian translation"
-msgstr "Rus tilidagi tarjima"
 
 #: app/templates/profile/profile.html:29
 #, python-format
@@ -711,37 +817,37 @@ msgstr ""
 msgid "Recent quizzes"
 msgstr "Soʻnggi testlar"
 
-#: app/templates/profile/profile.html:74
+#: app/templates/profile/profile.html:78
 msgid "Delete this result"
 msgstr "Bu natijani oʻchirish"
 
-#: app/templates/profile/profile.html:78
+#: app/templates/profile/profile.html:82
 msgid "Nothing here yet."
 msgstr "Hozircha hech narsa yoʻq."
 
-#: app/templates/profile/profile.html:78
+#: app/templates/profile/profile.html:82
 msgid "Pick a passage"
 msgstr "Matn tanlang"
 
-#: app/templates/profile/profile.html:83
+#: app/templates/profile/profile.html:87
 msgid "Account deletion"
 msgstr "Hisobni oʻchirish"
 
-#: app/templates/profile/profile.html:84
+#: app/templates/profile/profile.html:88
 msgid "Deletes your account and all your attempts and answers. This can't be undone."
 msgstr ""
 "Hisobingiz, barcha urinishlaringiz va javoblaringiz oʻchiriladi. Buni ortga qaytarib "
 "boʻlmaydi."
 
-#: app/templates/profile/profile.html:87
+#: app/templates/profile/profile.html:91
 msgid "Delete your account and all progress for good?"
 msgstr "Hisobingiz va butun natijalaringiz butunlay oʻchirilsinmi?"
 
-#: app/templates/profile/profile.html:88
+#: app/templates/profile/profile.html:92
 msgid "Confirm with your password"
 msgstr "Parolingiz bilan tasdiqlang"
 
-#: app/templates/profile/profile.html:92
+#: app/templates/profile/profile.html:96
 msgid "Delete account"
 msgstr "Hisobni oʻchirish"
 

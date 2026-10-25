@@ -5,6 +5,7 @@ import pytest
 from app.content.errors import ContentError, LineError, describe
 from app.content.loader import parse
 from app.core.i18n import use_locale
+from app.passages.schemas import PassageFile
 
 VALID = """\
 passages:
@@ -25,7 +26,7 @@ passages:
 
 def errors(text: str) -> list[LineError]:
     with pytest.raises(ContentError) as raised:
-        parse(text)
+        parse(text, PassageFile)
     return raised.value.errors
 
 
@@ -34,7 +35,7 @@ def where(text: str) -> list[tuple[int | None, str, str]]:
 
 
 def test_a_valid_file() -> None:
-    passage = parse(VALID).passages[0]
+    passage = parse(VALID, PassageFile).passages[0]
 
     assert (passage.slug, passage.title) == ("b1-media", None)
     assert passage.text == "الفقرة الأولى.\n\nالفقرة الثانية."  # | keeps the blank line

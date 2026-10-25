@@ -43,3 +43,14 @@ def _load[M: Owned](
     options: tuple[ExecutableOption, ...],
 ) -> M | None:
     return db.scalar(select(model).filter_by(id=row_id).where(rule).options(*options))
+
+
+def set_common(row: Owned, user: User, common: bool) -> None:
+    """Only admins publish; a private row needs an owner."""
+
+    common = common and user.is_admin
+
+    if not common and row.is_common and row.owner_id is None:
+        row.owner_id = user.id
+
+    row.is_common = common

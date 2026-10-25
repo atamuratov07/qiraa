@@ -8,7 +8,8 @@ from sqlalchemy.orm import Session
 from app.auth.models import User
 from app.core.timeutils import local_day
 from app.passages.models import Passage
-from app.practice.service import discard, load_attempt, save_answer, start, submit
+from app.passages.service import start_attempt
+from app.practice.service import discard, load_attempt, save_answer, submit
 from app.profile.streaks import record_activity, visible_streak
 from tests.factories import T0
 
@@ -136,7 +137,7 @@ def test_visible_streak(last: date | None, today: date, shown: int) -> None:
 
 
 def submit_quiz(db: Session, user: User, passage: Passage, now: datetime) -> None:
-    attempt = load_attempt(db, user, start(db, user, passage, now).id)
+    attempt = load_attempt(db, user, start_attempt(db, user, passage, now).id)
     assert attempt is not None
     submit(db, attempt, {1: 11}, now)
 
@@ -174,8 +175,8 @@ def test_a_quiz_after_local_midnight_counts_for_the_new_day(
 def test_unfinished_and_discarded_attempts_dont_count(
     db: Session, user: User, passage: Passage
 ) -> None:
-    attempt = start(db, user, passage, T0)
+    attempt = start_attempt(db, user, passage, T0)
     save_answer(db, attempt, 1, 11)
     discard(db, attempt)
-    start(db, user, passage, T0)  # left open
+    start_attempt(db, user, passage, T0)  # left open
     assert stored_streak(db, user) == (0, 0, None)

@@ -16,6 +16,7 @@ from app.auth.security import (
 )
 from app.core.config import get_settings
 from app.core.i18n import _, current_locale
+from app.grammar.models import GrammarQuestion
 from app.passages.models import Passage
 
 SESSION_COOKIE = "qiraa_session"
@@ -151,6 +152,11 @@ def delete_account(db: Session, user: User, password: str) -> None:
 
     db.execute(
         delete(Passage).where(Passage.owner_id == user.id, not_(Passage.is_common))
+    )
+    db.execute(
+        delete(GrammarQuestion).where(
+            GrammarQuestion.owner_id == user.id, not_(GrammarQuestion.is_common)
+        )
     )
 
     db.delete(user)

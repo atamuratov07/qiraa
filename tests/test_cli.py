@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.auth.models import User
 from app.cli import parse, run
+from app.grammar.models import GrammarQuestion
 from app.passages.models import Passage
 
 
@@ -100,3 +101,28 @@ def test_check(db: Session, tmp_path: Path, capsys: pytest.CaptureFixture[str]) 
         "Answer C is out of range: this question has 2 options."
     )
     assert errors[1].startswith(f"{tmp_path / 'missing.yaml'}: [Errno 2]")
+
+
+GRAMMAR = """\
+grammar:
+  - slug: case-01
+    prompt: جملة ___.
+    options: [أ, ب]
+    answer: A
+"""
+
+
+@pytest.mark.usefixtures("user")
+def test_a_grammar_file(
+    db: Session, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    file = tmp_path / "grammar.yaml"
+    file.write_text(GRAMMAR)
+
+    assert cli(db, "check", str(file)) == 0
+    assert cli(db, "import", str(file), "--owner", "peter") == 0
+
+    assert capsys.readouterr().out == (
+        f"{file}: 1 grammar question, no errors\nadded 1: case-01\nupdated 0: -\n"
+    )
+    assert db.scalars(select(GrammarQuestion.owner_id)).all() == [1]

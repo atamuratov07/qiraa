@@ -24,33 +24,34 @@ conventions are in [CONVENTIONS.md](CONVENTIONS.md).
 
 ## Decisions already made
 
-| Topic                 | Decision                                                                                                                                                                                                                                        |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Version number        | 2.0.0: existing attempts need a data migration and content management changes                                                                                                                                                                   |
-| Branching             | build on `v2`; `main` keeps serving 1.x; merge `main` into `v2` after any fix                                                                                                                                                                   |
-| Question tables       | passage questions and grammar questions share `questions`/`options` (`passage_id` is NULL for grammar questions); speaking gets its own table because it has no options or grading                                                              |
-| Attempts              | one `attempts` table for passages and grammar sessions; each attempt keeps a copy of what it shows (`content`: title, text, translation, questions with their options in shuffled order and the correct one marked)                             |
-| Editing content       | allowed at any time, also after attempts; a result shows the copy its attempt was taken on and keeps its score (no regrading); answers point into the copy, so editing or deleting content never removes a result                               |
-| Passage title         | optional; when missing, show the start of the text                                                                                                                                                                                              |
-| Slug                  | required in content files and written by hand (never generated, so fixing a title can't make the next import add a duplicate); unique among common passages and among each owner's private passages; passages made in the editor have none      |
-| Author and visibility | two separate columns on every content table: `owner_id` is the author, `is_common` is who can see it. A row is never private and authorless (CHECK constraint)                                                                                  |
-| Ownership rule        | Visible: common or mine. Editable: mine, or common if I am an admin. Admins don't see other users' private content                                                                                                                              |
-| Account deletion      | private content is deleted with the account; common content stays with `owner_id` set to NULL (`ON DELETE SET NULL`), so other users keep their results on it                                                                                   |
-| Publishing            | only admins set `is_common`; unpublishing returns a passage to its author, or to the admin when it has none                                                                                                                                     |
-| Admin                 | `users.is_admin`, set from the command line only                                                                                                                                                                                                |
-| Sign-ups              | closed to the public: the form asks for one shared invite code (`SIGNUP_CODE`); `ALLOW_SIGNUP=false` still closes sign-up completely                                                                                                            |
-| Bulk loading          | YAML at `/manage/import` (into my area, or common for admins) and `python -m app.cli import file.yaml --owner <username>` / `--common`; importing again updates by slug; real passages stay out of git                                          |
-| Frontend              | stay server-rendered; add Alpine.js (one script tag) for the passage editor and the navigator; no React, no switch to Django                                                                                                                    |
-| Passage editor        | Alpine keeps the passage and posts it as JSON in one form field; `PassageIn` validates it as it does YAML, and errors show under their fields                                                                                                   |
-| Grammar session       | `/grammar` is a start form only (no page that lists the whole bank): pool "common + mine" or "only mine", any size, both remembered in the browser; the size is capped at the number of questions in the pool                                   |
-| Speaking timer        | one timer for the whole list: a preparation countdown, then a speaking countdown. Each set stores default `prepare_seconds` and `speak_seconds`; the session page lets me change both before starting and remembers them in the browser per set |
-| Word translation      | passage glossary, then MyMemory; no cache table in 2.0                                                                                                                                                                                          |
-| Translations          | gettext with Babel and Jinja's i18n extension; English msgids, so English needs no catalog; catalogs for `ru` and `uz`                                                                                                                          |
-| Language choice       | the `qiraa_lang` cookie (set from `users.locale` at login), then `Accept-Language`, then English                                                                                                                                                |
-| Dates                 | Babel's date formatting replaces the hand-written Russian month names                                                                                                                                                                           |
-| Local database        | Postgres in Docker Compose for development and tests; the app itself runs on the machine, not in a container; SQLite support removed                                                                                                            |
-| Code layout           | organise by feature (see step 2)                                                                                                                                                                                                                |
-| Concurrency           | synchronous: `def` routes with a blocking `Session` run in FastAPI's thread pool; no `async` until a feature waits on many outside calls at once                                                                                                |
+| Topic                 | Decision                                                                                                                                                                                                                                                                                                                         |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Version number        | 2.0.0: existing attempts need a data migration and content management changes                                                                                                                                                                                                                                                    |
+| Branching             | build on `v2`; `main` keeps serving 1.x; merge `main` into `v2` after any fix                                                                                                                                                                                                                                                    |
+| Question tables       | passage questions (`passage_questions`, `passage_options`) and grammar questions (`grammar_questions`, `grammar_options`) have their own tables: attempts read their own copy, so nothing joins them; speaking gets its own table too                                                                                            |
+| Attempts              | one `attempts` table for passages and grammar sessions; each attempt keeps a copy of what it shows (`content`: title, text, translation, questions with their options in shuffled order and the correct one marked)                                                                                                              |
+| Editing content       | allowed at any time, also after attempts; a result shows the copy its attempt was taken on and keeps its score (no regrading); answers point into the copy, so editing or deleting content never removes a result                                                                                                                |
+| Passage title         | optional; when missing, show the start of the text                                                                                                                                                                                                                                                                               |
+| Slug                  | required in content files and written by hand (never generated, so fixing a title can't make the next import add a duplicate); unique among common passages and among each owner's private passages; passages made in the editor have none                                                                                       |
+| Author and visibility | two separate columns on every content table: `owner_id` is the author, `is_common` is who can see it. A row is never private and authorless (CHECK constraint)                                                                                                                                                                   |
+| Ownership rule        | Visible: common or mine. Editable: mine, or common if I am an admin. Admins don't see other users' private content                                                                                                                                                                                                               |
+| Account deletion      | private content is deleted with the account; common content stays with `owner_id` set to NULL (`ON DELETE SET NULL`), so other users keep their results on it                                                                                                                                                                    |
+| Publishing            | only admins set `is_common`; unpublishing returns a passage to its author, or to the admin when it has none                                                                                                                                                                                                                      |
+| Admin                 | `users.is_admin`, set from the command line only                                                                                                                                                                                                                                                                                 |
+| Sign-ups              | closed to the public: the form asks for one shared invite code (`SIGNUP_CODE`); `ALLOW_SIGNUP=false` still closes sign-up completely                                                                                                                                                                                             |
+| Bulk loading          | one kind per YAML file, each kind with its own import page (`/manage/passages/import`, `/manage/grammar/import`) into my area, or common for admins; `python -m app.cli import file.yaml --owner <username>` / `--common` reads the kind from the file's top key; importing again updates by slug; real content stays out of git |
+| Frontend              | stay server-rendered; add Alpine.js (one script tag) for the editors and the navigator; no React, no switch to Django                                                                                                                                                                                                            |
+| Passage editor        | Alpine keeps the passage and posts it as JSON in one form field; `PassageIn` validates it as it does YAML, and errors show under their fields                                                                                                                                                                                    |
+| Content language      | Arabic or English: content takes its direction from its own text (`dir="auto"`) and Latin letters are set in Inter; no language field until word translation needs one                                                                                                                                                           |
+| Grammar session       | `/grammar` is a start form only (no page that lists the whole bank): pool "common + mine" or "only mine", any size, both remembered in the browser; the size is capped at the number of questions in the pool; one open session per user, which the start page offers to continue or discard                                     |
+| Speaking timer        | one timer for the whole list: a preparation countdown, then a speaking countdown. Each set stores default `prepare_seconds` and `speak_seconds`; the session page lets me change both before starting and remembers them in the browser per set                                                                                  |
+| Word translation      | passage glossary, then MyMemory; no cache table in 2.0                                                                                                                                                                                                                                                                           |
+| Translations          | gettext with Babel and Jinja's i18n extension; English msgids, so English needs no catalog; catalogs for `ru` and `uz`                                                                                                                                                                                                           |
+| Language choice       | the `qiraa_lang` cookie (set from `users.locale` at login), then `Accept-Language`, then English                                                                                                                                                                                                                                 |
+| Dates                 | Babel's date formatting replaces the hand-written Russian month names                                                                                                                                                                                                                                                            |
+| Local database        | Postgres in Docker Compose for development and tests; the app itself runs on the machine, not in a container; SQLite support removed                                                                                                                                                                                             |
+| Code layout           | organise by feature (see step 2); each content feature owns its content end to end (CONVENTIONS rule 18)                                                                                                                                                                                                                         |
+| Concurrency           | synchronous: `def` routes with a blocking `Session` run in FastAPI's thread pool; no `async` until a feature waits on many outside calls at once                                                                                                                                                                                 |
 
 ## Open decisions (likely choice first)
 
@@ -73,21 +74,24 @@ passages          + owner_id        → users.id, nullable, ON DELETE SET NULL
                                     (owner_id, slug) unique WHERE NOT is_common
                     glossary        used by word translation
 
-questions           passage_id      now nullable (NULL = grammar question)
-                  + owner_id        → users.id, nullable, ON DELETE SET NULL
-                  + is_common       bool, default false
-                  CHECK: passage_id IS NULL OR (owner_id IS NULL AND NOT is_common)
-                         (a passage question takes author and visibility from its passage)
-                  CHECK: passage_id IS NOT NULL OR is_common OR owner_id IS NOT NULL
+passage_questions   renamed from questions; options renamed to passage_options
+
+grammar_questions (new) id, owner_id → users.id nullable ON DELETE SET NULL,
+                  is_common, slug, prompt, explanation
+                  CHECK: is_common OR owner_id IS NOT NULL
+                  slug unique WHERE is_common, and (owner_id, slug) unique WHERE NOT is_common
+grammar_options   (new) as passage_options, question_id → grammar_questions.id CASCADE
 
 attempts            passage_id      now nullable (NULL = grammar session),
                                     ON DELETE SET NULL (was CASCADE)
-                  + kind            "passage" | "grammar"
+                  + kind            "passage" | "grammar", no default
+                  CHECK: kind = 'passage' OR passage_id IS NULL
                   + content         JSON copy of what the attempt shows: title, text,
                                     translation_ru, and the questions with their options
                                     in shuffled order, the correct one marked
                   - option_order    the order is now the order in `content`
-                  unique (user_id, passage_id) WHERE open AND kind = 'passage'
+                  unique (user_id, passage_id) WHERE open    (NULLs never collide,
+                                                              so sessions skip it)
                   unique (user_id)            WHERE open AND kind = 'grammar'
 
 attempt_answers     question_id     no foreign key: ids inside attempts.content
@@ -109,7 +113,8 @@ Migrations:
 - The attempts migrations (step 5) fill `content` from each attempt's passage, with the
   options in the order its `option_order` showed them (a data migration, with a test), then
   drop `option_order` and the answers' foreign keys to questions and options. Step 8 adds
-  `kind` with `server_default 'passage'`, so existing attempts need no data migration.
+  `kind` with the default `'passage'`, which fills the existing attempts, then drops the
+  default.
 
 Account deletion is one service function and one commit: delete my private passages,
 grammar questions and speaking sets, then delete the user. The database sets `owner_id` to
@@ -130,13 +135,16 @@ the user delete fail instead of leaving private rows nobody can reach.
 ```
 app/core/       config, db, templating, i18n, permissions, timeutils, redirects
 app/auth/       users, sessions, sign-up/login, deps, security (password and token hashing)
-app/practice/   Question, Option, Attempt, AttemptAnswer, attempt service, routes, api,
-                attempt/result templates, the question navigator
-app/passages/   Passage, list and start pages, editor
-app/grammar/    session start page, sessions, editor
-app/speaking/   SpeakingSet, session page, editor
+app/practice/   Attempt, AttemptAnswer, what every attempt shares once started (autosave,
+                timer, grading), routes, api, attempt/result templates, the navigator
+app/passages/   Passage and its questions, starting an attempt, list and start pages,
+                file schema, prompt, import, editor
+app/grammar/    GrammarQuestion, GrammarOption, starting a session, start page, file
+                schema, prompt, import, editor
+app/speaking/   SpeakingSet, session page, file schema, prompt, import, editor
 app/profile/    statistics, streaks, profile page
-app/content/    YAML schemas, import, CLI
+app/content/    what content files share: question schema, slugs, loader, errors, the
+                import pages, CLI
 app/models.py   imports every model so Alembic sees them
 ```
 
@@ -215,18 +223,19 @@ Templates stay in `app/templates/<feature>/`.
 
 ### 8. Grammar practice
 
-- [ ] Migration: `questions.owner_id` (SET NULL), `questions.is_common`, both CHECKs;
-      `attempts.kind` (`server_default 'passage'`), the open-attempt index limited to
-      `kind = 'passage'`, and one open grammar session per user.
-- [ ] `/grammar`: start form with pool ("common + mine" / "only mine") and size, showing how
+- [x] Rename `questions`/`options` to `passage_questions`/`passage_options`.
+- [x] Migration: `grammar_questions`, `grammar_options`; `attempts.kind` (existing rows
+      `'passage'`, then no default) with its CHECKs, and one open grammar session per user.
+- [x] Grammar files (`grammar:`, a slug per question) with their own import page, chatbot
+      prompt and CLI support.
+- [x] Starting a passage attempt moves from `practice/` to `passages/`.
+- [x] `/grammar`: start form with pool ("common + mine" / "only mine") and size, showing how
       many questions the pool has; both choices remembered in the browser. The server caps the
       size at the pool count and shows a message when the pool is empty.
-- [ ] Sessions use the attempt page without the passage column; results, profile and streak
-      include them.
-- [ ] `/manage/grammar`: list of my questions (and common ones for admins) with new, edit,
-      delete.
-- [ ] Grammar questions in the content format (a `grammar:` list), imported by the CLI and
-      the import page; the chatbot prompt covers them.
+- [x] Sessions and passage attempts have their own attempt and result pages on shared layouts
+      in `practice/`; results, profile and streak include sessions.
+- [x] `/manage/grammar`: list of my questions (and common ones for admins) with new, edit,
+      delete and import; `/passages` and `/grammar` link to their manage pages.
       Done when: a 10-question session can be started, autosaved, submitted and reviewed, and asking
       for 50 questions from a pool of 40 gives 40.
 
@@ -246,7 +255,7 @@ Templates stay in `app/templates/<feature>/`.
       preparation countdown, then speaking countdown, then a "done" state. Before starting,
       both durations can be changed (defaults from the set, remembered in the browser per set).
 - [ ] `/manage/speaking` editor (one question per line, default durations).
-- [ ] Speaking sets in the content format (a `speaking:` list), imported like passages.
+- [ ] Speaking files (`speaking:`) with their own import page and chatbot prompt.
 - [ ] If open decision 1 is yes: `speaking_sessions` table, `POST /speaking/{id}/finish`
       calls `record_activity()`, and the profile calendar reads both tables.
       Done when: a set can be created and run with both countdowns (and, if decided, counted for the
@@ -257,6 +266,8 @@ Templates stay in `app/templates/<feature>/`.
 - [ ] `/api/translate`: passage glossary, then MyMemory (`MYMEMORY_EMAIL` raises the free
       quota from 5,000 to 50,000 characters a day).
 - [ ] Arabic normalisation: strip vowel marks, unify alef forms, try without و/ف/ب/ك/ل/ال prefixes.
+- [ ] English content (step 8): the word's script picks the MyMemory pair (`ar|ru` or
+      `en|ru`), and only Arabic words are normalised.
       Done when: tapping a glossary word and a new word each return Russian.
 
 ### 12. Release 2.0.0
@@ -277,9 +288,9 @@ Templates stay in `app/templates/<feature>/`.
 
 | Area     | Routes                                                                                                       |
 | -------- | ------------------------------------------------------------------------------------------------------------ |
-| Grammar  | `GET /grammar` (start form), `POST /grammar/sessions` → existing attempt page                                |
+| Grammar  | `GET /grammar` (start form), `POST /grammar/sessions` → the session's attempt page                           |
 | Speaking | `GET /speaking`, `GET /speaking/{id}`, `POST /speaking/{id}/finish` (only if speaking counts for the streak) |
-| Manage   | `/manage/{passages,grammar,speaking}` with `new`, `{id}/edit`, `{id}/delete`; `/manage/import`               |
+| Manage   | `/manage/{passages,grammar,speaking}` with `new`, `{id}/edit`, `{id}/delete`, `import`                       |
 | Settings | `POST /settings/language`                                                                                    |
 | API      | `GET /api/translate?q=…&passage_id=…`                                                                        |
 

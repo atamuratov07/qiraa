@@ -1,0 +1,11 @@
+{#
+  grammar/result.html: a submitted grammar session. The layout and the context are in
+  practice/_result.html.
+#}
+{% extends "practice/_result.html" %}
+
+{% block width %}mx-auto max-w-3xl{% endblock %}
+
+{% block actions %}
+<a href="/grammar" class="rounded-xl bg-accent px-4 py-2 font-semibold text-white hover:brightness-110">{{ _("New session") }}</a>
+{% endblock %}

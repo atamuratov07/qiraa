@@ -8,10 +8,10 @@ from datetime import timedelta
 
 import pytest
 
+from app.passages.service import copy_passage
 from app.practice.models import Attempt
 from app.practice.service import (
     apply_heartbeat,
-    copy_passage,
     grade,
     has_option,
     is_paused,

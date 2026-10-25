@@ -1,6 +1,5 @@
-import json
 from datetime import UTC, datetime
-from typing import Annotated, cast
+from typing import Annotated
 
 from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -9,23 +8,25 @@ from sqlalchemy.orm import selectinload
 
 from app.auth.deps import CurrentUser
 from app.auth.models import User
+from app.content.editor import EDITOR_MESSAGES, posted
 from app.content.errors import messages_by_path
+from app.content.service import SlugTaken
 from app.core.db import DB
-from app.core.i18n import N_, _
+from app.core.i18n import _
 from app.core.permissions import load_editable
 from app.core.templating import render
-from app.core.timeutils import local_day
-from app.passages.models import Passage
+from app.passages.models import Passage, PassageQuestion
 from app.passages.schemas import PassageIn
 from app.passages.service import (
-    SlugTaken,
     create_passage,
     delete_passage,
     load_passage,
     managed_passages,
+    open_attempt_for,
     passage_cards,
     passage_in,
     passage_stats,
+    start_attempt,
     update_passage,
 )
 from app.passages.views import (
@@ -35,21 +36,6 @@ from app.passages.views import (
     PassagesPage,
     PassageStartPage,
 )
-from app.practice.models import Question
-from app.practice.service import open_attempt_for, start
-from app.profile.streaks import visible_streak
-
-EDITOR_MESSAGES: dict[str, str] = {"bad_answer": N_("Choose the correct option.")}
-
-
-def posted(raw: str) -> dict[str, object] | None:
-    """What was posted, to refill the editor"""
-    try:
-        value = cast(object, json.loads(raw))
-    except ValueError:
-        return None
-
-    return cast(dict[str, object], value) if isinstance(value, dict) else None
 
 
 def render_editor(
@@ -81,7 +67,7 @@ def load_for_editing(db: DB, user: User, pid: int) -> Passage:
         user,
         Passage,
         pid,
-        selectinload(Passage.questions).selectinload(Question.options),
+        selectinload(Passage.questions).selectinload(PassageQuestion.options),
     )
     if passage is None:
         raise HTTPException(404, _("Passage not found"))
@@ -96,7 +82,6 @@ router = APIRouter(tags=["passages"])
 def passages(request: Request, db: DB, user: CurrentUser) -> HTMLResponse:
     ctx: PassagesPage = {
         "user": user,
-        "streak": visible_streak(user, local_day(datetime.now(UTC))),
         "passages": passage_cards(db, user),
     }
     return render(request, "passages/list.html", ctx)
@@ -126,12 +111,12 @@ def passage_start(
 
 
 @router.post("/passages/{pid}/attempts")
-def start_attempt(pid: int, db: DB, user: CurrentUser) -> RedirectResponse:
+def new_attempt(pid: int, db: DB, user: CurrentUser) -> RedirectResponse:
     passage = load_passage(db, user, pid)
     if passage is None:
         raise HTTPException(404, _("Passage not found"))
 
-    attempt = start(db, user, passage, now=datetime.now(UTC))
+    attempt = start_attempt(db, user, passage, now=datetime.now(UTC))
     return RedirectResponse(f"/attempts/{attempt.id}", status_code=303)
 
 

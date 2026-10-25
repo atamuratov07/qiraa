@@ -1,25 +1,28 @@
 {#
-  content/import.html
-  Route: GET /manage/import (empty form), POST /manage/import (the result, or the errors)
+  content/import.html: a passages file or a grammar file.
+  Routes: GET /manage/{passages,grammar}/import (empty form), POST (the result, or the errors)
 
   Context:
     user      logged-in user; .is_admin shows the "Common" checkbox
+    kind      "passages" or "grammar"
     text      refills the text box after errors; "" otherwise
     common    refills the checkbox
     errors    list of ShownError: .line (int or None) .path ("" when unknown) .message
     report    None, or ImportReport: .added and .updated, lists of .id .slug .title
     prompt    instructions for a chatbot, in English
 
-  Submits POST /manage/import as multipart/form-data with fields: text, file, common.
+  Submits POST /manage/{kind}/import as multipart/form-data with fields: text, file, common.
   A chosen file wins over the text box. An unticked checkbox sends nothing.
 #}
 {% extends "base.html" %}
-{% block title %}{{ _("Import passages") }}{% endblock %}
+{% set grammar = kind == "grammar" %}
+{% set heading = _("Import grammar questions") if grammar else _("Import passages") %}
+{% block title %}{{ heading }}{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-3xl space-y-6">
   <div>
-    <h1 class="text-2xl font-bold">{{ _("Import passages") }}</h1>
-    <p class="mt-1 text-muted">{{ _("A passage whose slug was imported before is updated.") }}</p>
+    <h1 class="text-2xl font-bold">{{ heading }}</h1>
+    <p class="mt-1 text-muted">{{ _("A question whose slug was imported before is updated.") if grammar else _("A passage whose slug was imported before is updated.") }}</p>
   </div>
 
   {% if errors %}
@@ -39,25 +42,35 @@
 
   {% if report %}
   <div class="rounded-2xl bg-accent-soft p-4 text-sm">
-    {% for passages, heading in [
+    {% if grammar %}
+    {% set groups = [
+      (report.added, ngettext("Added %(num)d question", "Added %(num)d questions", report.added | length)),
+      (report.updated, ngettext("Updated %(num)d question", "Updated %(num)d questions", report.updated | length)),
+    ] %}
+    {% else %}
+    {% set groups = [
       (report.added, ngettext("Added %(num)d passage", "Added %(num)d passages", report.added | length)),
       (report.updated, ngettext("Updated %(num)d passage", "Updated %(num)d passages", report.updated | length)),
-    ] if passages %}
-    <p class="font-semibold text-accent">{{ heading }}</p>
-    <ul class="mb-2 ms-4 list-disc">
-      {% for p in passages %}
-      <li><a href="/passages/{{ p.id }}" class="font-arabic text-lg hover:underline" lang="ar" dir="rtl">{{ p.title }}</a></li>
+    ] %}
+    {% endif %}
+    {% for items, group_heading in groups if items %}
+    <p class="font-semibold text-accent">{{ group_heading }}</p>
+    <ul class="mt-1 mb-3 list-disc ps-6 marker:text-accent/50 last:mb-0" dir="auto">
+      {% for item in items %}
+      <li class="font-content text-lg">
+        <a href="{{ '/manage/grammar/%d/edit' % item.id if grammar else '/passages/%d' % item.id }}" class="block rounded-lg px-3 py-1 transition-colors hover:bg-accent/10">{{ item.title }}</a>
+      </li>
       {% endfor %}
     </ul>
     {% endfor %}
   </div>
   {% endif %}
 
-  <form method="post" action="/manage/import" enctype="multipart/form-data"
+  <form method="post" action="/manage/{{ kind }}/import" enctype="multipart/form-data"
         class="space-y-4 rounded-2xl border border-line bg-white p-6">
     <label class="block text-sm text-muted">{{ _("YAML") }}
       <textarea name="text" rows="16" dir="ltr" spellcheck="false" autocomplete="off"
-                placeholder="passages:&#10;  - slug: a2-market&#10;    text: |&#10;      …"
+                placeholder="{% if grammar %}grammar:&#10;  - slug: subject-case-01&#10;    prompt: …{% else %}passages:&#10;  - slug: a2-market&#10;    text: |&#10;      …{% endif %}"
                 class="mt-1 block w-full rounded-lg border border-line bg-paper px-3 py-2 font-mono text-sm text-ink focus:outline-2 focus:outline-accent">{{ text }}</textarea>
     </label>
     <label class="block text-sm text-muted">{{ _("Or a file (up to 1 MB)") }}
@@ -67,7 +80,7 @@
     {% if user.is_admin %}
     <label class="flex items-center gap-2 text-sm">
       <input type="checkbox" name="common" {{ "checked" if common }} class="accent-accent">
-      {{ _("Common: every user sees these passages") }}
+      {{ _("Common: every user sees these questions") if grammar else _("Common: every user sees these passages") }}
     </label>
     {% endif %}
     <button class="cursor-pointer rounded-xl bg-accent px-5 py-2.5 font-semibold text-white hover:brightness-110">{{ _("Import") }}</button>

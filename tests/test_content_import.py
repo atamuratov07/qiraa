@@ -6,11 +6,15 @@ from sqlalchemy.orm import Session
 
 from app.auth.models import User
 from app.content.loader import parse
-from app.content.schemas import PassageEntry
-from app.content.service import NotAllowed, import_passages
-from app.passages.models import Passage
+from app.content.service import NotAllowed
+from app.grammar.models import GrammarQuestion
+from app.grammar.schemas import GrammarEntry, GrammarFile
+from app.grammar.service import import_grammar
+from app.passages.models import Passage, PassageOption, PassageQuestion
+from app.passages.schemas import PassageEntry, PassageFile
+from app.passages.service import import_passages, start_attempt
 from app.practice import service
-from app.practice.models import Attempt, Option, Question
+from app.practice.models import Attempt
 from tests.factories import T0
 
 TWO_QUESTIONS = """\
@@ -38,10 +42,10 @@ passages:
 
 
 def entries(text: str) -> list[PassageEntry]:
-    return parse(text).passages
+    return parse(text, PassageFile).passages
 
 
-def count(db: Session, model: type[Passage | Question | Option]) -> int:
+def count(db: Session, model: type[Passage | PassageQuestion | PassageOption]) -> int:
     return db.scalar(select(func.count()).select_from(model)) or 0
 
 
@@ -56,7 +60,7 @@ def test_reimporting_updates_the_passage_and_keeps_results(
         [True, False],
     ]
 
-    attempt = service.start(db, user, passage, T0)
+    attempt = start_attempt(db, user, passage, T0)
     q1 = attempt.content["questions"][0]
     right = next(o["id"] for o in q1["options"] if o["is_correct"])
     service.submit(db, attempt, {q1["id"]: right}, T0)
@@ -65,7 +69,11 @@ def test_reimporting_updates_the_passage_and_keeps_results(
     second = import_passages(db, entries(ONE_QUESTION), owner=None, common=True)
 
     assert (second.added, [p.id for p in second.updated]) == ([], [passage.id])
-    assert (count(db, Passage), count(db, Question), count(db, Option)) == (1, 1, 2)
+    assert (
+        count(db, Passage),
+        count(db, PassageQuestion),
+        count(db, PassageOption),
+    ) == (1, 1, 2)
     db.expire_all()
     assert [q.prompt for q in db.get_one(Passage, passage.id).questions] == ["جديد؟"]
     kept = db.get_one(Attempt, attempt.id)
@@ -83,7 +91,7 @@ def test_one_slug_in_each_scope_is_a_separate_passage(
 
     assert (len(again.added), len(again.updated)) == (0, 1)
     owners = db.execute(
-        select(Passage.owner_id, Passage.is_common, func.count(Question.id))
+        select(Passage.owner_id, Passage.is_common, func.count(PassageQuestion.id))
         .join(Passage.questions)
         .group_by(Passage.id)
         .order_by(Passage.id)
@@ -112,3 +120,31 @@ def test_only_admins_import_common_content(
 
     with Session(engine) as fresh:
         assert count(fresh, Passage) == 0
+
+
+def test_reimporting_grammar_updates_by_slug_within_each_area(
+    db: Session, user: User, other_user: User
+) -> None:
+    def grammar(answer: str, *options: str) -> list[GrammarEntry]:
+        text = f"""\
+grammar:
+  - slug: case-01
+    prompt: جملة ___.
+    options: [{", ".join(options)}]
+    answer: {answer}
+"""
+        return parse(text, GrammarFile).grammar
+
+    first = import_grammar(db, grammar("A", "أ", "ب"), owner=user, common=False)
+    theirs = import_grammar(db, grammar("A", "أ", "ب"), owner=other_user, common=False)
+    again = import_grammar(db, grammar("C", "ج", "د", "ه"), owner=user, common=False)
+
+    assert [i.id for i in again.updated] == [first.added[0].id]
+    assert again.added == [] and theirs.added[0].id != first.added[0].id
+    db.expire_all()
+    mine = db.get_one(GrammarQuestion, first.added[0].id)
+    assert [(o.text, o.is_correct) for o in mine.options] == [
+        ("ج", False),
+        ("د", False),
+        ("ه", True),
+    ]

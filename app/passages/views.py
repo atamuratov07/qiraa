@@ -2,16 +2,10 @@ from dataclasses import dataclass
 from typing import TypedDict
 
 from app.auth.models import User
+from app.content.schemas import MAX_OPTIONS, MIN_OPTIONS
 from app.passages.models import Passage
-from app.passages.schemas import MAX_LEVEL, MAX_OPTIONS, MAX_TITLE, MIN_OPTIONS
-
-
-@dataclass(frozen=True, slots=True)
-class UnfinishedInfo:
-    id: int
-    answered: int
-    total: int
-    elapsed_seconds: int
+from app.passages.schemas import MAX_LEVEL, MAX_TITLE
+from app.practice.views import UnfinishedInfo
 
 
 @dataclass(frozen=True, slots=True)
@@ -39,7 +33,6 @@ class PassagesPage(TypedDict):
     """passages/list.html, GET /passages"""
 
     user: User
-    streak: int
     passages: list[PassageCard]
 
 

@@ -41,7 +41,8 @@ throwaway database: every test drops all tables.
 
 ## Code layout
 
-Organised by feature. `app/main.py` creates the app, includes every router and handles errors.
+Organised by feature. `app/main.py` creates the app, includes every router, handles errors
+and registers what templates need from several features (`streak_today()`).
 `app/models.py` imports every model. `content/` holds YAML content files; only
 `example.yaml` is in git, so real passages stay private and local. `app/cli.py` holds
 commands for running the site (`make-admin`, `import`, `check`). `app/locale/` holds the
@@ -56,23 +57,32 @@ commands for running the site (`make-admin`, `import`, `check`). `app/locale/` h
   `display_title()` · `views.py` `ErrorPage`.
 - `auth/`: `User`, `UserSession` · `deps.py` `CurrentUser`, `MaybeUser`, `LoginRequired` ·
   `security.py` password hashing, session tokens.
-- `passages/`: `Passage` · `schemas.py` `PassageIn`, `QuestionIn` and their limits (shared
-  by YAML and the editor) · `apply_passage()`, passage list statistics, start card ·
-  `create_passage()`, `update_passage()`, `passage_in()`, the manage list and the editor.
-- `content/`: content files, no models · `schemas.py` `PassageEntry`, `ContentFile` ·
-  `loader.py` `parse()`, `decode()` · `yaml_tree.py` line numbers (see
-  [CONTENT-LOADER.md](CONTENT-LOADER.md)) · `errors.py` `LineError`, `ContentError`,
-  `describe()` · `service.py` `import_passages()` · `prompt.py` the chatbot prompt ·
-  the import page.
-- `practice/`: `Question`, `Option`, `Attempt`, `AttemptAnswer`, and the copy an attempt
-  keeps (`AttemptContent`, `QuestionCopy`, `OptionCopy`) · attempt service (`copy_passage()`,
-  `has_option()`, `grade()`) · pages, `api.py` and `schemas.py` for the JSON endpoints.
+- `passages/`: `Passage`, `PassageQuestion`, `PassageOption` · `schemas.py` `PassageIn`,
+  `PassageEntry`, `PassageFile` · `prompt.py` · `apply_passage()`, `import_passages()` ·
+  starting an attempt (`start_attempt()`, `copy_passage()`, `visible_passage_id()`) ·
+  passage list statistics, start card · `create_passage()`, `update_passage()`,
+  `passage_in()`, the manage list and the editor.
+- `grammar/`: `GrammarQuestion`, `GrammarOption` · `schemas.py` `GrammarEntry`,
+  `GrammarFile` · `prompt.py` · `apply_question()`, `import_grammar()` · sessions
+  (`start_session()`, `open_session_for()`, `copy_questions()`) and the start page ·
+  `create_question()`, `update_question()`, `question_in()`, the manage list and the
+  editor.
+- `content/`: what content files share, no models · `schemas.py` `QuestionIn`, its limits,
+  `Slug`, `WithSlug` · `loader.py` `parse()`, `parse_file()`, `decode()` · `yaml_tree.py`
+  line numbers (see [CONTENT-LOADER.md](CONTENT-LOADER.md)) · `errors.py` `LineError`,
+  `ContentError`, `describe()` · `service.py` `slug_scope()`, `commit_import()` ·
+  `prompt.py` the rules both prompts share · the import pages.
+- `practice/`: `Attempt`, `AttemptAnswer`, and the copy an attempt keeps (`AttemptContent`,
+  `QuestionCopy`, `OptionCopy`) · what every attempt shares once started (`save_answer()`,
+  `heartbeat()`, `submit()`, `grade()`, `has_option()`) · the attempt and result layouts
+  (`_attempt.html`, `_result.html`), which each kind's own pages extend · `api.py` and
+  `schemas.py` for the JSON endpoints.
 - `profile/`: `streaks.py` · profile statistics and page.
 
 A feature has `models.py`, `service.py`, `routes.py` and `views.py` (dataclasses and one
 `TypedDict` per page) where it needs them. Templates are in `app/templates/<feature>/`; shared
-ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_menu.html`) stay
-at the top.
+ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_menu.html`,
+`_editor.html`) stay at the top.
 `migrations/versions/6ad753184ecc_initial_schema.py` is the single initial schema.
 
 ## Rules
@@ -129,25 +139,45 @@ at the top.
     `base.html`, with `{name}` placeholders. `/api` errors stay English. After changing any
     text, run `pybabel extract` and `update`, then translate `ru` and `uz`.
 15. **Attempts read their own copy.** Starting an attempt copies what it shows into
-    `attempt.content` (`copy_passage()`). The attempt page, grading, autosave and the result
-    page read that copy, never the live passage; `Attempt` has no `passage` relationship.
-    Answers store ids from the copy with no foreign keys, so the service checks them
-    (`has_option()`). Editing or deleting content never changes a result: a deleted passage
-    only sets `passage_id` to NULL. The pages link to the passage only while I can see it
-    (`visible_passage_id()`).
+    `attempt.content` (`copy_passage()`; `copy_questions()` for a grammar session). The
+    attempt page, grading, autosave and the result page read that copy, never the live
+    passage; `Attempt` has no `passage` relationship. Answers store ids from the copy with
+    no foreign keys, so the service checks them (`has_option()`). Editing or deleting
+    content never changes a result: a deleted passage only sets `passage_id` to NULL. The
+    pages link to the passage only while I can see it (`visible_passage_id()`).
 
-16. **Content files.** Every passage in a file has a slug written by hand. An import looks
-    it up among common passages, or among the importer's private ones (a partial unique
-    index for each), updates what it finds and replaces its questions: clear, flush, then
-    insert, because one flush runs inserts before deletes. Errors are `LineError`s with a
+16. **Content files.** A file holds one kind of content (`passages:` or `grammar:`), and
+    every entry has a slug written by hand. An import looks it up among common rows of that
+    kind, or among the importer's private ones (a partial unique index for each), updates
+    what it finds and replaces its questions or options: clear, flush, then insert, because
+    one flush runs inserts before deletes. Errors are `LineError`s with a
     type (Pydantic's or ours) and the line from the YAML node tree, translated where they
     are shown (`describe()`), so the CLI prints English. Limits are constants in the
     schemas, and the chatbot prompt reads them.
 
-17. **The passage editor** posts the passage as JSON in one form field. The route validates
-    it with `PassageIn.model_validate_json()` in its body, since a failed check in the
-    signature shows the 404 page. `messages_by_path()` keys the errors by path, such as
-    `questions[0].options[1]`, for the field that shows them.
+17. **The editors** (passages, grammar questions) post their content as JSON in one form
+    field. The route validates it with `PassageIn` or `QuestionIn.model_validate_json()` in
+    its body, since a failed check in the signature shows the 404 page.
+    `messages_by_path()` keys the errors by path, such as `questions[0].options[1]` or
+    `options[1]`; the shared question card in `_editor.html` asks the component's
+    `path(qi, field)` for the key. `set_common()` applies the publishing rule for both.
+
+18. **Each content feature owns its content end to end.** `passages/`, `grammar/` and later
+    `speaking/` each hold their models, file schema, chatbot prompt, import, manage pages,
+    editor, and how an attempt on them starts (what goes into `attempt.content`).
+    `practice/` holds what every attempt shares once it has started, and imports no content
+    feature; `content/` holds what content files share. Code moves down into `practice/`,
+    `content/` or `core/` only when every kind uses it the same way; a few lines repeated
+    per feature, checked by a shared `TypedDict`, are better than one function that knows
+    every feature's models. Before building on an older decision, check that its reason
+    still holds: much of 1.0 assumed passages were the only content.
+
+19. **Content is Arabic or English.** Content text (titles, passages, prompts, options,
+    glossary words) takes its direction from its first letter (`dir="auto"`), in the
+    editors as on the pages, and each passage paragraph has its own; it has no `lang`.
+    `font-content` sets Latin letters in Inter and Arabic in Noto Naskh Arabic.
+    Explanations and translations stay left to right, since they often open with a quoted
+    Arabic word.
 
 ## Tests
 

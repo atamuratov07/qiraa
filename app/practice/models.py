@@ -1,71 +1,29 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, Literal, TypedDict
 
 from sqlalchemy import (
     JSON,
+    CheckConstraint,
     DateTime,
     ForeignKey,
     Index,
-    Text,
+    String,
     UniqueConstraint,
+    and_,
     column,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.base import Base, unique_where
+from app.core.i18n import _
 from app.core.text import display_title
 
 if TYPE_CHECKING:
     from app.auth.models import User
-    from app.passages.models import Passage
 
-
-class Question(Base):
-    __tablename__: str = "questions"
-    __table_args__: tuple[UniqueConstraint, ...] = (
-        UniqueConstraint("passage_id", "position"),
-    )
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    passage_id: Mapped[int] = mapped_column(
-        ForeignKey("passages.id", ondelete="CASCADE")
-    )
-    position: Mapped[int] = mapped_column()
-    prompt: Mapped[str] = mapped_column(Text)
-    explanation: Mapped[str | None] = mapped_column(Text)
-
-    passage: Mapped[Passage] = relationship(back_populates="questions")
-
-    options: Mapped[list[Option]] = relationship(
-        back_populates="question",
-        cascade="all, delete-orphan",
-        order_by="Option.position",
-        passive_deletes=True,
-    )
-
-
-class Option(Base):
-    __tablename__: str = "options"
-    __table_args__: tuple[UniqueConstraint, Index] = (
-        UniqueConstraint("question_id", "position"),
-        unique_where(
-            "uq_options_one_correct",
-            "question_id",
-            where=column("is_correct"),
-        ),
-    )
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    question_id: Mapped[int] = mapped_column(
-        ForeignKey("questions.id", ondelete="CASCADE")
-    )
-    position: Mapped[int] = mapped_column()
-    text: Mapped[str] = mapped_column(Text)
-    is_correct: Mapped[bool] = mapped_column(default=False)
-
-    question: Mapped[Question] = relationship(back_populates="options")
+AttemptKind = Literal["passage", "grammar"]
 
 
 class OptionCopy(TypedDict):
@@ -91,12 +49,21 @@ class AttemptContent(TypedDict):
 
 class Attempt(Base):
     __tablename__: str = "attempts"
-    __table_args__: tuple[Index, ...] = (
+    __table_args__: tuple[Index | CheckConstraint, ...] = (
         unique_where(
             "uq_attempts_one_open",
             "user_id",
             "passage_id",
             where=column("submitted_at").is_(None),
+        ),
+        unique_where(
+            "uq_attempts_one_open_grammar",
+            "user_id",
+            where=and_(column("submitted_at").is_(None), column("kind") == "grammar"),
+        ),
+        CheckConstraint("kind IN ('passage', 'grammar')", name="known_kind"),
+        CheckConstraint(
+            "kind = 'passage' OR passage_id IS NULL", name="grammar_has_no_passage"
         ),
     )
 
@@ -107,6 +74,7 @@ class Attempt(Base):
     passage_id: Mapped[int | None] = mapped_column(
         ForeignKey("passages.id", ondelete="SET NULL"), index=True
     )
+    kind: Mapped[AttemptKind] = mapped_column(String(16))
     content: Mapped[AttemptContent] = mapped_column(JSON)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
@@ -125,6 +93,9 @@ class Attempt(Base):
 
     @property
     def display_title(self) -> str:
+        if self.kind == "grammar":
+            return _("Grammar")
+
         return display_title(self.content["title"], self.content["text"])
 
 

@@ -10,8 +10,8 @@ from sqlalchemy.orm import Session
 
 from app.auth.models import User
 from app.auth.service import SESSION_COOKIE, create_session
-from app.passages.models import Passage
-from app.practice.models import Attempt, Question
+from app.passages.models import Passage, PassageQuestion
+from app.practice.models import Attempt
 
 
 def start(client: TestClient, passage_id: int = 1) -> int:
@@ -232,14 +232,14 @@ def test_unknown_passage_is_404(logged_in: TestClient) -> None:
 
 
 def change_question(db: Session) -> None:
-    question = db.get_one(Question, 1)
+    question = db.get_one(PassageQuestion, 1)
     question.prompt = "سؤال جديد؟"
     for option in question.options:
         option.is_correct = option.id == 13
 
 
 def delete_question(db: Session) -> None:
-    db.delete(db.get_one(Question, 2))
+    db.delete(db.get_one(PassageQuestion, 2))
 
 
 @pytest.mark.usefixtures("passage")

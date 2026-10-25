@@ -1,0 +1,35 @@
+{#
+  passages/attempt.html: an unfinished passage attempt, the passage beside the questions.
+  The layout and the full context are in practice/_attempt.html; here:
+    title       the passage title, or the start of its text
+    passage_id  also where Discard returns to; None once the passage is deleted or hidden
+    content     .text .level besides the questions
+#}
+{% extends "practice/_attempt.html" %}
+
+{% block columns %}lg:grid-cols-[1.15fr_1fr]{% endblock %}
+
+{% block aside %}
+<article class="rounded-2xl border border-line bg-white p-6 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-auto">
+  {% if content.level %}
+  <span class="rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-bold text-accent">{{ content.level }}</span>
+  {% endif %}
+  <h1 class="mt-3 mb-4 font-content text-3xl font-bold leading-relaxed" dir="auto">{{ title }}</h1>
+  <div class="font-content text-2xl leading-[2.2]" dir="auto"
+       data-tappable {% if passage_id %}data-passage-id="{{ passage_id }}"{% endif %}>
+    {% for para in content.text.strip().split("\n\n") %}
+    <p class="mb-4" dir="auto">{{ para }}</p>
+    {% endfor %}
+  </div>
+</article>
+{% endblock %}
+
+{% block pause_title %}
+<h2 class="mt-2 font-content text-3xl font-bold leading-relaxed" dir="auto">{{ title }}</h2>
+{% endblock %}
+
+{% block discard_next %}/passages{% if passage_id %}/{{ passage_id }}{% endif %}{% endblock %}
+
+{% block back_link %}
+<a href="/passages" class="mt-3 inline-block text-sm text-accent hover:underline">← {{ _("All passages") }}</a>
+{% endblock %}

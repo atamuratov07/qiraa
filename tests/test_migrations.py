@@ -10,6 +10,7 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from sqlalchemy import CheckConstraint, Engine, create_engine, inspect, text
+from sqlalchemy.exc import IntegrityError
 
 from app.core.config import BASE_DIR, get_settings
 from app.models import Base
@@ -39,11 +40,17 @@ def empty_db(database_url: str, monkeypatch: pytest.MonkeyPatch) -> Iterator[Eng
     get_settings.cache_clear()
 
     engine = create_engine(database_url)
+    reset_schema(engine)
+    yield engine
+    # A test can end at an old revision, whose table names drop_all() doesn't know.
+    reset_schema(engine)
+    engine.dispose()
+
+
+def reset_schema(engine: Engine) -> None:
     with engine.begin() as conn:
         conn.execute(text("DROP SCHEMA public CASCADE"))
         conn.execute(text("CREATE SCHEMA public"))
-    yield engine
-    engine.dispose()
 
 
 def test_existing_passages_become_common(empty_db: Engine) -> None:
@@ -105,6 +112,31 @@ def test_migrations_create_every_check_and_partial_index(empty_db: Engine) -> No
         }
 
     assert actual == expected
+
+
+def test_existing_attempts_become_passage_attempts(empty_db: Engine) -> None:
+    upgrade("2ad70ffd8c9c")
+    insert_attempt = text(
+        "INSERT INTO attempts (user_id, passage_id, content, started_at, "
+        "last_seen_at, elapsed_seconds) VALUES (1, NULL, '{}', now(), now(), 0)"
+    )
+    with empty_db.begin() as conn:
+        conn.execute(
+            text(
+                "INSERT INTO users (id, username, password_hash, created_at) "
+                "VALUES (1, 'peter', 'x', now())"
+            )
+        )
+        conn.execute(insert_attempt)
+
+    upgrade("head")
+
+    with empty_db.begin() as conn:
+        assert conn.scalar(text("SELECT kind FROM attempts")) == "passage"
+    with pytest.raises(IntegrityError), empty_db.begin() as conn:
+        conn.execute(
+            insert_attempt
+        )  # no default any more: a new attempt names its kind
 
 
 def test_existing_attempts_get_a_copy_of_their_passage(empty_db: Engine) -> None:
@@ -172,18 +204,18 @@ def test_downgrading_drops_what_the_old_schema_cannot_hold(empty_db: Engine) -> 
                 "VALUES (1, 'peter', 'x', now());"
                 "INSERT INTO passages (id, title, level, text, glossary, is_common) "
                 "VALUES (1, 'نص', 'A2', 'الفقرة.', '{}', true);"
-                "INSERT INTO questions (id, passage_id, position, prompt) "
+                "INSERT INTO passage_questions (id, passage_id, position, prompt) "
                 "VALUES (1, 1, 1, 'سؤال؟');"
-                "INSERT INTO options (id, question_id, position, text, is_correct) "
-                "VALUES (11, 1, 1, 'أ', false), (12, 1, 2, 'ب', true)"
+                "INSERT INTO passage_options (id, question_id, position, text, "
+                "is_correct) VALUES (11, 1, 1, 'أ', false), (12, 1, 2, 'ب', true)"
             )
         )
         conn.execute(
             text(
-                "INSERT INTO attempts (id, user_id, passage_id, content, started_at, "
-                "last_seen_at, elapsed_seconds) "
-                "VALUES (1, 1, 1, :copy, now(), now(), 0), "
-                "(2, 1, NULL, :copy, now(), now(), 0)"  # its passage was deleted
+                "INSERT INTO attempts (id, user_id, passage_id, kind, content, "
+                "started_at, last_seen_at, elapsed_seconds) "
+                "VALUES (1, 1, 1, 'passage', :copy, now(), now(), 0), "
+                "(2, 1, NULL, 'passage', :copy, now(), now(), 0)"  # passage deleted
             ),
             {"copy": copy},
         )
