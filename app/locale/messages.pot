@@ -425,39 +425,39 @@ msgid_plural "Updated %(num)d passages"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/content/import.html:71
+#: app/templates/content/import.html:72
 msgid "YAML"
 msgstr ""
 
-#: app/templates/content/import.html:76
+#: app/templates/content/import.html:77
 msgid "Or a file (up to 1 MB)"
 msgstr ""
 
-#: app/templates/content/import.html:83
+#: app/templates/content/import.html:84
 msgid "Common: every user sees these questions"
 msgstr ""
 
-#: app/templates/content/import.html:83
+#: app/templates/content/import.html:84
 msgid "Common: every user sees these passages"
 msgstr ""
 
-#: app/templates/content/import.html:86 app/templates/passages/manage.html:23
+#: app/templates/content/import.html:87 app/templates/passages/manage.html:23
 msgid "Import"
 msgstr ""
 
-#: app/templates/content/import.html:90
+#: app/templates/content/import.html:91
 msgid "Prompt for a chatbot: turn any material into this format"
 msgstr ""
 
-#: app/templates/content/import.html:91
+#: app/templates/content/import.html:92
 msgid "The chatbot marks answers it chose itself with # check. Check them before importing."
 msgstr ""
 
-#: app/templates/content/import.html:92
+#: app/templates/content/import.html:93
 msgid "Copy the prompt"
 msgstr ""
 
-#: app/templates/content/import.html:104
+#: app/templates/content/import.html:105
 msgid "Copied"
 msgstr ""
 

@@ -424,41 +424,41 @@ msgid_plural "Updated %(num)d passages"
 msgstr[0] "%(num)d ta matn yangilandi"
 msgstr[1] "%(num)d ta matn yangilandi"
 
-#: app/templates/content/import.html:71
+#: app/templates/content/import.html:72
 msgid "YAML"
 msgstr "YAML"
 
-#: app/templates/content/import.html:76
+#: app/templates/content/import.html:77
 msgid "Or a file (up to 1 MB)"
 msgstr "Yoki fayl (1 MB gacha)"
 
-#: app/templates/content/import.html:83
+#: app/templates/content/import.html:84
 msgid "Common: every user sees these questions"
 msgstr "Umumiy: bu savollarni barcha foydalanuvchilar koʻradi"
 
-#: app/templates/content/import.html:83
+#: app/templates/content/import.html:84
 msgid "Common: every user sees these passages"
 msgstr "Umumiy: bu matnlarni barcha foydalanuvchilar koʻradi"
 
-#: app/templates/content/import.html:86 app/templates/passages/manage.html:23
+#: app/templates/content/import.html:87 app/templates/passages/manage.html:23
 msgid "Import"
 msgstr "Import qilish"
 
-#: app/templates/content/import.html:90
+#: app/templates/content/import.html:91
 msgid "Prompt for a chatbot: turn any material into this format"
 msgstr "Chat-bot uchun prompt: istalgan materialni shu formatga oʻtkazish"
 
-#: app/templates/content/import.html:91
+#: app/templates/content/import.html:92
 msgid "The chatbot marks answers it chose itself with # check. Check them before importing."
 msgstr ""
 "Chat-bot oʻzi tanlagan javoblarni # check bilan belgilaydi. Import qilishdan oldin "
 "ularni tekshiring."
 
-#: app/templates/content/import.html:92
+#: app/templates/content/import.html:93
 msgid "Copy the prompt"
 msgstr "Promptni nusxalash"
 
-#: app/templates/content/import.html:104
+#: app/templates/content/import.html:105
 msgid "Copied"
 msgstr "Nusxalandi"
 
