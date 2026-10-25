@@ -117,14 +117,14 @@ ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_men
     saved (assign a new one); `None` in a JSON column is the JSON value `null`, `sa.null()` is
     SQL `NULL`; a `selectinload` chain is one path, so load siblings as separate options; use
     `selectinload` to avoid N+1 queries.
-12. **Owned content (from 2.0).** Passages, grammar questions and speaking sets have
-    `owner_id` (the author, `ON DELETE SET NULL`) and `is_common` (visibility). A CHECK keeps
-    every row either common or owned (`Owned` mixin, `common_or_owned()`). Visible: common or
-    mine. Editable: mine while private; common only for admins. Queries filter with
-    `visible(Model, user)`; rows load through `load_visible(db, user, Model, id)` /
-    `load_editable(...)` in `core/permissions.py`, which return `None` (answer 404); routes
-    never call `db.get()` on owned content. Account deletion removes the user's private
-    content before the user row.
+12. **Owned content (from 2.0).** Passages and grammar questions (and any later kind of
+    content) have `owner_id` (the author, `ON DELETE SET NULL`) and `is_common`
+    (visibility). A CHECK keeps every row either common or owned (`Owned` mixin,
+    `common_or_owned()`). Visible: common or mine. Editable: mine while private; common only
+    for admins. Queries filter with `visible(Model, user)`; rows load through
+    `load_visible(db, user, Model, id)` / `load_editable(...)` in `core/permissions.py`,
+    which return `None` (answer 404); routes never call `db.get()` on owned content. Account
+    deletion removes the user's private content before the user row.
 13. **Imports between features.** `core/` imports no feature at runtime. Model files start
     with `from __future__ import annotations` and import other features' models only under
     `if TYPE_CHECKING:`; SQLAlchemy finds relationship targets by class name. Services, views
@@ -163,15 +163,15 @@ ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_men
     `options[1]`; the shared question card in `_editor.html` asks the component's
     `path(qi, field)` for the key. `set_common()` applies the publishing rule for both.
 
-18. **Each content feature owns its content end to end.** `passages/`, `grammar/` and later
-    `speaking/` each hold their models, file schema, chatbot prompt, import, manage pages,
-    editor, and how an attempt on them starts (what goes into `attempt.content`).
-    `practice/` holds what every attempt shares once it has started, and imports no content
-    feature; `content/` holds what content files share. Code moves down into `practice/`,
-    `content/` or `core/` only when every kind uses it the same way; a few lines repeated
-    per feature, checked by a shared `TypedDict`, are better than one function that knows
-    every feature's models. Before building on an older decision, check that its reason
-    still holds: much of 1.0 assumed passages were the only content.
+18. **Each content feature owns its content end to end.** `passages/`, `grammar/` and any
+    later one (speaking sets, after 2.0) each hold their models, file schema, chatbot
+    prompt, import, manage pages, editor, and how an attempt on them starts (what goes into
+    `attempt.content`). `practice/` holds what every attempt shares once it has started, and
+    imports no content feature; `content/` holds what content files share. Code moves down
+    into `practice/`, `content/` or `core/` only when every kind uses it the same way; a few
+    lines repeated per feature, checked by a shared `TypedDict`, are better than one
+    function that knows every feature's models. Before building on an older decision, check
+    that its reason still holds: much of 1.0 assumed passages were the only content.
 
 19. **Content is Arabic or English.** Content text (titles, passages, prompts, options,
     glossary words) takes its direction from its first letter (`dir="auto"`), in the
@@ -179,11 +179,6 @@ ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_men
     `font-content` sets Latin letters in Inter and Arabic in Noto Naskh Arabic.
     Explanations and translations stay left to right, since they often open with a quoted
     Arabic word.
-
-20. **Pages work without scripts.** Scripts add to a page that already works: an attempt
-    without JavaScript is a plain list whose grid links scroll to `#q1`, `#q2`..., and
-    "Check answers" submits at once. Controls that need Alpine carry `x-cloak`; styles that
-    need scripts hang off the `js` class that `base.html` sets on `<html>`.
 
 ## Tests
 

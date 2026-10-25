@@ -431,8 +431,10 @@ Templates are in `app/templates/<feature>/`.
 - personal content for each user next to common content managed by an admin
 - editors in the app for passages and questions, plus YAML import
 - a grammar question bank with random practice sessions
-- speaking practice: a numbered list of questions with a countdown timer
 - a question navigator with a grid of question numbers and review flags
 - the interface in Uzbek, Russian and English
 - word translation inside the popup (glossary, cache, MyMemory)
 - Postgres in Docker for local development, and code organised by feature
+
+**After 2.0**: speaking practice, a numbered list of questions with preparation and speaking
+countdowns.

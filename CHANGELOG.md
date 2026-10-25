@@ -8,8 +8,8 @@ the data in a way that needs a migration of existing records, or changes how con
 ## [Unreleased]
 
 Work towards 2.0, planned in [docs/ROADMAP-v2.md](docs/ROADMAP-v2.md): personal and common
-content, in-app editors, grammar practice, speaking practice, a question navigator, sign-up
-with an invite code, and the interface in Uzbek, Russian and English.
+content, in-app editors, grammar practice, a question navigator, sign-up with an invite
+code, and the interface in Uzbek, Russian and English. Speaking practice comes after 2.0.
 
 ### Added
 
