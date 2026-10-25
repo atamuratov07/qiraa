@@ -33,7 +33,6 @@ class PassagesPage(TypedDict):
     """passages/list.html, GET /passages"""
 
     user: User
-    streak: int
     passages: list[PassageCard]
 
 

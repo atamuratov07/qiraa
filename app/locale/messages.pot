@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-25 10:41+0500\n"
+"POT-Creation-Date: 2026-10-25 10:42+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,31 +17,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:59
+#: app/main.py:70
 msgid "Bad Request"
 msgstr ""
 
-#: app/main.py:60
+#: app/main.py:71
 msgid "Unauthorized"
 msgstr ""
 
-#: app/main.py:61
+#: app/main.py:72
 msgid "Forbidden"
 msgstr ""
 
-#: app/main.py:62 app/main.py:93
+#: app/main.py:73 app/main.py:104
 msgid "Not Found"
 msgstr ""
 
-#: app/main.py:63
+#: app/main.py:74
 msgid "Method Not Allowed"
 msgstr ""
 
-#: app/main.py:64
+#: app/main.py:75
 msgid "Conflict"
 msgstr ""
 
-#: app/main.py:65
+#: app/main.py:76
 msgid "Internal Server Error"
 msgstr ""
 
@@ -182,21 +182,21 @@ msgstr ""
 msgid "The file is not UTF-8 text. Save it as UTF-8 and try again."
 msgstr ""
 
-#: app/passages/routes.py:42
+#: app/passages/routes.py:40
 msgid "Choose the correct option."
 msgstr ""
 
-#: app/passages/routes.py:87 app/passages/routes.py:111 app/passages/routes.py:132
-#: app/passages/routes.py:150
+#: app/passages/routes.py:85 app/passages/routes.py:108 app/passages/routes.py:129
+#: app/passages/routes.py:147
 msgid "Passage not found"
 msgstr ""
 
-#: app/passages/routes.py:213
+#: app/passages/routes.py:210
 #, python-format
 msgid "Another passage already uses the slug %(slug)s."
 msgstr ""
 
-#: app/practice/models.py:97 app/templates/base.html:56
+#: app/practice/models.py:97 app/templates/base.html:74
 #: app/templates/grammar/attempt.html:12 app/templates/grammar/start.html:17
 #: app/templates/grammar/start.html:20
 msgid "Grammar"
@@ -218,87 +218,100 @@ msgstr ""
 msgid "Google Translate"
 msgstr ""
 
-#: app/templates/base.html:55 app/templates/passages/list.html:19
+#: app/templates/base.html:54
+#, python-format
+msgid "Marhaba, %(name)s"
+msgstr ""
+
+#: app/templates/base.html:56 app/templates/base.html:61
+#, python-format
+msgid "%(count)s day in a row"
+msgid_plural "%(count)s days in a row"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/base.html:73 app/templates/passages/list.html:18
+#: app/templates/passages/list.html:20
 msgid "Passages"
 msgstr ""
 
-#: app/templates/base.html:57
+#: app/templates/base.html:75
 msgid "Manage"
 msgstr ""
 
-#: app/templates/base.html:58 app/templates/profile/profile.html:26
+#: app/templates/base.html:76 app/templates/profile/profile.html:26
 msgid "Profile"
 msgstr ""
 
-#: app/templates/base.html:60
+#: app/templates/base.html:83
 msgid "Log out"
 msgstr ""
 
-#: app/templates/base.html:75
+#: app/templates/base.html:102
 msgid "show"
 msgstr ""
 
-#: app/templates/base.html:76 app/templates/practice/_attempt.html:44
+#: app/templates/base.html:103 app/templates/practice/_attempt.html:44
 msgid "hide"
 msgstr ""
 
-#: app/templates/base.html:77
+#: app/templates/base.html:104
 msgid "Show timer"
 msgstr ""
 
-#: app/templates/base.html:78 app/templates/practice/_attempt.html:44
+#: app/templates/base.html:105 app/templates/practice/_attempt.html:44
 msgid "Hide timer"
 msgstr ""
 
-#: app/templates/base.html:79
+#: app/templates/base.html:106
 #, python-brace-format
 msgid "Answered {answered} of {total} · {status}"
 msgstr ""
 
-#: app/templates/base.html:80
+#: app/templates/base.html:107
 msgid "saving…"
 msgstr ""
 
-#: app/templates/base.html:81
+#: app/templates/base.html:108
 msgid "saved"
 msgstr ""
 
-#: app/templates/base.html:82
+#: app/templates/base.html:109
 #, python-brace-format
 msgid "not saved ({code}); the answer will be sent when you submit"
 msgstr ""
 
-#: app/templates/base.html:83
+#: app/templates/base.html:110
 msgid "no connection: not saved; the answer will be sent when you submit"
 msgstr ""
 
-#: app/templates/base.html:84
+#: app/templates/base.html:111
 #, python-brace-format
 msgid "Questions without an answer: {count}. Submit anyway?"
 msgstr ""
 
-#: app/templates/base.html:85
+#: app/templates/base.html:112
 msgid "Checking…"
 msgstr ""
 
-#: app/templates/base.html:86
+#: app/templates/base.html:113
 msgid "Translation is not available yet."
 msgstr ""
 
-#: app/templates/base.html:87
+#: app/templates/base.html:114
 #, python-brace-format
 msgid "Server error ({code})."
 msgstr ""
 
-#: app/templates/base.html:88
+#: app/templates/base.html:115
 msgid "Translation not found."
 msgstr ""
 
-#: app/templates/base.html:89
+#: app/templates/base.html:116
 msgid "Network error. Try the link below."
 msgstr ""
 
-#: app/templates/base.html:90
+#: app/templates/base.html:117
 #, python-brace-format
 msgid "Question {num}"
 msgstr ""
@@ -452,12 +465,12 @@ msgstr ""
 msgid "New session"
 msgstr ""
 
-#: app/templates/grammar/start.html:26 app/templates/passages/list.html:58
+#: app/templates/grammar/start.html:26 app/templates/passages/list.html:47
 #, python-format
 msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr ""
 
-#: app/templates/grammar/start.html:29 app/templates/passages/list.html:60
+#: app/templates/grammar/start.html:29 app/templates/passages/list.html:49
 #: app/templates/practice/_attempt.html:94
 msgid "Continue"
 msgstr ""
@@ -596,21 +609,10 @@ msgid "Common: every user sees this passage"
 msgstr ""
 
 #: app/templates/passages/list.html:26
-msgid "day in a row"
-msgid_plural "days in a row"
-msgstr[0] ""
-msgstr[1] ""
-
-#: app/templates/passages/list.html:29
-#, python-format
-msgid "Marhaba, %(name)s"
-msgstr ""
-
-#: app/templates/passages/list.html:37
 msgid "Other"
 msgstr ""
 
-#: app/templates/passages/list.html:43 app/templates/passages/manage.html:35
+#: app/templates/passages/list.html:32 app/templates/passages/manage.html:35
 #: app/templates/passages/start.html:46
 #, python-format
 msgid "%(count)s question"
@@ -618,26 +620,26 @@ msgid_plural "%(count)s questions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/passages/list.html:47
+#: app/templates/passages/list.html:36
 #, python-format
 msgid "Best score %(best)s%% · %(count)s attempt"
 msgid_plural "Best score %(best)s%% · %(count)s attempts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/templates/passages/list.html:50
+#: app/templates/passages/list.html:39
 msgid "New"
 msgstr ""
 
-#: app/templates/passages/list.html:62
+#: app/templates/passages/list.html:51
 msgid "Discard this unfinished attempt? Saved answers will be deleted."
 msgstr ""
 
-#: app/templates/passages/list.html:64
+#: app/templates/passages/list.html:53
 msgid "Discard"
 msgstr ""
 
-#: app/templates/passages/list.html:73 app/templates/passages/manage.html:50
+#: app/templates/passages/list.html:62 app/templates/passages/manage.html:50
 msgid "No passages yet."
 msgstr ""
 

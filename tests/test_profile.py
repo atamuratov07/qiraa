@@ -137,15 +137,13 @@ def test_profile_page_before_and_after_a_quiz(
 
 
 @pytest.mark.usefixtures("passage")
-def test_passage_list_shows_the_streak(logged_in: TestClient) -> None:
-    page = logged_in.get("/passages")
-    assert 'text-muted">0</span>' in page.text  # grey 0 before any quiz
+def test_the_header_shows_the_streak(logged_in: TestClient) -> None:
+    assert "0 дней подряд" in logged_in.get("/profile").text
 
     attempt_url = logged_in.post("/passages/1/attempts").headers["location"]
     logged_in.post(f"{attempt_url}/submit", data={"q1": "11"})
 
-    page = logged_in.get("/passages")
-    assert 'text-gold">1</span>' in page.text
+    assert "1 день подряд" in logged_in.get("/profile").text
 
 
 def test_wrong_password_on_delete_shows_the_real_profile(

@@ -14,7 +14,6 @@ from app.core.db import DB
 from app.core.i18n import N_, _
 from app.core.permissions import load_editable
 from app.core.templating import render
-from app.core.timeutils import local_day
 from app.passages.models import Passage, PassageQuestion
 from app.passages.schemas import PassageIn
 from app.passages.service import (
@@ -37,7 +36,6 @@ from app.passages.views import (
     PassagesPage,
     PassageStartPage,
 )
-from app.profile.streaks import visible_streak
 
 EDITOR_MESSAGES: dict[str, str] = {"bad_answer": N_("Choose the correct option.")}
 
@@ -96,7 +94,6 @@ router = APIRouter(tags=["passages"])
 def passages(request: Request, db: DB, user: CurrentUser) -> HTMLResponse:
     ctx: PassagesPage = {
         "user": user,
-        "streak": visible_streak(user, local_day(datetime.now(UTC))),
         "passages": passage_cards(db, user),
     }
     return render(request, "passages/list.html", ctx)

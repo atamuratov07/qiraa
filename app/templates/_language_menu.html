@@ -14,7 +14,8 @@
       <circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/>
     </svg>
     <span class="sr-only">{{ _("Language") }}:</span>
-    <span lang="{{ current_locale }}">{{ languages[current_locale] }}</span>
+    <span lang="{{ current_locale }}" class="hidden sm:inline">{{ languages[current_locale] }}</span>
+    <span class="uppercase sm:hidden">{{ current_locale }}</span>
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-3.5 transition-transform group-open:rotate-180">
       <path d="m6 9 6 6 6-6"/>
     </svg>

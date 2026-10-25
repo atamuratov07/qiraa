@@ -3,8 +3,7 @@
   Route: GET /passages
 
   Context:
-    user       logged-in user, needs .username
-    streak     int, current streak in days (pass 0 until you build streaks)
+    user       logged-in user
     passages   list of PassageCard: .id .title .level
                (.level must be a string, never None: use "" for "no level". Grouping sorts
                by level, and Python can't compare None with "A2")
@@ -18,17 +17,7 @@
 {% from "_macros.html" import mmss %}
 {% block title %}{{ _("Passages") }}{% endblock %}
 {% block content %}
-{% set streak = streak | default(0) %}
-
-<section class="mb-10 flex flex-wrap items-center gap-6">
-  <div class="flex min-w-36 flex-col items-center rounded-2xl border bg-white px-6 py-4 {{ 'border-gold' if streak else 'border-line' }}">
-    <span class="text-4xl font-extrabold leading-none {{ 'text-gold' if streak else 'text-muted' }}">{{ streak }}</span>
-    <span class="mt-1 text-sm font-medium">{% trans count=streak %}day in a row{% pluralize %}days in a row{% endtrans %}</span>
-  </div>
-  <div>
-    <h1 class="text-2xl font-bold">{% trans name=user.username %}Marhaba, {{ name }}{% endtrans %}</h1>
-  </div>
-</section>
+<h1 class="mb-6 text-2xl font-bold">{{ _("Passages") }}</h1>
 
 {# levels sorted A1, A2, B1...; passages without a level go last #}
 {% set groups = passages | groupby("level") %}
