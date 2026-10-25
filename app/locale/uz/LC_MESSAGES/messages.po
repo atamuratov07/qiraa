@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qiraa 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/atamuratov07/qiraa/issues\n"
-"POT-Creation-Date: 2026-10-25 12:25+0500\n"
+"POT-Creation-Date: 2026-10-25 16:39+0500\n"
 "PO-Revision-Date: 2026-10-15 13:30+0500\n"
 "Last-Translator: Damir\n"
 "Language: uz\n"
@@ -204,7 +204,7 @@ msgstr "Matn topilmadi"
 msgid "Another passage already uses the slug %(slug)s."
 msgstr "%(slug)s slugi boshqa matnda band."
 
-#: app/practice/models.py:97 app/templates/base.html:74
+#: app/practice/models.py:97 app/templates/base.html:83
 #: app/templates/grammar/attempt.html:12 app/templates/grammar/start.html:17
 #: app/templates/grammar/start.html:21
 msgid "Grammar"
@@ -222,23 +222,23 @@ msgstr "Bu urinish allaqachon tekshirishga yuborilgan."
 msgid "Remove question"
 msgstr "Savolni oʻchirish"
 
-#: app/templates/_editor.html:28
+#: app/templates/_editor.html:29
 msgid "Question"
 msgstr "Savol"
 
-#: app/templates/_editor.html:36
+#: app/templates/_editor.html:39
 msgid "Correct option"
 msgstr "Toʻgʻri variant"
 
-#: app/templates/_editor.html:39
+#: app/templates/_editor.html:42
 msgid "Remove option"
 msgstr "Variantni oʻchirish"
 
-#: app/templates/_editor.html:46
+#: app/templates/_editor.html:49
 msgid "Add option"
 msgstr "Variant qoʻshish"
 
-#: app/templates/_editor.html:49
+#: app/templates/_editor.html:52
 msgid "Explanation"
 msgstr "Izoh"
 
@@ -250,96 +250,83 @@ msgstr "Til"
 msgid "Google Translate"
 msgstr "Google Tarjimon"
 
-#: app/templates/base.html:54
+#: app/templates/base.html:63
 #, python-format
 msgid "Marhaba, %(name)s"
 msgstr "Marhaba, %(name)s"
 
-#: app/templates/base.html:56 app/templates/base.html:61
+#: app/templates/base.html:65 app/templates/base.html:70
 #, python-format
 msgid "%(count)s day in a row"
 msgid_plural "%(count)s days in a row"
 msgstr[0] "Ketma-ket %(count)s kun"
 msgstr[1] "Ketma-ket %(count)s kun"
 
-#: app/templates/base.html:73 app/templates/passages/list.html:18
+#: app/templates/base.html:82 app/templates/passages/list.html:18
 #: app/templates/passages/list.html:21
 msgid "Passages"
 msgstr "Matnlar"
 
-#: app/templates/base.html:75 app/templates/profile/profile.html:26
+#: app/templates/base.html:84 app/templates/profile/profile.html:26
 msgid "Profile"
 msgstr "Profil"
 
-#: app/templates/base.html:82
+#: app/templates/base.html:92
 msgid "Log out"
 msgstr "Chiqish"
 
-#: app/templates/base.html:101
-msgid "show"
-msgstr "koʻrsatish"
-
-#: app/templates/base.html:102 app/templates/practice/_attempt.html:44
-msgid "hide"
-msgstr "yashirish"
-
-#: app/templates/base.html:103
+#: app/templates/base.html:111
 msgid "Show timer"
 msgstr "Taymerni koʻrsatish"
 
-#: app/templates/base.html:104 app/templates/practice/_attempt.html:44
+#: app/templates/base.html:112 app/templates/practice/_attempt.html:42
 msgid "Hide timer"
 msgstr "Taymerni yashirish"
 
-#: app/templates/base.html:105
+#: app/templates/base.html:113
 #, python-brace-format
 msgid "Answered {answered} of {total} · {status}"
 msgstr "Javob berildi: {answered}/{total} · {status}"
 
-#: app/templates/base.html:106
+#: app/templates/base.html:114
 msgid "saving…"
 msgstr "saqlanmoqda…"
 
-#: app/templates/base.html:107
+#: app/templates/base.html:115
 msgid "saved"
 msgstr "saqlandi"
 
-#: app/templates/base.html:108
+#: app/templates/base.html:116
 #, python-brace-format
 msgid "not saved ({code}); the answer will be sent when you submit"
 msgstr "saqlanmadi ({code}); javob tekshirishda yuboriladi"
 
-#: app/templates/base.html:109
+#: app/templates/base.html:117
 msgid "no connection: not saved; the answer will be sent when you submit"
 msgstr "internet yoʻq: saqlanmadi; javob tekshirishda yuboriladi"
 
-#: app/templates/base.html:110
-#, python-brace-format
-msgid "Questions without an answer: {count}. Submit anyway?"
-msgstr "Javobsiz savollar: {count}. Baribir tekshirilsinmi?"
-
-#: app/templates/base.html:111
+#: app/templates/base.html:118
 msgid "Checking…"
 msgstr "Tekshirilmoqda…"
 
-#: app/templates/base.html:112
+#: app/templates/base.html:119
 msgid "Translation is not available yet."
 msgstr "Tarjima hozircha mavjud emas."
 
-#: app/templates/base.html:113
+#: app/templates/base.html:120
 #, python-brace-format
 msgid "Server error ({code})."
 msgstr "Server xatosi ({code})."
 
-#: app/templates/base.html:114
+#: app/templates/base.html:121
 msgid "Translation not found."
 msgstr "Tarjima topilmadi."
 
-#: app/templates/base.html:115
+#: app/templates/base.html:122
 msgid "Network error. Try the link below."
 msgstr "Tarmoq xatosi. Quyidagi havoladan foydalanib koʻring."
 
-#: app/templates/base.html:116
+#: app/templates/base.html:123
 #, python-brace-format
 msgid "Question {num}"
 msgstr "{num}-savol"
@@ -564,15 +551,15 @@ msgid "Unfinished · answered %(answered)s/%(total)s · %(time)s"
 msgstr "Tugallanmagan · javob berildi %(answered)s/%(total)s · %(time)s"
 
 #: app/templates/grammar/start.html:32 app/templates/passages/list.html:52
-#: app/templates/practice/_attempt.html:94
+#: app/templates/practice/_attempt.html:181
 msgid "Continue"
 msgstr "Davom etish"
 
-#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:97
+#: app/templates/grammar/start.html:34 app/templates/practice/_attempt.html:184
 msgid "Discard this attempt and its saved answers?"
 msgstr "Bu urinish va saqlangan javoblar bekor qilinsinmi?"
 
-#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:99
+#: app/templates/grammar/start.html:36 app/templates/practice/_attempt.html:186
 msgid "Discard and start over"
 msgstr "Bekor qilib, qaytadan boshlash"
 
@@ -724,20 +711,53 @@ msgid_plural "best score %(best)s%% in %(count)s attempts"
 msgstr[0] "%(count)s ta urinishda eng yaxshi natija %(best)s%%"
 msgstr[1] "%(count)s ta urinishda eng yaxshi natija %(best)s%%"
 
-#: app/templates/practice/_attempt.html:71
+#: app/templates/practice/_attempt.html:85
 #, python-format
 msgid "Answered %(answered)s of %(total)s"
 msgstr "Javob berildi: %(answered)s/%(total)s"
 
-#: app/templates/practice/_attempt.html:74
+#: app/templates/practice/_attempt.html:88 app/templates/practice/_attempt.html:97
+#: app/templates/practice/_attempt.html:134
 msgid "Check answers"
 msgstr "Javoblarni tekshirish"
 
-#: app/templates/practice/_attempt.html:84
+#: app/templates/practice/_attempt.html:102 app/templates/practice/_attempt.html:108
+msgid "Flag"
+msgstr "Belgilash"
+
+#: app/templates/practice/_attempt.html:112
+msgid "Previous"
+msgstr "Oldingi"
+
+#: app/templates/practice/_attempt.html:118 app/templates/practice/_navigator.html:14
+msgid "Question list"
+msgstr "Savollar roʻyxati"
+
+#: app/templates/practice/_attempt.html:126
+msgid "Next"
+msgstr "Keyingi"
+
+#: app/templates/practice/_attempt.html:145
+msgid "Check your answers"
+msgstr "Javoblaringizni tekshiring"
+
+#: app/templates/practice/_attempt.html:149
+msgid "Not answered"
+msgstr "Javob berilmagan"
+
+#: app/templates/practice/_attempt.html:155
+msgid "Submit"
+msgstr "Yuborish"
+
+#: app/templates/practice/_attempt.html:159
+msgid "Back to questions"
+msgstr "Savollarga qaytish"
+
+#: app/templates/practice/_attempt.html:171
 msgid "Paused"
 msgstr "Pauza"
 
-#: app/templates/practice/_attempt.html:87
+#: app/templates/practice/_attempt.html:174
 #, python-format
 msgid ""
 "Answered <span data-answered>%(answered)s</span>/%(total)s · <span data-pause-"
@@ -746,24 +766,24 @@ msgstr ""
 "Javob berildi: <span data-answered>%(answered)s</span>/%(total)s · oʻtgan vaqt <span "
 "data-pause-time>%(time)s</span>"
 
-#: app/templates/practice/_result.html:24
+#: app/templates/practice/_result.html:25
 msgid "Result"
 msgstr "Natija"
 
-#: app/templates/practice/_result.html:35
+#: app/templates/practice/_result.html:36
 #, python-format
 msgid "%(percent)s%% correct in %(time)s"
 msgstr "%(time)s ichida %(percent)s%% toʻgʻri"
 
-#: app/templates/practice/_result.html:60
+#: app/templates/practice/_result.html:62
 msgid "Correct answer"
 msgstr "Toʻgʻri javob"
 
-#: app/templates/practice/_result.html:64
+#: app/templates/practice/_result.html:66
 msgid "Your answer, wrong"
 msgstr "Sizning javobingiz, notoʻgʻri"
 
-#: app/templates/practice/_result.html:71
+#: app/templates/practice/_result.html:73
 msgid "No answer"
 msgstr "Javob yoʻq"
 

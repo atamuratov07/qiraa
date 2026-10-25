@@ -33,7 +33,6 @@
   const submitBtn = form.querySelector("[data-submit]");
   const timerBox = document.getElementById("timer");
   const timeEl = timerBox.querySelector("[data-time]");
-  const toggleBtn = timerBox.querySelector("[data-toggle]");
   const heartbeatUrl = `/api/attempts/${id}/heartbeat`;
 
   // ---- timer ----------------------------------------------------------------------
@@ -118,17 +117,23 @@
     }
   });
 
-  // ---- hide/show the timer ----
+  // ---- the timer floats just under the sticky header, whose height differs by screen ----
+  const header = document.querySelector("header");
+  const placeTimer = () =>
+    (timerBox.style.top = `${header.getBoundingClientRect().height + 12}px`);
+  placeTimer();
+  new ResizeObserver(placeTimer).observe(header);
+
+  // ---- hide/show the time: the timer is itself the button ----
   const STORAGE_KEY = "qiraa.timerHidden";
   function setTimerHidden(hidden) {
     timeEl.hidden = hidden;
-    toggleBtn.textContent = hidden ? t("show") : t("hide");
-    toggleBtn.title = hidden ? t("showTimer") : t("hideTimer");
+    timerBox.title = hidden ? t("showTimer") : t("hideTimer");
     try {
       localStorage.setItem(STORAGE_KEY, hidden ? "1" : "0");
     } catch {}
   }
-  toggleBtn.addEventListener("click", () => setTimerHidden(!timeEl.hidden));
+  timerBox.addEventListener("click", () => setTimerHidden(!timeEl.hidden));
   try {
     if (localStorage.getItem(STORAGE_KEY) === "1") setTimerHidden(true);
   } catch {}
@@ -165,12 +170,7 @@
   });
 
   // ---- submit -------------------------------------------------------------------------
-  form.addEventListener("submit", (e) => {
-    const missing = total - answered();
-    if (missing > 0) {
-      if (!confirm(t("unanswered", { count: missing })))
-        return e.preventDefault();
-    }
+  form.addEventListener("submit", () => {
     clearInterval(beat); // the submit route does the final time calculation itself
     submitBtn.disabled = true; // no double submit
     submitBtn.textContent = t("checking");
@@ -181,7 +181,7 @@
     if (res.status === 409)
       location.reload(); // submitted: reloading shows the result
     else if (res.status === 404)
-      location.href = "/passages"; // discarded
+      location.href = root.dataset.back; // discarded
     else if (res.status === 401) location.href = "/login";
     else return false;
     return true;

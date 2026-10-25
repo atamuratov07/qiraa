@@ -1,0 +1,36 @@
+{#
+  practice/_navigator.html: the grid of question numbers, on the attempt and result pages.
+  Import it with {% import "practice/_navigator.html" as navigator %}.
+
+  grid(questions, answers, result=false) renders a link per question to #q<number>, the
+  id of that question on the page, so the grid jumps through the list without JavaScript.
+    attempt page: data-answered on answered numbers, data-current on the first. The
+      Alpine bindings are for static/navigator.js, which keeps both current and adds
+      data-flagged with a gold dot; the page must sit inside its x-data.
+    result page (result=true): data-result="right", "wrong" or "skipped".
+  questions and answers are the page's content.questions and answers.
+#}
+{% macro grid(questions, answers, result=false) %}
+<nav aria-label="{{ _("Question list") }}" class="flex flex-wrap gap-1.5" data-grid>
+  {% for q in questions %}
+  {% set chosen = answers.get(q.id) %}
+  {% if result %}
+  {% set right = chosen in q.options | selectattr("is_correct") | map(attribute="id") | list %}
+  <a href="#q{{ loop.index }}" data-result="{{ 'skipped' if chosen is none else ('right' if right else 'wrong') }}"
+  {% else %}
+  <a href="#q{{ loop.index }}" {% if chosen is not none %}data-answered{% endif %} {% if loop.first %}data-current{% endif %}
+     :data-answered="answered.includes({{ q.id }})" :data-current="current === {{ loop.index0 }}"
+     :data-flagged="flagged.includes({{ q.id }})" @click.prevent="go({{ loop.index0 }})"
+  {% endif %}
+     class="relative grid size-9 place-items-center rounded-lg border border-line bg-white text-sm font-semibold tabular-nums text-muted transition-colors hover:border-accent
+            data-answered:border-accent/40 data-answered:bg-accent-soft data-answered:text-accent
+            data-current:ring-2 data-current:ring-accent data-current:ring-offset-1
+            data-[result=right]:border-accent/40 data-[result=right]:bg-accent-soft data-[result=right]:text-accent
+            data-[result=wrong]:border-bad/40 data-[result=wrong]:bg-bad-soft data-[result=wrong]:text-bad
+            data-[result=skipped]:border-dashed data-[result=skipped]:border-bad/50 data-[result=skipped]:text-bad">
+    {{- loop.index -}}
+    {% if not result %}<span x-cloak x-show="flagged.includes({{ q.id }})" class="absolute -end-1 -top-1 size-2.5 rounded-full bg-gold ring-2 ring-white"></span>{% endif -%}
+  </a>
+  {% endfor %}
+</nav>
+{% endmacro %}

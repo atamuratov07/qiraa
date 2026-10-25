@@ -9,7 +9,7 @@ is in [ROADMAP-v2.md](ROADMAP-v2.md); the user-facing description is in
 Python 3.13 · FastAPI with Jinja2 server-rendered pages · SQLAlchemy 2.1 · Alembic · Babel ·
 Pydantic v2 + pydantic-settings · argon2-cffi · uv · pytest · Tailwind v4 browser build from a
 CDN · plain JavaScript (`reader.js`, `attempt.js`, `forms.js`) and Alpine.js from a CDN
-(`editor.js`), no build step.
+(`editor.js`, `navigator.js`), no build step.
 
 - Production: Docker image on Render (free web service, Frankfurt), Postgres on Neon (free,
   Frankfurt). Every push to `main` deploys. The container runs `alembic upgrade head` on start.
@@ -75,7 +75,8 @@ commands for running the site (`make-admin`, `import`, `check`). `app/locale/` h
 - `practice/`: `Attempt`, `AttemptAnswer`, and the copy an attempt keeps (`AttemptContent`,
   `QuestionCopy`, `OptionCopy`) · what every attempt shares once started (`save_answer()`,
   `heartbeat()`, `submit()`, `grade()`, `has_option()`) · the attempt and result layouts
-  (`_attempt.html`, `_result.html`), which each kind's own pages extend · `api.py` and
+  (`_attempt.html`, `_result.html`), which each kind's own pages extend, and the question
+  grid (`_navigator.html`, `navigator.js`) · `api.py` and
   `schemas.py` for the JSON endpoints.
 - `profile/`: `streaks.py` · profile statistics and page.
 
@@ -178,6 +179,11 @@ ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_men
     `font-content` sets Latin letters in Inter and Arabic in Noto Naskh Arabic.
     Explanations and translations stay left to right, since they often open with a quoted
     Arabic word.
+
+20. **Pages work without scripts.** Scripts add to a page that already works: an attempt
+    without JavaScript is a plain list whose grid links scroll to `#q1`, `#q2`..., and
+    "Check answers" submits at once. Controls that need Alpine carry `x-cloak`; styles that
+    need scripts hang off the `js` class that `base.html` sets on `<html>`.
 
 ## Tests
 
