@@ -41,7 +41,7 @@ Version history: [CHANGELOG.md](CHANGELOG.md).
 
 | Feature                                          | Status                                                 |
 | ------------------------------------------------ | ------------------------------------------------------ |
-| Word translation inside the popup                | planned; the `passages.glossary` column already exists |
+| Word translation inside the popup                | planned for 2.0                                        |
 | Adding or editing passages without changing code | planned for 2.0                                        |
 | Interface in Uzbek and English                   | planned for 2.0                                        |
 
@@ -433,7 +433,7 @@ Templates are in `app/templates/<feature>/`.
 - a grammar question bank with random practice sessions
 - a question navigator with a grid of question numbers and review flags
 - the interface in Uzbek, Russian and English
-- word translation inside the popup (glossary, cache, MyMemory)
+- word translation inside the popup, into Uzbek, Russian or English (MyMemory)
 - Postgres in Docker for local development, and code organised by feature
 
 **After 2.0**: speaking practice, a numbered list of questions with preparation and speaking
