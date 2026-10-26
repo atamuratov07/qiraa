@@ -506,7 +506,7 @@ qiraa/
 │       └── forms.js       background forms, data-forget, menus
 ├── content/               example.yaml; other content files stay local (ignored by git)
 ├── docker/initdb/         SQL run on the first start of the Compose database
-├── docs/                  CONVENTIONS.md, ROADMAP-v2.md, CONTENT-LOADER.md
+├── docs/                  CONVENTIONS.md, ROADMAP.md, CONTENT-LOADER.md
 ├── migrations/            Alembic environment and revisions
 ├── tests/                 conftest.py, factories.py and one file per area
 ├── .env.example           settings for local development, to copy to .env
@@ -530,15 +530,8 @@ the JSON endpoints. Templates are in `app/templates/<feature>/`.
 - There is no password reset and no limit on login attempts; sign-up needs the invite code.
 - MyMemory translates a word without its sentence, so a word with several meanings can get
   the wrong one.
-- The × that deletes a result on the profile has no confirm dialog (Discard has one).
 
 ## Roadmap
 
-**After 2.0**:
-
-- speaking practice: a numbered list of questions with preparation and speaking countdowns;
-- personal single-use invite codes instead of one shared `SIGNUP_CODE`;
-- word meanings in context, which needs a translation endpoint on the server;
-- users publishing their own content as common.
-
-The plan for 2.0 and these items in detail: [docs/ROADMAP-v2.md](docs/ROADMAP-v2.md).
+Ideas for after 2.0, such as speaking practice, accounts with an email and password reset,
+personal invite codes and word meanings in context, are in [docs/ROADMAP.md](docs/ROADMAP.md).
