@@ -9,6 +9,8 @@ wheels/
 # Virtual environments
 .venv
 .env
+.env.*
+!.env.example
 *.db
 .pytest_cache/
 .ruff_cache/
