@@ -1,0 +1,109 @@
+{#
+  content/import.html: a passages file or a grammar file.
+  Routes: GET /manage/{passages,grammar}/import (empty form), POST (the result, or the errors)
+
+  Context:
+    user      logged-in user; .is_admin shows the "Common" checkbox
+    kind      "passages" or "grammar"
+    text      refills the text box after errors; "" otherwise
+    common    refills the checkbox
+    errors    list of ShownError: .line (int or None) .path ("" when unknown) .message
+    report    None, or ImportReport: .added and .updated, lists of .id .slug .title
+    prompt    instructions for a chatbot, in English
+
+  Submits POST /manage/{kind}/import as multipart/form-data with fields: text, file, common.
+  A chosen file wins over the text box. An unticked checkbox sends nothing.
+#}
+{% extends "base.html" %}
+{% set grammar = kind == "grammar" %}
+{% set heading = _("Import grammar questions") if grammar else _("Import passages") %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold">{{ heading }}</h1>
+    <p class="mt-1 text-muted">{{ _("A question whose slug was imported before is updated.") if grammar else _("A passage whose slug was imported before is updated.") }}</p>
+  </div>
+
+  {% if errors %}
+  <div class="rounded-2xl bg-bad-soft p-4 text-sm text-bad">
+    <p class="mb-2 font-semibold">{{ _("Nothing was imported. Fix these problems and try again:") }}</p>
+    <ul class="space-y-1">
+      {% for e in errors %}
+      <li>
+        {%- if e.line %}<span class="font-semibold">{% trans line=e.line %}Line {{ line }}{% endtrans %}</span> · {% endif -%}
+        {%- if e.path %}<code>{{ e.path }}</code> · {% endif -%}
+        {{ e.message }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% if report %}
+  <div class="rounded-2xl bg-accent-soft p-4 text-sm">
+    {% if grammar %}
+    {% set groups = [
+      (report.added, ngettext("Added %(num)d question", "Added %(num)d questions", report.added | length)),
+      (report.updated, ngettext("Updated %(num)d question", "Updated %(num)d questions", report.updated | length)),
+    ] %}
+    {% else %}
+    {% set groups = [
+      (report.added, ngettext("Added %(num)d passage", "Added %(num)d passages", report.added | length)),
+      (report.updated, ngettext("Updated %(num)d passage", "Updated %(num)d passages", report.updated | length)),
+    ] %}
+    {% endif %}
+    {% for items, group_heading in groups if items %}
+    <p class="font-semibold text-accent">{{ group_heading }}</p>
+    <ul class="mt-1 mb-3 list-disc ps-6 marker:text-accent/50 last:mb-0" dir="auto">
+      {% for item in items %}
+      <li class="font-content text-lg">
+        <a href="{{ '/manage/grammar/%d/edit' % item.id if grammar else '/passages/%d' % item.id }}" class="block rounded-lg px-3 py-1 transition-colors hover:bg-accent/10">{{ item.title }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" action="/manage/{{ kind }}/import" enctype="multipart/form-data"
+        class="space-y-4 rounded-2xl border border-line bg-white p-6">
+    <label class="block text-sm text-muted">{{ _("YAML") }}
+      <textarea name="text" rows="16" dir="ltr" spellcheck="false" autocomplete="off"
+                placeholder="{% if grammar %}grammar:&#10;  - slug: subject-case-01&#10;    prompt: …{% else %}passages:&#10;  - slug: a2-market&#10;    text: |&#10;      …{% endif %}"
+                class="mt-1 block w-full rounded-lg border border-line bg-paper px-3 py-2 font-mono text-sm text-ink focus:outline-2 focus:outline-accent">{{ text }}</textarea>
+    </label>
+    <label class="block text-sm text-muted">{{ _("Or a file (up to 1 MB)") }}
+      <input type="file" name="file" accept=".yaml,.yml"
+             class="mt-1 block w-full text-sm text-ink file:me-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-accent-soft file:px-3 file:py-2 file:text-accent">
+    </label>
+    {% if user.is_admin %}
+    <label class="flex items-center gap-2 text-sm">
+      <input type="checkbox" name="common" {{ "checked" if common }} class="accent-accent">
+      {{ _("Common: every user sees these questions") if grammar else _("Common: every user sees these passages") }}
+    </label>
+    {% endif %}
+    <button class="cursor-pointer rounded-xl bg-accent px-5 py-2.5 font-semibold text-white hover:brightness-110">{{ _("Import") }}</button>
+  </form>
+
+  <details class="rounded-2xl border border-line bg-white p-6">
+    <summary class="cursor-pointer font-semibold">{{ _("Prompt for a chatbot: turn any material into this format") }}</summary>
+    <p class="mt-3 text-sm text-muted">{{ _("The chatbot marks answers it chose itself with # check. Check them before importing.") }}</p>
+    <button type="button" id="copy-prompt" class="mt-3 cursor-pointer rounded-xl border border-accent px-4 py-2 text-sm font-semibold text-accent hover:bg-accent-soft">{{ _("Copy the prompt") }}</button>
+    <pre id="chatbot-prompt" dir="ltr" class="mt-3 max-h-96 overflow-auto whitespace-pre-wrap rounded-lg bg-paper p-3 text-xs">{{ prompt }}</pre>
+  </details>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const copyButton = document.getElementById("copy-prompt");
+  const copyLabel = copyButton.textContent;
+  let resetTimer;
+  copyButton.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(document.getElementById("chatbot-prompt").textContent);
+    copyButton.textContent = {{ _("Copied") | tojson }};
+    clearTimeout(resetTimer); // a second click restarts the 2 seconds
+    resetTimer = setTimeout(() => (copyButton.textContent = copyLabel), 2000);
+  });
+</script>
+{% endblock %}

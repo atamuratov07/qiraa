@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from http import HTTPStatus
 from urllib.parse import quote
 
@@ -8,20 +9,43 @@ from fastapi.responses import JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.deps import LoginRequired
-from app.routers import api, attempts, auth, passages, profile
-from app.templating import APP_DIR, render
-from app.views import ErrorPage
+from app import models  # noqa: F401  registers every model before the first query
+from app.auth.deps import LoginRequired
+from app.auth.models import User
+from app.auth.routes import router as auth_router
+from app.content.routes import router as content_router
+from app.core.config import APP_DIR
+from app.core.i18n import N_, LocaleMiddleware, _
+from app.core.redirects import return_path
+from app.core.templating import render, templates
+from app.core.timeutils import local_day
+from app.core.views import ErrorPage
+from app.grammar.routes import router as grammar_router
+from app.passages.routes import router as passages_router
+from app.practice.api import router as api_router
+from app.practice.routes import router as practice_router
+from app.profile.routes import router as profile_router
+from app.profile.streaks import visible_streak
+
+
+def streak_today(user: User) -> int:
+    return visible_streak(user, local_day(datetime.now(UTC)))
+
+
+templates.env.globals["streak_today"] = streak_today  # pyright: ignore[reportArgumentType]
 
 app = FastAPI(title="Qiraa")
+app.add_middleware(LocaleMiddleware)
 app.mount("/static", StaticFiles(directory=APP_DIR / "static"), name="static")
 
 for router in (
-    auth.router,
-    passages.router,
-    attempts.router,
-    api.router,
-    profile.router,
+    auth_router,
+    grammar_router,
+    passages_router,
+    practice_router,
+    api_router,
+    profile_router,
+    content_router,
 ):
     app.include_router(router)
 
@@ -40,16 +64,17 @@ def _is_api(request: Request) -> bool:
     return request.url.path.startswith("/api/")
 
 
-# Starlette's own errors (unknown URL, wrong method) carry the English status phrase.
-RU_STATUS_PHRASES = {
-    400: "Некорректный запрос",
-    401: "Требуется вход",
-    403: "Доступ запрещён",
-    404: "Страница не найдена",
-    405: "Метод не поддерживается",
-    409: "Конфликт",
-    500: "Внутренняя ошибка сервера",
-}
+# Starlette's own errors (unknown URL, wrong method) carry the English status phrase,
+# which is then the msgid. Listed here only so that pybabel extracts them.
+STATUS_PHRASES = (
+    N_("Bad Request"),
+    N_("Unauthorized"),
+    N_("Forbidden"),
+    N_("Not Found"),
+    N_("Method Not Allowed"),
+    N_("Conflict"),
+    N_("Internal Server Error"),
+)
 
 
 def _error_page(request: Request, status_code: int, message: str) -> Response:
@@ -66,7 +91,7 @@ async def http_error(request: Request, exc: StarletteHTTPException) -> Response:
 
     message = str(exc.detail)
     if message == HTTPStatus(exc.status_code).phrase:
-        message = RU_STATUS_PHRASES.get(exc.status_code, message)
+        message = _(message)
 
     return _error_page(request, exc.status_code, message)
 
@@ -76,14 +101,14 @@ async def invalid_request(request: Request, exc: RequestValidationError) -> Resp
     if _is_api(request):
         return await request_validation_exception_handler(request, exc)
 
-    return _error_page(request, 404, "Страница не найдена")
+    return _error_page(request, 404, _("Not Found"))
 
 
 @app.exception_handler(LoginRequired)
 async def login_required(request: Request, _exc: LoginRequired) -> Response:
     if _is_api(request):
-        return JSONResponse({"detail": "Требуется вход"}, status_code=401)
+        return JSONResponse({"detail": "Not authenticated"}, status_code=401)
 
-    target = request.url.path + (f"?{request.url.query}" if request.url.query else "")
+    target = return_path(request)
     next_query = "" if target == "/" else f"?next={quote(target, safe='/')}"
     return RedirectResponse(f"/login{next_query}", status_code=303)

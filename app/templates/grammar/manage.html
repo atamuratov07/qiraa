@@ -1,0 +1,52 @@
+{#
+  grammar/manage.html: the grammar questions I may edit (mine, and common ones for admins).
+  Route: GET /manage/grammar
+
+  Context:
+    user        logged-in user
+    questions   list of ManagedQuestion, private first, newest first:
+                  .id .prompt .slug (None for editor-made questions) .is_common
+
+  "Edit" opens /manage/grammar/{id}/edit. "Delete" submits POST
+  /manage/grammar/{id}/delete (no fields) after a confirm dialog, in the background
+  (data-background, see forms.js).
+#}
+{% extends "base.html" %}
+{% block title %}{{ _("Manage grammar") }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-6">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-2xl font-bold">{{ _("Manage grammar") }}</h1>
+    <div class="flex gap-2">
+      <a href="/manage/grammar/new" class="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white hover:brightness-110">{{ _("New question") }}</a>
+      <a href="/manage/grammar/import" class="rounded-xl border border-accent px-4 py-2 text-sm font-semibold text-accent hover:bg-accent-soft">{{ _("Import") }}</a>
+    </div>
+  </div>
+
+  {% if questions %}
+  <ul class="divide-y divide-line rounded-2xl border border-line bg-white">
+    {% for q in questions %}
+    <li class="flex items-center gap-4 px-5 py-3">
+      <div class="min-w-0 flex-1">
+        <p class="truncate font-content text-lg" dir="auto">{{ q.prompt }}</p>
+        {% if q.slug or q.is_common %}
+        <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+          {% if q.slug %}<code>{{ q.slug }}</code>{% endif %}
+          {% if q.is_common %}<span class="rounded-full bg-accent-soft px-2 py-0.5 font-semibold text-accent">{{ _("Common") }}</span>{% endif %}
+        </p>
+        {% endif %}
+      </div>
+      {% set question = _("Delete this question for everyone? Results with it stay.") if q.is_common else _("Delete this question? Results with it stay.") %}
+      <a href="/manage/grammar/{{ q.id }}/edit" class="text-sm font-semibold text-accent hover:underline">{{ _("Edit") }}</a>
+      <form method="post" action="/manage/grammar/{{ q.id }}/delete"
+            onsubmit='return confirm({{ question | tojson }})' data-background>
+        <button class="cursor-pointer text-sm text-muted hover:text-bad">{{ _("Delete") }}</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="rounded-2xl border border-line bg-white p-6 text-muted">{{ _("No questions yet.") }}</p>
+  {% endif %}
+</div>
+{% endblock %}

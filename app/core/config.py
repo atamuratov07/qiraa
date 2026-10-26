@@ -1,0 +1,41 @@
+from functools import lru_cache
+from pathlib import Path
+
+from pydantic import SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BASE_DIR = Path(__file__).resolve().parents[2]
+APP_DIR = BASE_DIR / "app"
+
+
+def to_sqlalchemy_url(url: str) -> str:
+    for prefix in ("postgres://", "postgresql://"):
+        if url.startswith(prefix):
+            return "postgresql+psycopg://" + url.removeprefix(prefix)
+    return url
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", extra="ignore")
+
+    database_url: str = "postgresql://qiraa:qiraa@localhost:5432/qiraa"
+    migration_database_url: str | None = None
+
+    secure_cookies: bool = False
+    session_days: int = 30
+    app_timezone: str = "Asia/Tashkent"
+    allow_signup: bool = True
+    signup_code: SecretStr | None = None
+
+    @property
+    def sqlalchemy_url(self) -> str:
+        return to_sqlalchemy_url(self.database_url)
+
+    @property
+    def migration_url(self) -> str:
+        return to_sqlalchemy_url(self.migration_database_url or self.database_url)
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()

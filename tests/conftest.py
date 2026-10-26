@@ -1,22 +1,25 @@
 """
-Set TEST_DATABASE_URL to run the same tests against Postgres, e.g.
-    TEST_DATABASE_URL=postgresql+psycopg://postgres@localhost:5432/qiraa_test uv run pytest
+Tests use the qiraa_test database of the Postgres in docker-compose.yml.
+TEST_DATABASE_URL points them at another database. Every test drops all tables there.
 """
 
 import os
-import sqlite3
 from collections.abc import Iterator
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import Engine, create_engine, event
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.db import get_db
+from app.auth.models import User
+from app.auth.service import SESSION_COOKIE, create_session
+from app.core.config import get_settings
+from app.core.db import get_db
+from app.core.i18n import LOCALE_COOKIE
 from app.main import app
-from app.models import Base, Passage, User
-from app.services import auth
+from app.models import Base
+from app.passages.models import Passage
 from tests.factories import make_passage, make_question, make_user
 
 # ---------------------------------------------------------------------------
@@ -24,25 +27,40 @@ from tests.factories import make_passage, make_question, make_user
 # ---------------------------------------------------------------------------
 
 
+@pytest.fixture(autouse=True)
+def default_settings(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
+    monkeypatch.setenv("APP_TIMEZONE", "Asia/Tashkent")
+    monkeypatch.setenv("SECURE_COOKIES", "false")
+    monkeypatch.setenv("ALLOW_SIGNUP", "true")
+    monkeypatch.setenv("SIGNUP_CODE", "")
+    monkeypatch.setenv("SESSION_DAYS", "30")
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
+
+
+DEFAULT_TEST_DATABASE_URL = "postgresql+psycopg://qiraa:qiraa@localhost:5432/qiraa_test"
+
+
 @pytest.fixture
-def engine(tmp_path: Path) -> Iterator[Engine]:
+def database_url() -> str:
+    return os.environ.get("TEST_DATABASE_URL", DEFAULT_TEST_DATABASE_URL)
+
+
+@pytest.fixture
+def engine(database_url: str) -> Iterator[Engine]:
     """A fresh, empty database for one test.
 
-    `tmp_path` is a built-in pytest fixture: a new empty folder for each test.
-    Tables come from the models (create_all). Alembic is not involved here: these tests
-    check the app's behaviour, and migrations are checked when you run `alembic upgrade`.
+    Tables come from the models (create_all). Alembic is not involved here:
+    these tests check the app's behaviour; test_migrations.py and CI check the migrations.
     """
-    url = os.environ.get("TEST_DATABASE_URL") or f"sqlite:///{tmp_path / 'test.db'}"
-    engine = create_engine(url)
-    if engine.dialect.name == "sqlite":
-
-        @event.listens_for(engine, "connect")
-        def _foreign_keys_on(
-            dbapi_connection: sqlite3.Connection, _record: object
-        ) -> None:
-            dbapi_connection.execute("PRAGMA foreign_keys=ON")
-
-    Base.metadata.drop_all(engine)
+    engine = create_engine(database_url)
+    try:
+        Base.metadata.drop_all(engine)
+    except OperationalError:
+        pytest.exit(
+            "Test database not reachable. Start it: docker compose up -d --wait db"
+        )
     Base.metadata.create_all(engine)
     yield engine
     engine.dispose()
@@ -76,6 +94,14 @@ def other_user(db: Session) -> User:
 
 
 @pytest.fixture
+def admin(db: Session) -> User:
+    u = make_user(3, "admin", is_admin=True)
+    db.add(u)
+    db.commit()
+    return u
+
+
+@pytest.fixture
 def passage(db: Session) -> Passage:
     p = make_passage(1, [make_question(1, correct=1), make_question(2, correct=2)])
     db.add(p)
@@ -103,6 +129,7 @@ def client(engine: Engine) -> Iterator[TestClient]:
     `dependency_overrides` swaps get_db for one that uses the test database, so every
     route, and every dependency built on get_db (like CurrentUser), sees the test data.
     `follow_redirects=False` lets tests check a redirect's status and Location header.
+    The Russian cookie makes the page tests check the Russian catalog: the text of 1.0.
     """
     test_sessions = sessionmaker(bind=engine)
 
@@ -112,11 +139,13 @@ def client(engine: Engine) -> Iterator[TestClient]:
 
     app.dependency_overrides[get_db] = get_test_db
     with TestClient(app, follow_redirects=False) as test_client:
+        # The domain the server's own cookies get, so a Set-Cookie replaces this one.
+        test_client.cookies.set(LOCALE_COOKIE, "ru", domain="testserver.local")
         yield test_client
     app.dependency_overrides.clear()
 
 
 @pytest.fixture
 def logged_in(client: TestClient, db: Session, user: User) -> TestClient:
-    client.cookies.set(auth.SESSION_COOKIE, auth.create_session(db, user))
+    client.cookies.set(SESSION_COOKIE, create_session(db, user))
     return client

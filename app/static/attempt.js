@@ -16,6 +16,10 @@
   const root = document.getElementById("attempt-root");
   if (!root) return;
 
+  const messages = JSON.parse(document.getElementById("i18n").textContent);
+  const t = (key, values = {}) =>
+    messages[key].replace(/\{(\w+)\}/g, (_, name) => values[name]);
+
   const id = root.dataset.attemptId;
   const total = Number(root.dataset.total);
   const HEARTBEAT_MS = 15_000; // must be well under the server's 30 s gap limit
@@ -29,23 +33,12 @@
   const submitBtn = form.querySelector("[data-submit]");
   const timerBox = document.getElementById("timer");
   const timeEl = timerBox.querySelector("[data-time]");
-  const toggleBtn = timerBox.querySelector("[data-toggle]");
   const heartbeatUrl = `/api/attempts/${id}/heartbeat`;
 
   // ---- timer ----------------------------------------------------------------------
   let base = Number(root.dataset.elapsed) || 0; // seconds last confirmed by the server
   let runningSince = null; // performance.now() when the clock last started, null if stopped
   let beat = null;
-
-  // Russian plural: 1 вопрос, 2 вопроса, 5 вопросов, 21 вопрос, 11 вопросов
-  const plural = (n, one, few, many) => {
-    const n100 = n % 100;
-    const n10 = n % 10;
-    if (n100 >= 11 && n100 <= 14) return many;
-    if (n10 === 1) return one;
-    if (n10 >= 2 && n10 <= 4) return few;
-    return many;
-  };
 
   const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   const seconds = () =>
@@ -124,17 +117,23 @@
     }
   });
 
-  // ---- hide/show the timer ----
+  // ---- the timer floats just under the sticky header, whose height differs by screen ----
+  const header = document.querySelector("header");
+  const placeTimer = () =>
+    (timerBox.style.top = `${header.getBoundingClientRect().height + 12}px`);
+  placeTimer();
+  new ResizeObserver(placeTimer).observe(header);
+
+  // ---- hide/show the time: the timer is itself the button ----
   const STORAGE_KEY = "qiraa.timerHidden";
   function setTimerHidden(hidden) {
     timeEl.hidden = hidden;
-    toggleBtn.textContent = hidden ? "показать" : "скрыть";
-    toggleBtn.title = hidden ? "Показать таймер" : "Скрыть таймер";
+    timerBox.title = hidden ? t("showTimer") : t("hideTimer");
     try {
       localStorage.setItem(STORAGE_KEY, hidden ? "1" : "0");
     } catch {}
   }
-  toggleBtn.addEventListener("click", () => setTimerHidden(!timeEl.hidden));
+  timerBox.addEventListener("click", () => setTimerHidden(!timeEl.hidden));
   try {
     if (localStorage.getItem(STORAGE_KEY) === "1") setTimerHidden(true);
   } catch {}
@@ -142,8 +141,8 @@
   // ---- autosave every pick ----------------------------------------------------------
   const answered = () =>
     form.querySelectorAll("input[type=radio]:checked").length;
-  function setStatus(text, bad = false) {
-    statusEl.textContent = `Отвечено ${answered()} из ${total} · ${text}`;
+  function setStatus(status, bad = false) {
+    statusEl.textContent = t("status", { answered: answered(), total, status });
     statusEl.classList.toggle("text-bad", bad);
     statusEl.classList.toggle("text-muted", !bad);
     overlay.querySelector("[data-answered]").textContent = answered();
@@ -155,7 +154,7 @@
     if (input.type !== "radio") return;
     const questionId = input.closest("[data-question-id]").dataset.questionId;
     const mine = ++saveId;
-    setStatus("сохранение…");
+    setStatus(t("saving"));
     try {
       const res = await fetch(`/api/attempts/${id}/answers/${questionId}`, {
         method: "PUT",
@@ -163,30 +162,18 @@
         body: JSON.stringify({ option_id: Number(input.value) }),
       });
       if (handleGone(res) || mine !== saveId) return;
-      if (res.ok) setStatus("сохранено");
-      else
-        setStatus(
-          `не сохранено (${res.status}); ответ отправится при проверке`,
-          true,
-        );
+      if (res.ok) setStatus(t("saved"));
+      else setStatus(t("notSaved", { code: res.status }), true);
     } catch {
-      if (mine === saveId)
-        setStatus("нет сети: не сохранено; ответ отправится при проверке", true);
+      if (mine === saveId) setStatus(t("offline"), true);
     }
   });
 
   // ---- submit -------------------------------------------------------------------------
-  form.addEventListener("submit", (e) => {
-    const missing = total - answered();
-    if (missing > 0) {
-      const ok = confirm(
-        `${missing} ${plural(missing, "вопрос остался", "вопроса остались", "вопросов остались")} без ответа. Всё равно проверить?`,
-      );
-      if (!ok) return e.preventDefault();
-    }
+  form.addEventListener("submit", () => {
     clearInterval(beat); // the submit route does the final time calculation itself
     submitBtn.disabled = true; // no double submit
-    submitBtn.textContent = "Проверяем…";
+    submitBtn.textContent = t("checking");
   });
 
   // ---- the attempt changed elsewhere (another tab, another device) --------------------
@@ -194,7 +181,7 @@
     if (res.status === 409)
       location.reload(); // submitted: reloading shows the result
     else if (res.status === 404)
-      location.href = "/passages"; // discarded
+      location.href = root.dataset.back; // discarded
     else if (res.status === 401) location.href = "/login";
     else return false;
     return true;

@@ -1,0 +1,92 @@
+{#
+  grammar/start.html: start a grammar session, or continue the open one.
+  Routes: GET /grammar, and POST /grammar/sessions when the chosen pool is empty (400)
+
+  Context:
+    user
+    counts      PoolCounts: .all (common and mine) .mine
+    unfinished  None, or the open session: .id .answered .total .elapsed_seconds
+    empty_pool  bool, True after asking for a pool with no questions
+
+  Submits POST /grammar/sessions with pool=all|mine (radios drawn as tabs) and size (at
+  least 1; the server caps it at the pool). The script below keeps both in localStorage.
+#}
+{% extends "base.html" %}
+{% from "_macros.html" import mmss %}
+{% set button = "block w-full cursor-pointer rounded-xl px-5 py-2.5 text-center font-semibold" %}
+{% block title %}{{ _("Grammar") }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-xl space-y-6">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-2xl font-bold">{{ _("Grammar") }}</h1>
+    <a href="/manage/grammar" class="rounded-xl border border-accent px-4 py-2 text-sm font-semibold text-accent hover:bg-accent-soft">{{ _("Manage") }}</a>
+  </div>
+
+  {% if unfinished %}
+  {% set u = unfinished %}
+  <section class="space-y-4 rounded-2xl border border-gold bg-white p-6">
+    <p class="font-semibold text-gold">
+      {% trans answered=u.answered, total=u.total, time=mmss(u.elapsed_seconds) %}Unfinished · answered {{ answered }}/{{ total }} · {{ time }}{% endtrans %}
+    </p>
+    <div class="flex flex-col gap-3 lg:flex-row lg:justify-center">
+      <a href="/attempts/{{ u.id }}" class="{{ button }} bg-accent text-white hover:brightness-110 lg:w-auto">{{ _("Continue") }}</a>
+      <form method="post" action="/attempts/{{ u.id }}/discard" data-forget="qiraa.flags.{{ u.id }}"
+            onsubmit='return confirm({{ _("Discard this attempt and its saved answers?") | tojson }})'>
+        <input type="hidden" name="next" value="/grammar">
+        <button class="{{ button }} border border-line text-muted hover:border-bad hover:text-bad lg:w-auto">{{ _("Discard and start over") }}</button>
+      </form>
+    </div>
+  </section>
+
+  {% elif counts.all == 0 %}
+  <p class="rounded-2xl border border-line bg-white p-6 text-muted">{{ _("No grammar questions yet.") }}</p>
+
+  {% else %}
+  <form id="session-form" method="post" action="/grammar/sessions"
+        class="space-y-5 rounded-2xl border border-line bg-white p-6">
+    {% if empty_pool %}
+    <p class="rounded-lg bg-bad-soft px-3 py-2 text-sm text-bad">{{ _("This pool has no questions yet.") }}</p>
+    {% endif %}
+
+    <div class="grid grid-cols-2 gap-1 rounded-xl bg-paper p-1">
+      {% for value, label, count in [("all", _("Common and mine"), counts.all), ("mine", _("Only mine"), counts.mine)] %}
+      <label class="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg px-2 py-2 text-center text-sm lg:flex-row lg:gap-2 font-semibold text-muted hover:text-ink has-checked:bg-white has-checked:text-accent has-checked:shadow-sm has-focus-visible:outline-2 has-focus-visible:outline-accent has-disabled:cursor-default has-disabled:opacity-50 has-disabled:hover:text-muted">
+        <input type="radio" name="pool" value="{{ value }}" class="sr-only"
+               {{ "checked" if loop.first }} {{ "disabled" if not count }}>
+        <span>{{ label }}</span>
+        <span class="rounded-full bg-line/60 px-1.5 text-xs tabular-nums">{{ count }}</span>
+      </label>
+      {% endfor %}
+    </div>
+
+    <label class="block text-sm text-muted">{{ _("Questions") }}
+      <input type="number" name="size" value="10" min="1" required
+             class="mt-1 block w-full rounded-lg border border-line bg-paper px-3 py-2 text-ink focus:outline-2 focus:outline-accent">
+    </label>
+
+    <button class="{{ button }} bg-accent text-white hover:brightness-110">{{ _("Start") }}</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  (() => {
+    const form = document.getElementById("session-form");
+    if (!form) return;
+    const KEY = "qiraa.grammar";
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY) ?? "{}");
+      const pool = form.querySelector(`[name=pool][value="${saved.pool}"]`);
+      if (pool && !pool.disabled) pool.checked = true;
+      if (saved.size) form.elements.size.value = saved.size;
+    } catch {} // storage can be blocked, e.g. in a private window
+    form.addEventListener("submit", () => {
+      const choice = { pool: form.elements.pool.value, size: form.elements.size.value };
+      try {
+        localStorage.setItem(KEY, JSON.stringify(choice));
+      } catch {}
+    });
+  })();
+</script>
+{% endblock %}

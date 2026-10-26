@@ -1,0 +1,72 @@
+{#
+  passages/list.html: all passages, grouped by level.
+  Route: GET /passages
+
+  Context:
+    user       logged-in user
+    passages   list of PassageCard: .id .title .level
+               (.level must be a string, never None: use "" for "no level". Grouping sorts
+               by level, and Python can't compare None with "A2")
+                 .question_count   int
+                 .best             0-100 int or None   (submitted attempts only)
+                 .tries            int                 (submitted attempts only)
+                 .unfinished       None, or the user's unfinished attempt for this passage:
+                                   .id .answered .total .elapsed_seconds
+#}
+{% extends "base.html" %}
+{% from "_macros.html" import mmss %}
+{% block title %}{{ _("Passages") }}{% endblock %}
+{% block content %}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <h1 class="text-2xl font-bold">{{ _("Passages") }}</h1>
+  <a href="/manage/passages" class="rounded-xl border border-accent px-4 py-2 text-sm font-semibold text-accent hover:bg-accent-soft">{{ _("Manage") }}</a>
+</div>
+
+{# levels sorted A1, A2, B1...; passages without a level go last #}
+{% set groups = passages | groupby("level") %}
+{% for level, items in (groups | selectattr("grouper") | list) + (groups | rejectattr("grouper") | list) %}
+<section class="mb-8">
+  <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">{{ level or _("Other") }}</h2>
+  {# Room above the first row for the label on a card with an unfinished attempt #}
+  <div class="grid items-start gap-x-3 gap-y-6 sm:grid-cols-2 lg:grid-cols-3 {{ 'pt-3' if items | selectattr('unfinished') | list else '' }}">
+    {% for p in items %}
+    {% set u = p.unfinished %}
+    <div class="relative transition hover:-translate-y-0.5">
+      {% if u %}
+      <span class="absolute -top-2.5 start-3 z-10 whitespace-nowrap rounded-full bg-[#fbe7a6] px-2.5 py-0.5 text-xs font-semibold text-[#7a4f0f] shadow-sm">
+        {% trans answered=u.answered, total=u.total, time=mmss(u.elapsed_seconds) %}Unfinished · answered {{ answered }}/{{ total }} · {{ time }}{% endtrans %}
+      </span>
+      {% endif %}
+      <div class="flex flex-col overflow-hidden rounded-2xl border bg-white {{ 'border-gold' if u else 'border-line hover:border-accent' }}">
+        <a href="/passages/{{ p.id }}" class="flex flex-1 flex-col gap-2 p-4">
+          <span class="font-content text-xl font-semibold" dir="auto">{{ p.title }}</span>
+          <span class="text-xs text-muted">{% trans count=p.question_count %}{{ count }} question{% pluralize %}{{ count }} questions{% endtrans %}</span>
+          {% if p.best is not none %}
+            {% set color = 'text-accent' if p.best >= 80 else ('text-gold' if p.best >= 50 else 'text-bad') %}
+            <span class="text-xs font-semibold {{ color }}">
+              {% trans best=p.best, count=p.tries %}Best score {{ best }}% · {{ count }} attempt{% pluralize count %}Best score {{ best }}% · {{ count }} attempts{% endtrans %}
+            </span>
+          {% elif not u %}
+            <span class="text-xs font-semibold text-accent">{{ _("New") }}</span>
+          {% endif %}
+        </a>
+
+        {% if u %}
+        <div class="flex items-center justify-between gap-3 border-t border-gold/30 bg-gold/10 px-4 py-2 text-xs">
+          <a href="/attempts/{{ u.id }}" class="font-semibold text-accent hover:underline">{{ _("Continue") }}</a>
+          <form method="post" action="/attempts/{{ u.id }}/discard" data-forget="qiraa.flags.{{ u.id }}"
+                onsubmit='return confirm({{ _("Discard this unfinished attempt? Saved answers will be deleted.") | tojson }})' data-background>
+            <input type="hidden" name="next" value="/passages">
+            <button class="cursor-pointer text-muted hover:text-bad">{{ _("Discard") }}</button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% else %}
+<p class="rounded-2xl border border-line bg-white p-6 text-muted">{{ _("No passages yet.") }}</p>
+{% endfor %}
+{% endblock %}

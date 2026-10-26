@@ -2,13 +2,19 @@
   base.html: the shared layout. Every other page starts with {% extends "base.html" %}
   and fills in {% block content %}.
 
-  Context: user (optional). When present, the header shows the nav and "Log out".
+  Context: user (optional). When present, the header shows the greeting, the streak
+  (streak_today(), registered in main.py), the nav and a "Log out" icon; otherwise
+  the logo.
+  render() adds current_locale ("uz", "ru" or "en"), languages and return_path, used by
+  the language menu (_language_menu.html).
 #}
 <!doctype html>
-<html lang="ru">
+<html lang="{{ current_locale }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {# Before anything is drawn: styles that only apply when scripts run hang off .js #}
+  <script>document.documentElement.classList.add("js")</script>
   <title>{% block title %}Qiraa{% endblock %} · قراءة</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>ق</text></svg>">
 
@@ -21,7 +27,7 @@
   <style type="text/tailwindcss">
     @theme {
       --font-sans: "Inter", system-ui, sans-serif;
-      --font-arabic: "Noto Naskh Arabic", "Geeza Pro", "Traditional Arabic", serif;
+      --font-content: "Inter", "Noto Naskh Arabic", "Geeza Pro", "Traditional Arabic", serif;
       --color-paper: #f7f3ea;
       --color-ink: #1f1b16;
       --color-muted: #6f6759;
@@ -34,7 +40,14 @@
     }
   </style>
   <style>
-    /* Arabic words that reader.js made tappable */
+    /* An attempt shows one question at a time when navigator.js runs; otherwise a list. */
+    .js [data-step]:not([data-current]) { display: none; }
+    .js [data-nojs] { display: none; }
+    /* Links within a page (the result page's question grid) glide to their target. */
+    @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+    /* Controls that need Alpine stay hidden until it starts, and without scripts. */
+    [x-cloak] { display: none !important; }
+    /* Words that reader.js made tappable */
     .w { cursor: pointer; border-radius: 4px; transition: background .1s; }
     .w:hover { background: #dcefe6; }
     .w.on { background: #fbe7a6; }
@@ -42,20 +55,49 @@
 </head>
 <body class="min-h-screen bg-paper font-sans text-ink antialiased">
   <header class="sticky top-0 z-40 border-b border-line bg-white/85 backdrop-blur">
-    <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-      <a href="/passages" class="flex items-center gap-2 font-semibold">
-        <span class="font-arabic text-2xl leading-none text-accent" lang="ar">قراءة</span>
+    {# Phones: greeting and language on the first row, the nav on its own row below. #}
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3">
+      {% if user %}
+      {% set streak = streak_today(user) %}
+      <div class="flex min-w-0 flex-1 items-center gap-3">
+        <span class="truncate font-semibold">{% trans name=user.username %}Marhaba, {{ name }}{% endtrans %}</span>
+        <span class="flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-sm font-bold tabular-nums {{ 'bg-orange-600/10 text-orange-600' if streak else 'bg-paper text-muted' }}"
+              title="{% trans count=streak %}{{ count }} day in a row{% pluralize %}{{ count }} days in a row{% endtrans %}">
+          {# the "fire" icon from Heroicons (MIT) #}
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" class="size-4">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.176 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.313-1.172c.628.465 1.35.81 2.133 1a5.99 5.99 0 0 1 1.925-3.546 3.75 3.75 0 0 1 3.255 3.718Z"/>
+          </svg>
+          <span class="sr-only">{% trans count=streak %}{{ count }} day in a row{% pluralize %}{{ count }} days in a row{% endtrans %}</span>
+          <span aria-hidden="true">{{ streak }}</span>
+        </span>
+      </div>
+      {% else %}
+      <a href="/passages" class="flex flex-1 items-center gap-2 font-semibold">
+        <span class="font-content text-2xl leading-none text-accent" lang="ar">قراءة</span>
         <span>Qiraa</span>
       </a>
+      {% endif %}
       {% if user %}
-      <nav class="flex items-center gap-5 text-sm">
-        <a href="/passages" class="hover:text-accent">Тексты</a>
-        <a href="/profile" class="hover:text-accent">Профиль</a>
-        <form method="post" action="/logout">
-          <button class="cursor-pointer text-muted hover:text-bad">Выйти</button>
-        </form>
+      <nav class="order-last flex w-full flex-wrap items-center justify-around gap-x-4 gap-y-1 text-sm lg:order-none lg:w-auto lg:justify-end lg:gap-x-5">
+        <a href="/passages" class="hover:text-accent">{{ _("Passages") }}</a>
+        <a href="/grammar" class="hover:text-accent">{{ _("Grammar") }}</a>
+        <a href="/profile" class="hover:text-accent">{{ _("Profile") }}</a>
       </nav>
       {% endif %}
+      <div class="flex shrink-0 items-center gap-2">
+        {% include "_language_menu.html" %}
+        {% if user %}
+        <form method="post" action="/logout">
+          <button title="{{ _("Log out") }}" aria-label="{{ _("Log out") }}"
+                  class="grid size-8.5 cursor-pointer place-items-center rounded-lg border border-line bg-white text-muted hover:border-bad hover:text-bad">
+            {# the "arrow-right-start-on-rectangle" icon from Heroicons (MIT) #}
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="size-4.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/>
+            </svg>
+          </button>
+        </form>
+        {% endif %}
+      </div>
     </div>
   </header>
 
@@ -63,6 +105,23 @@
     {% block content %}{% endblock %}
   </main>
 
+  {# Text for the scripts in static/; they fill in the {name} placeholders. #}
+  <script type="application/json" id="i18n">{{ {
+    "showTimer": _("Show timer"),
+    "hideTimer": _("Hide timer"),
+    "status": _("Answered {answered} of {total} · {status}"),
+    "saving": _("saving…"),
+    "saved": _("saved"),
+    "notSaved": _("not saved ({code}); the answer will be sent when you submit"),
+    "offline": _("no connection: not saved; the answer will be sent when you submit"),
+    "checking": _("Checking…"),
+    "serverError": _("Server error ({code})."),
+    "quotaSpent": _("Today's translation limit is used up. Try the link below."),
+    "tooLong": _("Too long to translate here. Try the link below."),
+    "noTranslation": _("Translation not found."),
+    "networkError": _("Network error. Try the link below."),
+    "question": _("Question {num}"),
+  } | tojson }}</script>
   <script src="/static/forms.js" defer></script>
   {% block scripts %}{% endblock %}
 </body>

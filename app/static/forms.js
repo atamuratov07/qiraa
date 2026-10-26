@@ -1,3 +1,14 @@
+// Forms marked <form data-forget="key ..."> remove those localStorage keys when they are
+// sent. This listener comes first: the next one cancels the browser's own submit.
+document.addEventListener("submit", (event) => {
+  if (event.defaultPrevented) return;
+  for (const key of event.target.dataset.forget?.split(" ") ?? []) {
+    try {
+      localStorage.removeItem(key);
+    } catch {}
+  }
+});
+
 // Forms marked <form data-background> are sent with fetch() instead of loading a new page.
 document.addEventListener("submit", async (event) => {
   const form = event.target.closest("form[data-background]");
@@ -25,4 +36,17 @@ document.addEventListener("submit", async (event) => {
     "text/html",
   );
   document.querySelector("main").replaceWith(page.querySelector("main"));
+});
+
+// Menus made of <details data-menu> close on a click outside them or on Escape.
+document.addEventListener("click", (event) => {
+  for (const menu of document.querySelectorAll("details[data-menu][open]"))
+    if (!menu.contains(event.target)) menu.open = false;
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+  for (const menu of document.querySelectorAll("details[data-menu][open]")) {
+    menu.open = false;
+    menu.querySelector("summary").focus();
+  }
 });

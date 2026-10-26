@@ -7,11 +7,15 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Attempt, AttemptAnswer, Passage, User
-from app.services import auth
-from app.services.profile import CALENDAR_DAYS, profile_context
-from app.templating import local_date, plural, ru_date
-from app.views import ProfileStats
+from app.auth.models import User
+from app.auth.service import SESSION_COOKIE, create_session
+from app.core.i18n import use_locale
+from app.core.templating import local_date
+from app.passages.models import Passage
+from app.passages.service import copy_passage
+from app.practice.models import Attempt, AttemptAnswer
+from app.profile.service import CALENDAR_DAYS, profile_context
+from app.profile.views import ProfileStats
 from tests.factories import T0
 
 NIGHT = datetime(2026, 10, 7, 23, 16, tzinfo=UTC)  # 04:16 on 8 Oct in Tashkent
@@ -22,9 +26,10 @@ def submitted(
     user: User, passage: Passage, score: int, total: int, at: datetime
 ) -> Attempt:
     return Attempt(
+        kind="passage",
         user_id=user.id,
         passage_id=passage.id,
-        option_order={},
+        content=copy_passage(passage),
         started_at=at,
         last_seen_at=at,
         elapsed_seconds=90,
@@ -62,9 +67,10 @@ def test_profile_numbers_and_calendar(
             submitted(user, passage, 5, 5, datetime(2026, 10, 6, 10, tzinfo=UTC)),
             submitted(user, passage2, 2, 4, datetime(2026, 9, 1, 10, tzinfo=UTC)),
             Attempt(  # still open: counted nowhere
+                kind="passage",
                 user_id=user.id,
                 passage_id=passage2.id,
-                option_order={},
+                content=copy_passage(passage2),
                 started_at=NIGHT,
                 last_seen_at=NIGHT,
             ),
@@ -131,15 +137,13 @@ def test_profile_page_before_and_after_a_quiz(
 
 
 @pytest.mark.usefixtures("passage")
-def test_passage_list_shows_the_streak(logged_in: TestClient) -> None:
-    page = logged_in.get("/passages")
-    assert 'text-muted">0</span>' in page.text  # grey 0 before any quiz
+def test_the_header_shows_the_streak(logged_in: TestClient) -> None:
+    assert "0 дней подряд" in logged_in.get("/profile").text
 
     attempt_url = logged_in.post("/passages/1/attempts").headers["location"]
     logged_in.post(f"{attempt_url}/submit", data={"q1": "11"})
 
-    page = logged_in.get("/passages")
-    assert 'text-gold">1</span>' in page.text
+    assert "1 день подряд" in logged_in.get("/profile").text
 
 
 def test_wrong_password_on_delete_shows_the_real_profile(
@@ -156,10 +160,11 @@ def test_wrong_password_on_delete_shows_the_real_profile(
 
 
 def test_local_date_filter_shows_the_tashkent_date() -> None:
-    assert local_date(NIGHT, "%d %b") == "08 окт"
-    assert (
-        local_date(NIGHT.replace(tzinfo=None)) == "8 окт 2026"
-    )  # naive, as from SQLite
+    with use_locale("ru"):
+        assert local_date(NIGHT, "MMMd") == "8 окт."
+        assert local_date(NIGHT.replace(tzinfo=None)) == "8 окт. 2026\u202fг."
+        assert local_date(date(2026, 10, 8), "MMMEd") == "чт, 8 окт."
+    assert local_date(NIGHT) == "Oct 8, 2026"
 
 
 def test_deleting_a_result(
@@ -191,7 +196,7 @@ def test_cannot_delete_someone_elses_result(
 ) -> None:
     db.add(submitted(user, passage, 1, 2, T0))
     db.commit()
-    client.cookies.set(auth.SESSION_COOKIE, auth.create_session(db, other_user))
+    client.cookies.set(SESSION_COOKIE, create_session(db, other_user))
 
     response = client.post("/attempts/1/delete", data={"next": "/profile"})
 
@@ -205,27 +210,3 @@ def test_delete_only_redirects_within_the_site(logged_in: TestClient) -> None:
     logged_in.post(f"{attempt_url}/submit", data={"q1": "11"})
     response = logged_in.post(f"{attempt_url}/delete", data={"next": "//evil.example"})
     assert response.headers["location"] == "/profile"
-
-
-def test_ru_date_uses_russian_names() -> None:
-    assert ru_date(date(2026, 10, 8), "%a, %-d %b") == "чт, 8 окт"
-
-
-@pytest.mark.parametrize(
-    ("n", "word"),
-    [
-        (0, "дней"),
-        (1, "день"),
-        (2, "дня"),
-        (4, "дня"),
-        (5, "дней"),
-        (11, "дней"),
-        (14, "дней"),
-        (21, "день"),
-        (22, "дня"),
-        (111, "дней"),
-        (101, "день"),
-    ],
-)
-def test_plural(n: int, word: str) -> None:
-    assert plural(n, "день", "дня", "дней") == word

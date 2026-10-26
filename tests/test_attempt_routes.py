@@ -1,14 +1,17 @@
 """Level 3: the routes, through HTTP requests, as a browser and attempt.js would send them."""
 
 import re
+from collections.abc import Callable
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Attempt, Passage, User
-from app.services import auth
+from app.auth.models import User
+from app.auth.service import SESSION_COOKIE, create_session
+from app.passages.models import Passage, PassageQuestion
+from app.practice.models import Attempt
 
 
 def start(client: TestClient, passage_id: int = 1) -> int:
@@ -147,7 +150,7 @@ def test_autosave_rejects_bad_answers(logged_in: TestClient) -> None:
     )  # option of passage 2's question
     assert (
         response.status_code == 400
-        and "не относится к вопросу" in response.json()["detail"]
+        and "does not belong to question" in response.json()["detail"]
     )
     assert logged_in.put(url, json={"option_id": "x"}).status_code == 422  # Pydantic
     assert logged_in.put(url, json={}).status_code == 422
@@ -179,14 +182,14 @@ def test_submitted_attempt_is_read_only(logged_in: TestClient, db: Session) -> N
 def test_someone_elses_attempt_is_404(
     client: TestClient, db: Session, user: User, other_user: User, passage: Passage
 ) -> None:
-    client.cookies.set(auth.SESSION_COOKIE, auth.create_session(db, user))
+    client.cookies.set(SESSION_COOKIE, create_session(db, user))
     attempt_id = start(client)
-    client.cookies.set(auth.SESSION_COOKIE, auth.create_session(db, other_user))
+    client.cookies.set(SESSION_COOKIE, create_session(db, other_user))
 
     page = client.get(f"/attempts/{attempt_id}")
     assert page.status_code == 404 and "text/html" in page.headers["content-type"]
     api = client.post(f"/api/attempts/{attempt_id}/heartbeat")
-    assert (api.status_code, api.json()) == (404, {"detail": "Попытка не найдена"})
+    assert (api.status_code, api.json()) == (404, {"detail": "Attempt not found"})
     assert client.post(f"/attempts/{attempt_id}/discard").status_code == 404
 
 
@@ -201,6 +204,91 @@ def test_logged_out_pages_redirect_and_api_says_401(client: TestClient) -> None:
     assert api.status_code == 401
 
 
+def test_a_logged_out_post_returns_to_the_page_it_was_sent_from(
+    client: TestClient,
+) -> None:
+    # 1.0 put the POST path into next; after login the browser opened it with GET: 405.
+    sent_from_attempt = client.post(
+        "/attempts/1/submit",
+        data={"q1": "11"},
+        headers={"referer": "http://testserver/attempts/1"},
+    )
+    without_referer = client.post("/attempts/1/submit", data={"q1": "11"})
+
+    assert [r.headers["location"] for r in (sent_from_attempt, without_referer)] == [
+        "/login?next=/attempts/1",
+        "/login?next=/passages",
+    ]
+
+
 def test_unknown_passage_is_404(logged_in: TestClient) -> None:
     assert logged_in.get("/passages/999").status_code == 404
     assert logged_in.post("/passages/999/attempts").status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Results keep the content they were taken on
+# ---------------------------------------------------------------------------
+
+
+def change_question(db: Session) -> None:
+    question = db.get_one(PassageQuestion, 1)
+    question.prompt = "سؤال جديد؟"
+    for option in question.options:
+        option.is_correct = option.id == 13
+
+
+def delete_question(db: Session) -> None:
+    db.delete(db.get_one(PassageQuestion, 2))
+
+
+@pytest.mark.usefixtures("passage")
+@pytest.mark.parametrize(
+    "edit", [change_question, delete_question], ids=["changed", "deleted"]
+)
+def test_editing_a_question_after_submitting_keeps_the_result(
+    logged_in: TestClient, db: Session, edit: Callable[[Session], None]
+) -> None:
+    attempt_id = start(logged_in)
+    logged_in.post(f"/attempts/{attempt_id}/submit", data={"q1": "11", "q2": "22"})
+    before = logged_in.get(f"/attempts/{attempt_id}").text
+
+    edit(db)
+    db.commit()
+
+    assert logged_in.get(f"/attempts/{attempt_id}").text == before
+    assert len(stored_attempt(db, attempt_id).answers) == 2
+
+
+@pytest.mark.usefixtures("passage")
+def test_deleting_the_passage_keeps_the_result(
+    logged_in: TestClient, db: Session
+) -> None:
+    attempt_id = start(logged_in)
+    logged_in.post(f"/attempts/{attempt_id}/submit", data={"q1": "11", "q2": "22"})
+
+    db.delete(db.get_one(Passage, 1))
+    db.commit()
+
+    result = logged_in.get(f"/attempts/{attempt_id}")
+    assert result.status_code == 200
+    assert "نص 1" in result.text and "100% верно" in result.text
+    assert 'action="/passages/1/attempts"' not in result.text  # no "Try again"
+    assert "data-passage-id" not in result.text
+    assert f'href="/attempts/{attempt_id}"' in logged_in.get("/profile").text
+
+
+@pytest.mark.usefixtures("passage")
+def test_an_open_attempt_on_a_deleted_passage_can_still_be_finished(
+    logged_in: TestClient, db: Session
+) -> None:
+    attempt_id = start(logged_in)
+    db.delete(db.get_one(Passage, 1))
+    db.commit()
+
+    page = logged_in.get(f"/attempts/{attempt_id}")
+    assert page.status_code == 200
+    assert 'name="next" value="/passages"' in page.text  # "Discard" goes to the list
+
+    logged_in.post(f"/attempts/{attempt_id}/submit", data={"q1": "11"})
+    assert stored_attempt(db, attempt_id).score == 1

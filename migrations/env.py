@@ -3,7 +3,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from app.config import get_settings
+from app.core.config import get_settings
 from app.models import Base
 
 config = context.config
@@ -63,7 +63,6 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
-            render_as_batch=URL.startswith("sqlite"),
         )
 
         with context.begin_transaction():
