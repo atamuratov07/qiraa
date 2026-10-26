@@ -7,13 +7,37 @@ the data in a way that needs a migration of existing records, or changes how con
 
 ## [Unreleased]
 
-Work towards 2.0, planned in [docs/ROADMAP-v2.md](docs/ROADMAP-v2.md): personal and common
-content, in-app editors, grammar practice, a question navigator, word translation in
-Uzbek, Russian or English, sign-up with an invite code, and the interface in the same three
-languages. Speaking practice comes after 2.0.
+## [2.0.0] - 2026-10-26
+
+Personal and common content managed in the app, grammar practice, a question navigator, word
+translation, sign-up with an invite code, and the interface in Uzbek, Russian and English.
+Existing attempts are migrated to keep a copy of what they showed, which is why the major
+version goes up. The plan and its decisions are in [docs/ROADMAP-v2.md](docs/ROADMAP-v2.md).
 
 ### Added
 
+- Interface in Uzbek, Russian and English, with a language switch in the header. A
+  logged-in user's choice is saved with the account. Dates and plural forms follow each
+  language.
+- Private and common content: every passage and grammar question has an author and a
+  visibility. Admins, set with `python -m app.cli make-admin`, edit and publish common
+  content. Deleting an account removes its private content and keeps common content.
+- Sign-up with an invite code (`SIGNUP_CODE`).
+- Editors for passages and grammar questions, with manage pages listing my content (and
+  common content for admins).
+- Content files in YAML, one kind per file, with a slug written by hand for every entry: an
+  import page for each kind, with errors by line and a prompt that tells a chatbot how to
+  write the format, and the `import` and `check` commands. Importing again updates by slug.
+- Grammar practice: random sessions of any size from common and my questions, or only mine,
+  one open at a time. Sessions count for the streak and the profile.
+- Question navigator on the attempt page: one question at a time, a bar at the bottom of the
+  screen with previous and next, a grid of question numbers (answered, current, flagged),
+  keyboard shortcuts, the question in the URL (`#q3`), and a review before submitting. The
+  result page has the same grid. Without JavaScript the questions are a plain list.
+- Word translation in the popup into Uzbek, Russian or English, from MyMemory, for a tapped
+  word or a selection of up to 500 characters.
+- Content in English as well as Arabic: text takes its direction from its first letter.
+- The greeting and the streak in the header.
 - Postgres 18 in Docker Compose for development and tests, with a `qiraa` and a `qiraa_test`
   database.
 - GitHub Actions on every push: migrations up, `alembic check`, migrations down, then the
@@ -21,8 +45,16 @@ languages. Speaking practice comes after 2.0.
 
 ### Changed
 
-- Code organised by feature: `app/core`, `auth`, `passages`, `practice` and `profile`, with
-  templates in a folder per feature. No change in behaviour.
+- Attempts keep a copy of what they show (`attempts.content`), filled in for existing
+  attempts by a data migration. Editing or deleting a passage no longer changes any result,
+  and deleting a passage keeps everyone's results on it. `attempts.option_order` is gone.
+- Passage titles are optional; a passage without one shows the start of its text.
+- The `questions` and `options` tables are now `passage_questions` and `passage_options`.
+- The confirm dialog before submitting is replaced by the navigator's review.
+- An unfinished attempt shows as a label on its passage card.
+- The four 1.0 passages moved from `app/seed.py` to a YAML file kept out of git.
+- Code organised by feature: `app/core`, `auth`, `passages`, `grammar`, `content`,
+  `practice` and `profile`, with templates in a folder per feature.
 
 ### Removed
 
@@ -34,6 +66,8 @@ languages. Speaking practice comes after 2.0.
 
 - Settings are now read from a `.env` file in the project root. Unknown keys in it are
   ignored.
+- A form sent while logged out now brings you back to its page after logging in, instead of
+  a `405` error.
 
 ## [1.0.0]
 
@@ -75,5 +109,6 @@ First release, built from 6 to 8 October 2026.
 | `f0294e2` | Real passages                                                         |
 | `6c2decb` | Russian interface                                                     |
 
-[Unreleased]: https://github.com/atamuratov07/qiraa/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/atamuratov07/qiraa/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/atamuratov07/qiraa/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/atamuratov07/qiraa/releases/tag/v1.0.0
