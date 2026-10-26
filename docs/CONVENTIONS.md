@@ -1,8 +1,8 @@
 # Conventions
 
-How the code in this repo is organised and the rules it follows. The plan for the next version
-is in [ROADMAP-v2.md](ROADMAP-v2.md); the user-facing description is in
-[README.md](../README.md); history is in [CHANGELOG.md](../CHANGELOG.md).
+How the code in this repo is organised and the rules it follows. Ideas for later are in
+[ROADMAP.md](ROADMAP.md); the user-facing description is in [README.md](../README.md);
+history is in [CHANGELOG.md](../CHANGELOG.md).
 
 ## Stack and hosting
 
@@ -13,6 +13,8 @@ CDN · plain JavaScript (`reader.js`, `attempt.js`, `forms.js`) and Alpine.js fr
 
 - Production: Docker image on Render (free web service, Frankfurt), Postgres on Neon (free,
   Frankfurt). Every push to `main` deploys. The container runs `alembic upgrade head` on start.
+- Work happens on a branch off `main` (`feat/...`, `fix/...`) and is merged through a pull
+  request once CI is green. A release gets a CHANGELOG entry and a `vX.Y.Z` tag.
 - Local: Postgres 18 from `docker-compose.yml`, with `qiraa` for the app and `qiraa_test` for
   tests. The app runs on the machine. Settings come from the environment, then `.env`.
 - Word translation: `reader.js` asks MyMemory (`api.mymemory.translated.net`) from the
@@ -120,7 +122,7 @@ ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_men
     saved (assign a new one); `None` in a JSON column is the JSON value `null`, `sa.null()` is
     SQL `NULL`; a `selectinload` chain is one path, so load siblings as separate options; use
     `selectinload` to avoid N+1 queries.
-12. **Owned content (from 2.0).** Passages and grammar questions (and any later kind of
+12. **Owned content.** Passages and grammar questions (and any later kind of
     content) have `owner_id` (the author, `ON DELETE SET NULL`) and `is_common`
     (visibility). A CHECK keeps every row either common or owned (`Owned` mixin,
     `common_or_owned()`). Visible: common or mine. Editable: mine while private; common only
@@ -167,7 +169,7 @@ ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_men
     `path(qi, field)` for the key. `set_common()` applies the publishing rule for both.
 
 18. **Each content feature owns its content end to end.** `passages/`, `grammar/` and any
-    later one (speaking sets, after 2.0) each hold their models, file schema, chatbot
+    later one (speaking sets, say) each hold their models, file schema, chatbot
     prompt, import, manage pages, editor, and how an attempt on them starts (what goes into
     `attempt.content`). `practice/` holds what every attempt shares once it has started, and
     imports no content feature; `content/` holds what content files share. Code moves down
@@ -198,7 +200,3 @@ ones (`base.html`, `error.html`, `_macros.html`, `_popover.html`, `_language_men
 - `tests/test_content_files.py` parses every `content/*.yaml`, so a broken file fails CI.
 - `tests/test_i18n.py` fails when a catalog misses a message from the code, or has a fuzzy,
   stale or untranslated entry, or a broken placeholder.
-
-## Known issues in 1.0 (to fix in 2.0)
-
-- The × that deletes a result on the profile has no confirm dialog (Discard has one).

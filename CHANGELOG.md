@@ -12,7 +12,8 @@ the data in a way that needs a migration of existing records, or changes how con
 Personal and common content managed in the app, grammar practice, a question navigator, word
 translation, sign-up with an invite code, and the interface in Uzbek, Russian and English.
 Existing attempts are migrated to keep a copy of what they showed, which is why the major
-version goes up. The plan and its decisions are in [docs/ROADMAP-v2.md](docs/ROADMAP-v2.md).
+version goes up. The plan and its decisions are in
+[docs/ROADMAP-v2.md](https://github.com/atamuratov07/qiraa/blob/v2.0.0/docs/ROADMAP-v2.md).
 
 ### Added
 
